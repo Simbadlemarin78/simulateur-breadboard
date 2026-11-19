@@ -1,0 +1,470 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fiche-composant.schema.json",
+  "title": "Fiche composant (format 1)",
+  "description": "Une fiche par composant. Toute valeur numérique est une 'grandeur' qui porte sa source (page de datasheet, mesure ou hypothèse justifiée). Aucun nombre nu.",
+  "type": "object",
+  "required": ["format", "id", "nom", "categorie", "documents", "validation", "broches"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": "fiche-composant/1" },
+    "id": {
+      "description": "Identifiant unique, en minuscules et tirets. Sert de nom de fichier : fiches/<id>.json.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "nom": { "type": "string", "minLength": 1 },
+    "categorie": {
+      "description": "puce = circuit intégré nu ; module = petite carte qui embarque une puce (driver TMC2209 sur radiateur) ; carte = carte de développement (ESP32 DevKitC).",
+      "enum": ["puce", "module", "carte", "passif", "source", "moteur", "connectique"]
+    },
+    "fabricant": { "type": "string" },
+    "reference": { "type": "string" },
+    "description": { "type": "string" },
+    "documents": {
+      "description": "Documents d'où viennent les valeurs. On garde l'URL et l'empreinte du PDF, pas le PDF lui-même (droits d'auteur du fabricant).",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/document" }
+    },
+    "validation": { "$ref": "#/$defs/validation" },
+    "wokwi": {
+      "description": "Correspondance avec un type de pièce Wokwi, pour importer et exporter diagram.json.",
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string" },
+        "broches": {
+          "description": "Nom de broche Wokwi -> nom de broche de cette fiche, quand ils diffèrent.",
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "sous_composants": {
+      "description": "Pour un module : les pièces qu'il embarque (la puce, la résistance de mesure...). Les limites d'une broche de module viennent de la broche de puce vers laquelle elle pointe.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/sous_composant" }
+    },
+    "broches": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/broche" }
+    },
+    "liaisons_internes": {
+      "description": "Connexions entre broches à l'intérieur du composant (les deux GND d'un module reliés, une résistance de tirage soudée sur la carte...).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/liaison" }
+    },
+    "parametres": {
+      "description": "Réglages propres à chaque exemplaire, donnés dans le montage (attrs de diagram.json) : courant moteur réglé, tension de l'alim...",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/parametre" }
+    },
+    "modele": { "$ref": "#/$defs/modele" },
+    "thermique": { "$ref": "#/$defs/thermique" },
+    "regles": {
+      "description": "Règles du moteur de règles qui s'appliquent à ce composant, avec leurs paramètres et leur source.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/regle" }
+    }
+  },
+
+  "$defs": {
+    "unite": {
+      "enum": ["V", "mV", "A", "mA", "µA", "nA", "Ω", "mΩ", "kΩ", "MΩ", "F", "mF", "µF", "nF", "pF", "H", "mH", "µH", "W", "mW", "°C", "K/W", "s", "ms", "µs", "ns", "Hz", "kHz", "MHz", "%", "N", "N·m", "1"]
+    },
+
+    "source": {
+      "description": "D'où vient une valeur. datasheet = document + page ; mesure = faite par quelqu'un, avec la méthode ; hypothese = pas dans les documents, justifiée, affichée comme telle dans l'appli ; heritee = reprise d'une autre fiche (module -> puce).",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "doc", "page"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "datasheet" },
+            "doc": { "description": "id d'un document de la liste 'documents'.", "type": "string" },
+            "page": { "description": "Numéro de page du PDF (celui que donne le lecteur, utilisable dans un lien #page=N).", "type": "integer", "minimum": 1 },
+            "page_imprimee": { "description": "Numéro imprimé sur la page, s'il diffère.", "type": "string" },
+            "ou": { "description": "Tableau, section ou figure : 'Table 13 Absolute maximum ratings'.", "type": "string" },
+            "citation": { "description": "Courte citation de la ligne, pour la relecture (moins de 15 mots).", "type": "string", "maxLength": 160 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "par", "date", "methode"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "mesure" },
+            "par": { "type": "string" },
+            "date": { "type": "string", "format": "date" },
+            "methode": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "justification"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "hypothese" },
+            "justification": { "type": "string", "minLength": 10 }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "fiche", "chemin"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "heritee" },
+            "fiche": { "type": "string" },
+            "chemin": { "description": "Où lire la valeur dans l'autre fiche, ex. 'broches/VS/max_absolus/tension_max'.", "type": "string" }
+          }
+        }
+      ]
+    },
+
+    "grandeur": {
+      "description": "Une valeur physique avec son unité et sa source. Au moins une des trois valeurs min, typ, max.",
+      "type": "object",
+      "required": ["unite", "src"],
+      "additionalProperties": false,
+      "properties": {
+        "min": { "type": "number" },
+        "typ": { "type": "number" },
+        "max": { "type": "number" },
+        "unite": { "$ref": "#/$defs/unite" },
+        "conditions": { "description": "Conditions de la mesure du fabricant : 'à 25 °C', 'VM = 24 V'...", "type": "string" },
+        "src": { "$ref": "#/$defs/source" },
+        "note": { "type": "string" }
+      },
+      "anyOf": [
+        { "required": ["min"] },
+        { "required": ["typ"] },
+        { "required": ["max"] }
+      ]
+    },
+
+    "fait": {
+      "description": "Un fait non numérique (vrai/faux, un état, un texte court) avec sa source.",
+      "type": "object",
+      "required": ["valeur", "src"],
+      "additionalProperties": false,
+      "properties": {
+        "valeur": { "type": ["boolean", "string"] },
+        "src": { "$ref": "#/$defs/source" },
+        "note": { "type": "string" }
+      }
+    },
+
+    "document": {
+      "type": "object",
+      "required": ["id", "titre"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "titre": { "type": "string" },
+        "editeur": { "type": "string" },
+        "revision": { "type": "string" },
+        "date": { "type": "string" },
+        "url": { "type": "string" },
+        "sha256": { "description": "Empreinte du PDF utilisé, pour savoir exactement de quelle version viennent les pages.", "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+
+    "validation": {
+      "description": "brouillon = extraite (par Claude) et pas encore relue ; relue = vérifiée par une personne contre les documents. Un verdict qui s'appuie sur une fiche brouillon est signalé comme tel dans l'appli.",
+      "type": "object",
+      "required": ["statut", "extraite_par"],
+      "additionalProperties": false,
+      "properties": {
+        "statut": { "enum": ["brouillon", "relue"] },
+        "extraite_par": { "type": "string" },
+        "date_extraction": { "type": "string", "format": "date" },
+        "relue_par": { "type": "string" },
+        "date_relecture": { "type": "string", "format": "date" },
+        "remarques": { "type": "string" }
+      },
+      "if": { "properties": { "statut": { "const": "relue" } } },
+      "then": { "required": ["relue_par", "date_relecture"] }
+    },
+
+    "sous_composant": {
+      "type": "object",
+      "required": ["ref", "fiche"],
+      "additionalProperties": false,
+      "properties": {
+        "ref": { "description": "Repère sur la carte : U1, R3...", "type": "string" },
+        "fiche": { "description": "id de la fiche du sous-composant.", "type": "string" },
+        "valeurs": { "type": "object", "additionalProperties": { "$ref": "#/$defs/grandeur" } },
+        "note": { "type": "string" }
+      }
+    },
+
+    "role": {
+      "enum": [
+        "alim_entree", "alim_sortie", "masse",
+        "entree_logique", "sortie_logique", "entree_sortie_logique",
+        "entree_analogique", "sortie_puissance", "configuration",
+        "communication", "non_connectee", "autre"
+      ]
+    },
+
+    "broche": {
+      "type": "object",
+      "required": ["nom", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "nom": { "description": "Nom imprimé sur le composant ou la carte.", "type": "string" },
+        "alias": { "type": "array", "items": { "type": "string" } },
+        "position": {
+          "description": "Emplacement physique : connecteur et numéro de broche.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "connecteur": { "type": "string" },
+            "numero": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "role": { "$ref": "#/$defs/role" },
+        "fonctions": { "description": "Fonctions possibles : STEP, DIR, UART, ADC1_CH6...", "type": "array", "items": { "type": "string" } },
+        "vers": { "description": "Pour un module : broche du sous-composant à laquelle elle est reliée, ex. 'U1.VS'.", "type": "string", "pattern": "^[A-Za-z0-9_]+\\.[A-Za-z0-9_+\\-]+$" },
+        "domaine": {
+          "description": "Broches de cette fiche qui servent de référence : l'alimentation logique et la masse par rapport auxquelles on lit les tensions de cette broche.",
+          "type": "object",
+          "required": ["masse"],
+          "additionalProperties": false,
+          "properties": {
+            "alim": { "type": "string" },
+            "masse": { "type": "string" }
+          }
+        },
+        "capacites": {
+          "description": "Ce que la broche sait faire. Sert au cas 'STEP sur IO34' : sortie = false.",
+          "type": "object",
+          "required": ["src"],
+          "additionalProperties": false,
+          "properties": {
+            "entree": { "type": "boolean" },
+            "sortie": { "type": "boolean" },
+            "tirage_haut_interne": { "type": "boolean" },
+            "tirage_bas_interne": { "type": "boolean" },
+            "src": { "$ref": "#/$defs/source" }
+          }
+        },
+        "niveaux": {
+          "description": "Seuils logiques. vil_max : au-dessous, la broche lit 0 ; vih_min : au-dessus, elle lit 1.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "vil_max": { "$ref": "#/$defs/grandeur" },
+            "vih_min": { "$ref": "#/$defs/grandeur" },
+            "vol_max": { "$ref": "#/$defs/grandeur" },
+            "voh_min": { "$ref": "#/$defs/grandeur" }
+          }
+        },
+        "entree": {
+          "description": "Modèle électrique quand la broche reçoit un signal.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "resistance": { "description": "Résistance d'entrée équivalente (très grande pour une entrée logique).", "$ref": "#/$defs/grandeur" },
+            "tirage": {
+              "description": "Résistance de tirage interne, si elle existe.",
+              "type": "object",
+              "required": ["vers", "resistance"],
+              "additionalProperties": false,
+              "properties": {
+                "vers": { "enum": ["alim", "masse"] },
+                "resistance": { "$ref": "#/$defs/grandeur" }
+              }
+            },
+            "diodes_protection": {
+              "description": "Diodes internes vers l'alim et vers la masse : au-delà de leurs seuils, elles conduisent et le courant d'injection monte.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "vers_alim": { "type": "boolean" },
+                "vers_masse": { "type": "boolean" },
+                "courant_injection_max": { "$ref": "#/$defs/grandeur" },
+                "src": { "$ref": "#/$defs/source" }
+              }
+            }
+          }
+        },
+        "sortie": {
+          "description": "Modèle électrique quand la broche impose un niveau : source de tension avec une résistance de sortie.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "resistance_sortie": { "$ref": "#/$defs/grandeur" },
+            "courant_max": { "$ref": "#/$defs/grandeur" }
+          }
+        },
+        "max_absolus": {
+          "description": "Valeurs à ne jamais dépasser, même un instant. Tensions mesurées par rapport à la masse du domaine.",
+          "$ref": "#/$defs/limites"
+        },
+        "recommande": {
+          "description": "Plage où le fabricant garantit le fonctionnement.",
+          "$ref": "#/$defs/limites"
+        },
+        "etat_demarrage": {
+          "description": "État de la broche entre la mise sous tension et la première instruction du programme. Sert au cas 'EN flotte au démarrage'.",
+          "type": "object",
+          "required": ["etat", "src"],
+          "additionalProperties": false,
+          "properties": {
+            "etat": { "enum": ["haute_impedance", "tirage_haut", "tirage_bas", "sortie_haute", "sortie_basse", "impulsions", "inconnu"] },
+            "src": { "$ref": "#/$defs/source" },
+            "note": { "type": "string" }
+          }
+        },
+        "lue_au_demarrage": {
+          "description": "Broche de configuration lue au démarrage (strapping) : un mauvais niveau change le comportement du composant.",
+          "$ref": "#/$defs/fait"
+        },
+        "note": { "type": "string" }
+      }
+    },
+
+    "limites": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tension": { "$ref": "#/$defs/grandeur" },
+        "courant": { "$ref": "#/$defs/grandeur" },
+        "puissance": { "$ref": "#/$defs/grandeur" }
+      }
+    },
+
+    "liaison": {
+      "type": "object",
+      "required": ["entre", "type", "src"],
+      "additionalProperties": false,
+      "properties": {
+        "entre": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2 },
+        "type": { "enum": ["direct", "resistance", "diode", "condensateur"] },
+        "valeur": { "$ref": "#/$defs/grandeur" },
+        "src": { "$ref": "#/$defs/source" },
+        "note": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "enum": ["resistance", "condensateur"] } } },
+          "then": { "required": ["valeur"] }
+        }
+      ]
+    },
+
+    "parametre": {
+      "type": "object",
+      "required": ["description", "unite"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string" },
+        "unite": { "$ref": "#/$defs/unite" },
+        "defaut": { "type": ["number", "boolean", "string"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "choix": { "type": "array", "items": { "type": ["number", "string"] } },
+        "src": { "$ref": "#/$defs/source" }
+      }
+    },
+
+    "modele": {
+      "description": "Modèle de comportement que le moteur de calcul sait utiliser. Le type dit quelles valeurs sont attendues.",
+      "type": "object",
+      "required": ["type", "valeurs"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "microcontroleur", "driver_pas_a_pas", "moteur_pas_a_pas",
+            "alim_laboratoire", "batterie", "regulateur_lineaire",
+            "resistance", "condensateur", "diode", "led",
+            "contact", "fil", "breadboard"
+          ]
+        },
+        "valeurs": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "$ref": "#/$defs/grandeur" },
+              { "$ref": "#/$defs/fait" },
+              { "$ref": "#/$defs/table" }
+            ]
+          }
+        },
+        "note": { "type": "string" }
+      }
+    },
+
+    "table": {
+      "description": "Petite table de correspondance avec sa source, ex. niveaux de MS1/MS2 -> micro-pas.",
+      "type": "object",
+      "required": ["colonnes", "lignes", "src"],
+      "additionalProperties": false,
+      "properties": {
+        "colonnes": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+        "lignes": { "type": "array", "items": { "type": "array" }, "minItems": 1 },
+        "src": { "$ref": "#/$defs/source" }
+      }
+    },
+
+    "thermique": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resistance_thermique": {
+          "description": "Rth : élévation de température par watt dissipé (K/W). T ≈ T_ambiante + Rth × P.",
+          "$ref": "#/$defs/grandeur"
+        },
+        "temperature_max": { "$ref": "#/$defs/grandeur" },
+        "seuils": {
+          "description": "Seuils internes : pré-alerte, coupure...",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["nom", "temperature", "effet"],
+            "additionalProperties": false,
+            "properties": {
+              "nom": { "type": "string" },
+              "temperature": { "$ref": "#/$defs/grandeur" },
+              "effet": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+
+    "verdict": {
+      "description": "grille : limite absolue dépassée avec assez d'énergie pour détruire (calcul seulement) ; risque_eleve : cause de casse documentée, issue non simulable ; risque : comportement dangereux possible ; chauffe : au-delà du nominal ; ne_marchera_pas : fonctionnement impossible ou faux.",
+      "enum": ["grille", "risque_eleve", "risque", "chauffe", "ne_marchera_pas"]
+    },
+
+    "regle": {
+      "type": "object",
+      "required": ["id", "verdict", "explication", "src"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "description": "Nom d'une règle codée dans le moteur : condensateur-reservoir, pas-de-branchement-a-chaud...", "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "verdict": { "$ref": "#/$defs/verdict" },
+        "parametres": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "$ref": "#/$defs/grandeur" },
+              { "type": ["string", "number", "boolean"] },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
+        },
+        "explication": { "description": "Ce que l'appli affiche : pourquoi c'est un problème, en 2-3 lignes.", "type": "string" },
+        "correction": { "description": "Ce qu'il faut faire.", "type": "string" },
+        "src": { "$ref": "#/$defs/source" }
+      }
+    }
+  }
+}
