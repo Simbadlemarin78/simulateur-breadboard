@@ -1,0 +1,94 @@
+{
+  "format": "fiche-composant/1",
+  "id": "lipo-4s",
+  "nom": "Batterie LiPo 4S (4 éléments en série)",
+  "categorie": "source",
+  "description": "Batterie lithium-polymère de 4 éléments en série : 16,8 V chargée, 14,8 V nominale, 12 V vide. Aucune limite de courant : en court-circuit, elle débite des centaines d'ampères.",
+  "documents": [
+    {
+      "id": "maxamps-670-1s",
+      "titre": "MaxAmps 670 1S LiPo, data sheet",
+      "editeur": "MaxAmps",
+      "url": "https://cdn.shopify.com/s/files/1/0609/0811/0079/files/MaxAmps_670_1S_LiPo_Data_Sheet.pdf",
+      "sha256": "4a69e44bce9c11bda460c99e3a86bfe1377511be20bd7063a9a8c6eaad4ea0af"
+    },
+    {
+      "id": "adafruit-lipo",
+      "titre": "Li-Ion & LiPoly Batteries (guide)",
+      "editeur": "Adafruit Industries",
+      "date": "2025-07-08",
+      "url": "https://cdn-learn.adafruit.com/downloads/pdf/li-ion-and-lipoly-batteries.pdf",
+      "sha256": "302de31064b349a2fbe42567226f123033204615b3ea689029ec0b504a8ee70c"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Capacité et taux de décharge de la batterie de Jean inconnus. La résistance interne est un ordre de grandeur : à mesurer (chute de tension sous un courant connu)."
+  },
+  "broches": [
+    {
+      "nom": "+",
+      "role": "alim_sortie",
+      "domaine": { "masse": "-" },
+      "note": "Fil de puissance positif. Le connecteur d'équilibrage n'est pas décrit."
+    },
+    {
+      "nom": "-",
+      "role": "masse",
+      "note": "Fil de puissance négatif."
+    }
+  ],
+  "parametres": {
+    "tension_element": {
+      "description": "Tension d'un élément, selon la charge : 4,2 V chargé, 3,7 V nominal, 3,0 V vide. La batterie fait 4 fois plus.",
+      "unite": "V",
+      "defaut": 4.2,
+      "min": 3.0,
+      "max": 4.2,
+      "src": { "type": "datasheet", "doc": "maxamps-670-1s", "page": 1, "ou": "Technical data", "citation": "VOLTAGE - 3.7v (NOMINAL/STORAGE) ; 3v (MIN) ; 4.2v (MAX)" }
+    }
+  },
+  "modele": {
+    "type": "batterie",
+    "valeurs": {
+      "nombre_elements": {
+        "valeur": "4 éléments en série (4S)",
+        "src": { "type": "hypothese", "justification": "Batterie prévue pour la base roulante de Jean : LiPo 4S, 14,8 V nominale, 16,8 V chargée (CLAUDE.md)." }
+      },
+      "tension_element": {
+        "min": 3.0,
+        "typ": 3.7,
+        "max": 4.2,
+        "unite": "V",
+        "src": { "type": "datasheet", "doc": "maxamps-670-1s", "page": 1, "ou": "Technical data", "citation": "VOLTAGE - 3.7v (NOMINAL/STORAGE) ; 3v (MIN) ; 4.2v (MAX)" },
+        "note": "Mêmes valeurs dans adafruit-lipo (p. 4)."
+      },
+      "tension_batterie": {
+        "min": 12.0,
+        "typ": 14.8,
+        "max": 16.8,
+        "unite": "V",
+        "src": { "type": "hypothese", "justification": "4 fois les valeurs d'un élément (maxamps-670-1s, p. 1)." }
+      },
+      "resistance_interne": {
+        "typ": 0.03,
+        "max": 0.1,
+        "unite": "Ω",
+        "conditions": "batterie entière (4 éléments), sans les fils",
+        "src": { "type": "hypothese", "justification": "MaxAmps annonce 3 mΩ par élément pour un élément de forte décharge (maxamps-670-1s, p. 1, mesuré à 1 kHz). Une batterie de robot ordinaire est plus résistante : on retient 7,5 mΩ par élément (30 mΩ au total), et au plus 25 mΩ (100 mΩ)." },
+        "note": "Valeur maximale gardée volontairement haute : même avec elle, le court-circuit dépasse 100 A."
+      },
+      "courant_court_circuit": {
+        "min": 100,
+        "unite": "A",
+        "src": { "type": "hypothese", "justification": "16,8 V divisés par la résistance interne maximale retenue (0,1 Ω) donnent 168 A ; on retient au moins 100 A en comptant les fils. Largement de quoi détruire un driver (cas 2a)." }
+      },
+      "risque_incendie": {
+        "valeur": "Une LiPo mal chargée ou mal utilisée (court-circuit, inversion) peut exploser ou prendre feu.",
+        "src": { "type": "datasheet", "doc": "adafruit-lipo", "page": 6, "ou": "Protection Circuitry", "citation": "Charging or using the batteries incorrectly can cause explosion or fire" }
+      }
+    }
+  }
+}

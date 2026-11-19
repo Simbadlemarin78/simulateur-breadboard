@@ -1,0 +1,75 @@
+{
+  "format": "fiche-composant/1",
+  "id": "condensateur-electrolytique",
+  "nom": "Condensateur électrolytique aluminium",
+  "categorie": "passif",
+  "description": "Condensateur polarisé de forte capacité, celui qu'on met entre VM et GND de chaque driver. Le montage règle sa capacité et sa tension nominale. En régime continu, il ne laisse passer aucun courant : il compte pour les règles (cas 4) et pour les phénomènes brefs de la V2.",
+  "documents": [
+    {
+      "id": "chemicon-precautions",
+      "titre": "Precautions and Guidelines (Aluminum Electrolytic Capacitors)",
+      "editeur": "Nippon Chemi-Con",
+      "revision": "CAT. No. E1001A",
+      "date": "2026",
+      "url": "https://www.chemi-con.co.jp/products/relatedfiles/capacitor/catalog/al-precaution-e.pdf",
+      "sha256": "90174cd4fefbdae9e846a9ba29f172ee636eacf43be2ebd739a0b792ff3cf39c"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Fiche générique : les valeurs de chaque exemplaire viennent du montage. Courant de fuite, résistance série et courant d'ondulation non décrits en V1."
+  },
+  "broches": [
+    {
+      "nom": "+",
+      "role": "autre",
+      "note": "Patte longue ; côté sans bande sur le boîtier."
+    },
+    {
+      "nom": "-",
+      "role": "autre",
+      "note": "Patte courte ; côté de la bande « − » sur le boîtier."
+    }
+  ],
+  "parametres": {
+    "capacite": {
+      "description": "Capacité. 100 µF : valeur prévue près de chaque driver sur le montage de Jean.",
+      "unite": "µF",
+      "defaut": 100,
+      "src": { "type": "hypothese", "justification": "Condensateur prévu sur le vrai montage de la base roulante : 100 µF 35 V par driver (CLAUDE.md)." }
+    },
+    "tension_nominale": {
+      "description": "Tension nominale imprimée sur le boîtier : à ne jamais dépasser.",
+      "unite": "V",
+      "defaut": 35,
+      "src": { "type": "hypothese", "justification": "Condensateur prévu sur le vrai montage de la base roulante : 100 µF 35 V par driver (CLAUDE.md)." }
+    }
+  },
+  "modele": {
+    "type": "condensateur",
+    "valeurs": {
+      "polarise": {
+        "valeur": true,
+        "src": { "type": "datasheet", "doc": "chemicon-precautions", "page": 1, "ou": "Device circuits design considerations, 2) Polarity", "citation": "Aluminum electrolytic capacitors are polarized." }
+      }
+    }
+  },
+  "regles": [
+    {
+      "id": "condensateur-polarite",
+      "verdict": "risque_eleve",
+      "explication": "Le condensateur est monté à l'envers : la borne « + » est plus basse que la borne « − ». Un électrolytique inversé se met en court-circuit ou s'abîme, et sa soupape peut s'ouvrir.",
+      "correction": "Retourner le condensateur : « + » vers VM, « − » vers GND.",
+      "src": { "type": "datasheet", "doc": "chemicon-precautions", "page": 1, "ou": "Device circuits design considerations, 2) Polarity", "citation": "Connecting with wrong polarity will short-circuit or damage the capacitor with the pressure relief vent opening early on." }
+    },
+    {
+      "id": "condensateur-surtension",
+      "verdict": "risque_eleve",
+      "explication": "La tension aux bornes du condensateur dépasse sa tension nominale. Le fabricant l'interdit : le condensateur chauffe, vieillit vite et peut ouvrir sa soupape.",
+      "correction": "Prendre un condensateur de tension nominale nettement plus haute que VM : 35 V pour une LiPo 4S (16,8 V chargée).",
+      "src": { "type": "datasheet", "doc": "chemicon-precautions", "page": 1, "ou": "Device circuits design considerations, 3) Operating voltage", "citation": "Do not apply an over-voltage that exceeds a rated voltage specified for the capacitors." }
+    }
+  ]
+}

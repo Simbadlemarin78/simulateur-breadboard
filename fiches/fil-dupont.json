@@ -1,0 +1,53 @@
+{
+  "format": "fiche-composant/1",
+  "id": "fil-dupont",
+  "nom": "Fil Dupont (jumper 28 AWG)",
+  "categorie": "connectique",
+  "description": "Fil de câblage à embouts Dupont, celui des kits de breadboard. Chaque fil du montage (« connections » du diagram.json) utilise cette fiche, sauf indication contraire. Son courant est comparé au courant nominal : au-delà, verdict « chauffe ».",
+  "documents": [
+    {
+      "id": "samtec-dwct-28",
+      "titre": "DWCT-28-01, 28 AWG power cable, datasheet",
+      "editeur": "Samtec",
+      "url": "https://suddendocs.samtec.com/notesandwhitepapers/dwct-28-01_datasheet.pdf",
+      "sha256": "eb6dfba9244ebbca8ca9e28cd71a821b3bad4413ec1ccd5dcf0524b4cda9525a"
+    },
+    {
+      "id": "adafruit-1957",
+      "titre": "Jumper Wire Male to Male 6\" 28 AWG (Adafruit 1957), fiche DigiKey (consultée le 19/11/2026)",
+      "editeur": "DigiKey",
+      "url": "https://www.digikey.ca/en/products/detail/adafruit-industries-llc/1957/6827090"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Aucun fabricant de fils Dupont ne publie de courant nominal ni de résistance : valeurs tirées d'un câble 28 AWG de Samtec, avec de la marge. Résistance des contacts non publiée : à mesurer à l'étape 9. Le schéma n'a pas d'unité de longueur : la résistance est donnée pour un fil de 20 cm."
+  },
+  "broches": [
+    { "nom": "1", "role": "autre" },
+    { "nom": "2", "role": "autre" }
+  ],
+  "modele": {
+    "type": "fil",
+    "valeurs": {
+      "section": {
+        "valeur": "28 AWG",
+        "src": { "type": "hypothese", "justification": "Section des fils Dupont vendus en kit (par exemple Adafruit 1957, « 28 AWG » dans le titre de la fiche adafruit-1957)." }
+      },
+      "resistance": {
+        "typ": 0.045,
+        "unite": "Ω",
+        "conditions": "fil de 20 cm, sans les contacts",
+        "src": { "type": "hypothese", "justification": "Un conducteur 28 AWG fait 68 Ω pour 1000 pieds (samtec-dwct-28, p. 1), soit environ 0,22 Ω/m : 20 cm donnent 0,045 Ω. Les fils bon marché (aluminium cuivré) sont plus résistants." }
+      },
+      "courant_nominal": {
+        "max": 1,
+        "unite": "A",
+        "src": { "type": "hypothese", "justification": "Samtec annonce 3 A pour son câble 28 AWG à +30 °C, avec un isolant qui tient 200 °C (samtec-dwct-28, p. 1). Un fil Dupont a un isolant PVC et des contacts sertis bon marché : on retient 1 A pour « chauffe »." },
+        "note": "Au-delà : verdict « chauffe »."
+      }
+    }
+  }
+}

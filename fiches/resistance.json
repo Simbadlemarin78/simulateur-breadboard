@@ -1,0 +1,51 @@
+{
+  "format": "fiche-composant/1",
+  "id": "resistance",
+  "nom": "Résistance",
+  "categorie": "passif",
+  "description": "Résistance traversante. Le montage règle sa valeur (attribut « value » de Wokwi, en ohms) et, si besoin, sa puissance nominale. La puissance dissipée (R × I²) est comparée à la puissance nominale : au-delà, verdict « chauffe ».",
+  "documents": [
+    {
+      "id": "wokwi-resistor",
+      "titre": "wokwi-resistor Reference (page web, consultée le 19/11/2026)",
+      "editeur": "Wokwi",
+      "url": "https://docs.wokwi.com/parts/wokwi-resistor"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Fiche générique : la valeur de chaque exemplaire vient du montage. La puissance de 1/4 W est une hypothèse ; à changer pour les résistances de puissance."
+  },
+  "wokwi": {
+    "type": "wokwi-resistor"
+  },
+  "broches": [
+    { "nom": "1", "role": "autre" },
+    { "nom": "2", "role": "autre" }
+  ],
+  "parametres": {
+    "valeur": {
+      "description": "Résistance, en ohms. Attribut « value » de Wokwi ; 1000 par défaut.",
+      "unite": "Ω",
+      "defaut": 1000,
+      "src": { "type": "hypothese", "justification": "Valeur par défaut de l'attribut value de wokwi-resistor (page wokwi-resistor)." }
+    },
+    "puissance_nominale": {
+      "description": "Puissance que la résistance dissipe sans chauffer exagérément.",
+      "unite": "W",
+      "defaut": 0.25,
+      "src": { "type": "hypothese", "justification": "Résistance traversante courante des kits d'électronique : 1/4 W. À préciser si le montage utilise d'autres modèles." }
+    }
+  },
+  "modele": {
+    "type": "resistance",
+    "valeurs": {
+      "loi": {
+        "valeur": "U = R × I ; puissance dissipée P = R × I², comparée à puissance_nominale.",
+        "src": { "type": "hypothese", "justification": "Loi d'Ohm et effet Joule : modèle de la résistance en régime continu." }
+      }
+    }
+  }
+}

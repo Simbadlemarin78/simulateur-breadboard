@@ -1,0 +1,3452 @@
+{
+  "format": "fiche-composant/1",
+  "id": "breadboard-830",
+  "nom": "Breadboard 830 points",
+  "categorie": "connectique",
+  "description": "Plaque d'essai sans soudure : 63 colonnes de deux bandes de 5 trous reliés (moitié haute « t », rangées a à e ; moitié basse « b », rangées f à j) et 4 rails d'alimentation de 50 trous (tp, tn en haut ; bp, bn en bas). Les trous portent les noms de Wokwi : 27t.a, tn.6...",
+  "documents": [
+    {
+      "id": "velleman-vtbb2n",
+      "titre": "Breadboard, solderless, 830 contacts (VTBB2N), fiche produit",
+      "editeur": "Velleman (copie RS Components)",
+      "date": "2026-02-05",
+      "url": "https://docs.rs-online.com/f7a1/A700000015716504.pdf",
+      "sha256": "0d274df06e76219a783a06edb5d1901eb8be43f193b937c08738c511bc4c79b6"
+    },
+    {
+      "id": "busboard-bb830",
+      "titre": "BusBoard BB830, datasheet (lue via un résumé de recherche, non téléchargée : Mouser bloque)",
+      "editeur": "BusBoard Prototype Systems",
+      "url": "https://www.mouser.com/datasheet/2/58/BPS_DAT__KIT_BB830_2bSB830__Datasheet-3216334.pdf"
+    },
+    {
+      "id": "gs-pb83m",
+      "titre": "Global Specialties PB-83M, datasheet (lue via un résumé de recherche, non téléchargée)",
+      "editeur": "Global Specialties",
+      "url": "https://www.mouser.com/datasheet/2/172/PB-83M_datasheet-1483472.pdf"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Modèle de la breadboard de Jean inconnu. À vérifier sur la vraie : nombre de colonnes, rails coupés au milieu ou non (au multimètre). Aucun fabricant ne publie la résistance d'un contact : non simulée en V1, à mesurer à l'étape 9. Noms des trous : forme relevée dans des projets Wokwi publics (27t.a, tn.6), à confirmer à l'étape 3 avec un diagram.json exporté de Wokwi."
+  },
+  "wokwi": {
+    "type": "wokwi-breadboard"
+  },
+  "broches": [
+    {
+      "nom": "1t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "1t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "1t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "1t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "1t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "1b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "1b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "1b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "1b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "1b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "2t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "2t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "2t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "2t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "2t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "2b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "2b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "2b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "2b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "2b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "3t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "3t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "3t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "3t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "3t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "3b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "3b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "3b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "3b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "3b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "4t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "4t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "4t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "4t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "4t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "4b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "4b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "4b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "4b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "4b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "5t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "5t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "5t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "5t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "5t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "5b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "5b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "5b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "5b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "5b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "6t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "6t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "6t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "6t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "6t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "6b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "6b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "6b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "6b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "6b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "7t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "7t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "7t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "7t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "7t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "7b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "7b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "7b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "7b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "7b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "8t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "8t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "8t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "8t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "8t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "8b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "8b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "8b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "8b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "8b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "9t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "9t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "9t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "9t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "9t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "9b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "9b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "9b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "9b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "9b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "10t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "10t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "10t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "10t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "10t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "10b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "10b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "10b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "10b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "10b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "11t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "11t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "11t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "11t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "11t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "11b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "11b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "11b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "11b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "11b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "12t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "12t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "12t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "12t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "12t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "12b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "12b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "12b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "12b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "12b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "13t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "13t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "13t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "13t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "13t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "13b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "13b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "13b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "13b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "13b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "14t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "14t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "14t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "14t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "14t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "14b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "14b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "14b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "14b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "14b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "15t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "15t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "15t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "15t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "15t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "15b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "15b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "15b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "15b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "15b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "16t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "16t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "16t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "16t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "16t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "16b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "16b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "16b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "16b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "16b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "17t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "17t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "17t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "17t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "17t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "17b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "17b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "17b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "17b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "17b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "18t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "18t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "18t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "18t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "18t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "18b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "18b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "18b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "18b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "18b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "19t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "19t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "19t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "19t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "19t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "19b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "19b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "19b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "19b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "19b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "20t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "20t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "20t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "20t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "20t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "20b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "20b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "20b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "20b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "20b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "21t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "21t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "21t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "21t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "21t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "21b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "21b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "21b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "21b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "21b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "22t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "22t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "22t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "22t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "22t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "22b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "22b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "22b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "22b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "22b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "23t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "23t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "23t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "23t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "23t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "23b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "23b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "23b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "23b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "23b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "24t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "24t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "24t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "24t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "24t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "24b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "24b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "24b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "24b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "24b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "25t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "25t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "25t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "25t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "25t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "25b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "25b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "25b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "25b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "25b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "26t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "26t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "26t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "26t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "26t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "26b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "26b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "26b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "26b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "26b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "27t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "27t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "27t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "27t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "27t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "27b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "27b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "27b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "27b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "27b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "28t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "28t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "28t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "28t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "28t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "28b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "28b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "28b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "28b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "28b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "29t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "29t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "29t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "29t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "29t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "29b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "29b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "29b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "29b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "29b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "30t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "30t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "30t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "30t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "30t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "30b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "30b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "30b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "30b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "30b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "31t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "31t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "31t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "31t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "31t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "31b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "31b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "31b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "31b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "31b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "32t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "32t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "32t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "32t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "32t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "32b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "32b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "32b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "32b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "32b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "33t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "33t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "33t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "33t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "33t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "33b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "33b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "33b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "33b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "33b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "34t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "34t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "34t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "34t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "34t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "34b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "34b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "34b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "34b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "34b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "35t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "35t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "35t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "35t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "35t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "35b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "35b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "35b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "35b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "35b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "36t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "36t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "36t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "36t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "36t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "36b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "36b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "36b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "36b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "36b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "37t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "37t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "37t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "37t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "37t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "37b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "37b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "37b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "37b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "37b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "38t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "38t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "38t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "38t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "38t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "38b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "38b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "38b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "38b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "38b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "39t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "39t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "39t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "39t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "39t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "39b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "39b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "39b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "39b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "39b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "40t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "40t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "40t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "40t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "40t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "40b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "40b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "40b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "40b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "40b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "41t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "41t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "41t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "41t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "41t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "41b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "41b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "41b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "41b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "41b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "42t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "42t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "42t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "42t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "42t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "42b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "42b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "42b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "42b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "42b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "43t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "43t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "43t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "43t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "43t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "43b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "43b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "43b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "43b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "43b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "44t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "44t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "44t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "44t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "44t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "44b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "44b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "44b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "44b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "44b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "45t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "45t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "45t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "45t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "45t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "45b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "45b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "45b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "45b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "45b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "46t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "46t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "46t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "46t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "46t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "46b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "46b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "46b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "46b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "46b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "47t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "47t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "47t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "47t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "47t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "47b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "47b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "47b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "47b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "47b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "48t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "48t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "48t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "48t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "48t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "48b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "48b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "48b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "48b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "48b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "49t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "49t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "49t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "49t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "49t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "49b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "49b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "49b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "49b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "49b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "50t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "50t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "50t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "50t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "50t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "50b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "50b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "50b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "50b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "50b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "51t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "51t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "51t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "51t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "51t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "51b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "51b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "51b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "51b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "51b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "52t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "52t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "52t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "52t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "52t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "52b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "52b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "52b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "52b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "52b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "53t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "53t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "53t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "53t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "53t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "53b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "53b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "53b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "53b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "53b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "54t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "54t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "54t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "54t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "54t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "54b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "54b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "54b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "54b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "54b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "55t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "55t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "55t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "55t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "55t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "55b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "55b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "55b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "55b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "55b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "56t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "56t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "56t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "56t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "56t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "56b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "56b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "56b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "56b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "56b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "57t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "57t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "57t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "57t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "57t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "57b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "57b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "57b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "57b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "57b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "58t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "58t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "58t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "58t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "58t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "58b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "58b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "58b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "58b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "58b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "59t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "59t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "59t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "59t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "59t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "59b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "59b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "59b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "59b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "59b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "60t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "60t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "60t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "60t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "60t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "60b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "60b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "60b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "60b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "60b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "61t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "61t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "61t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "61t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "61t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "61b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "61b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "61b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "61b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "61b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "62t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "62t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "62t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "62t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "62t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "62b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "62b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "62b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "62b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "62b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "63t.a",
+      "role": "autre"
+    },
+    {
+      "nom": "63t.b",
+      "role": "autre"
+    },
+    {
+      "nom": "63t.c",
+      "role": "autre"
+    },
+    {
+      "nom": "63t.d",
+      "role": "autre"
+    },
+    {
+      "nom": "63t.e",
+      "role": "autre"
+    },
+    {
+      "nom": "63b.f",
+      "role": "autre"
+    },
+    {
+      "nom": "63b.g",
+      "role": "autre"
+    },
+    {
+      "nom": "63b.h",
+      "role": "autre"
+    },
+    {
+      "nom": "63b.i",
+      "role": "autre"
+    },
+    {
+      "nom": "63b.j",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.1",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.2",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.3",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.4",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.5",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.6",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.7",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.8",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.9",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.10",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.11",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.12",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.13",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.14",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.15",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.16",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.17",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.18",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.19",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.20",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.21",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.22",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.23",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.24",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.25",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.26",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.27",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.28",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.29",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.30",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.31",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.32",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.33",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.34",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.35",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.36",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.37",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.38",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.39",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.40",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.41",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.42",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.43",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.44",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.45",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.46",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.47",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.48",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.49",
+      "role": "autre"
+    },
+    {
+      "nom": "tp.50",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.1",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.2",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.3",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.4",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.5",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.6",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.7",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.8",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.9",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.10",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.11",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.12",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.13",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.14",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.15",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.16",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.17",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.18",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.19",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.20",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.21",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.22",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.23",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.24",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.25",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.26",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.27",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.28",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.29",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.30",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.31",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.32",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.33",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.34",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.35",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.36",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.37",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.38",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.39",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.40",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.41",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.42",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.43",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.44",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.45",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.46",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.47",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.48",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.49",
+      "role": "autre"
+    },
+    {
+      "nom": "tn.50",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.1",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.2",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.3",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.4",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.5",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.6",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.7",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.8",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.9",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.10",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.11",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.12",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.13",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.14",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.15",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.16",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.17",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.18",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.19",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.20",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.21",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.22",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.23",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.24",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.25",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.26",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.27",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.28",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.29",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.30",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.31",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.32",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.33",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.34",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.35",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.36",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.37",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.38",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.39",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.40",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.41",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.42",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.43",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.44",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.45",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.46",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.47",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.48",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.49",
+      "role": "autre"
+    },
+    {
+      "nom": "bp.50",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.1",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.2",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.3",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.4",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.5",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.6",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.7",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.8",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.9",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.10",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.11",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.12",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.13",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.14",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.15",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.16",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.17",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.18",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.19",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.20",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.21",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.22",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.23",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.24",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.25",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.26",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.27",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.28",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.29",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.30",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.31",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.32",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.33",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.34",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.35",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.36",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.37",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.38",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.39",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.40",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.41",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.42",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.43",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.44",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.45",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.46",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.47",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.48",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.49",
+      "role": "autre"
+    },
+    {
+      "nom": "bn.50",
+      "role": "autre"
+    }
+  ],
+  "parametres": {
+    "rails_coupes": {
+      "description": "Les rails sont-ils coupés au milieu (deux moitiés de 25 trous) ? Varie d'un modèle à l'autre : à vérifier au multimètre.",
+      "unite": "1",
+      "defaut": false,
+      "src": {
+        "type": "hypothese",
+        "justification": "Aucune des fiches lues ne le précise ; par défaut, rails continus sur toute la longueur."
+      }
+    }
+  },
+  "modele": {
+    "type": "breadboard",
+    "valeurs": {
+      "geometrie": {
+        "colonnes": [
+          "zone",
+          "trous",
+          "reliés entre eux"
+        ],
+        "lignes": [
+          [
+            "moitié haute",
+            "Nt.a à Nt.e, N de 1 à 63",
+            "les 5 trous d'une même colonne N"
+          ],
+          [
+            "moitié basse",
+            "Nb.f à Nb.j, N de 1 à 63",
+            "les 5 trous d'une même colonne N"
+          ],
+          [
+            "rail haut +",
+            "tp.1 à tp.50",
+            "tout le rail, ou chaque moitié si rails_coupes"
+          ],
+          [
+            "rail haut −",
+            "tn.1 à tn.50",
+            "tout le rail, ou chaque moitié si rails_coupes"
+          ],
+          [
+            "rail bas +",
+            "bp.1 à bp.50",
+            "tout le rail, ou chaque moitié si rails_coupes"
+          ],
+          [
+            "rail bas −",
+            "bn.1 à bn.50",
+            "tout le rail, ou chaque moitié si rails_coupes"
+          ]
+        ],
+        "src": {
+          "type": "hypothese",
+          "justification": "830 points = 63 colonnes × 10 trous + 4 rails × 50 trous, la disposition la plus courante ; velleman-vtbb2n (p. 2) confirme 830 points et 2 barrettes d'alimentation. Noms des trous : ceux de Wokwi."
+        }
+      },
+      "courant_nominal_contact": {
+        "max": 1,
+        "unite": "A",
+        "conditions": "par contact, en continu",
+        "src": {
+          "type": "hypothese",
+          "justification": "Les fabricants annoncent 1,5 A (gs-pb83m), 2 A (busboard-bb830) ou 3 A (velleman-vtbb2n, p. 2) pour la plaque, sans dire si c'est par contact. Les breadboards génériques n'ont pas de fiche : on retient 1 A, avec de la marge (cas 9)."
+        },
+        "note": "Au-delà : verdict « chauffe »."
+      },
+      "courant_max_annonce": {
+        "max": 3,
+        "unite": "A",
+        "src": {
+          "type": "datasheet",
+          "doc": "velleman-vtbb2n",
+          "page": 2,
+          "ou": "Specifications, Electrical Properties",
+          "citation": "Maximum current rating 3 A"
+        },
+        "note": "Valeur la plus haute des fiches lues : au-delà, on sort de tout ce qu'un fabricant annonce."
+      },
+      "tension_max": {
+        "max": 30,
+        "unite": "V",
+        "src": {
+          "type": "datasheet",
+          "doc": "velleman-vtbb2n",
+          "page": 2,
+          "ou": "Specifications, Electrical Properties",
+          "citation": "Maximum voltage rating pcbs 30 V"
+        }
+      }
+    }
+  }
+}

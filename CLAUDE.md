@@ -56,7 +56,7 @@ Une appli web dans l'esprit de Wokwi : je pose mes composants sur un plan de tra
 Réécrit le 19/11/2026 pour le plan de travail 2D. Le moteur (étapes 1 à 6) ne change pas ; l'éditeur ajoute les étapes 4, 7 et 8. Vers la fin de la quatrième semaine, le moteur doit déjà vérifier le vrai montage, avant le câblage de la base.
 
 1. **Socle** (2 h, fait) : Vite + TypeScript + Vitest, CI GitHub Actions, déploiement GitHub Pages. Test : page en ligne, CI verte.
-2. **Fiches** (6 h) : validateur du schéma dans `npm test`, puis fiches ESP32, TMC2209 (puce + module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance, fil Dupont. Test : toutes valides et relues.
+2. **Fiches** (6 h) : validateur du schéma dans `npm test`, puis fiches ESP32, TMC2209 (puce + module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance, fil Dupont. Test : toutes valides et relues. État au 19/11/2026 : les 11 fiches sont écrites et valides, en brouillon ; reste la relecture de Jean.
 3. **Du montage au réseau** (4 h) : lecture de diagram.json, nœuds avec liaisons internes et bandes du breadboard. Test : les 4 EN sur le même nœud que IO13.
 4. **Affichage 2D du montage** (5 h) : chaque pièce dessinée à sa position du diagram.json, avec ses broches et ses fils, sans encore pouvoir modifier. Test : chaque broche de chaque fiche a une position sur son dessin ; la base roulante s'affiche en ligne.
 5. **Calcul en continu** (8 h) : méthode des nœuds + Newton. Test : 6 circuits calculés à la main à moins de 1 % (dont 12 V via 10 kΩ sur une broche 3,3 V ≈ 0,8 mA dans la diode de protection).
@@ -117,6 +117,7 @@ outils/      scripts annexes
 - 17HS4401 : pas de datasheet officielle. Fiche `fiches/17hs4401.json` (brouillon) faite le 19/11/2026 depuis trois pages web, avec les valeurs sur lesquelles deux sources concordent. À remplacer par la fiche du vendeur si elle arrive.
 - ESP32 : fiches `esp32` (puce) et `esp32-devkitc` (carte, noms de broches de Wokwi) faites le 19/11/2026 (brouillon), depuis la datasheet v5.3, le WROOM-32 v3.8 et le schéma DevKitC V4. Restent à confirmer : le module exact (WROOM-32, 32D ou 32E) et l'ordre des broches de la carte Keyestudio. Espressif ne publie aucune limite de courant d'injection : le seuil de « grillé » du cas 1 (200 mA, tiré de l'essai de latch-up) est une hypothèse à valider.
 - Cas 5 : après le reset, IO13 a un tirage interne de 45 kΩ vers la masse (p. 69). Avec le tirage de 20 kΩ vers VDD du module BIGTREETECH, EN tombe vers 2,3 V, dans la zone indécise du TMC2209 (entre 0,3 et 0,7 × VCC_IO). Le calcul doit le trouver.
+- Fiches génériques (`breadboard-830`, `alim-labo`, `lipo-4s`, `condensateur-electrolytique`, `resistance`, `fil-dupont`) faites le 19/11/2026 sur des modèles courants (Velleman, MaxAmps, Chemi-Con, Samtec). À vérifier sur le vrai matériel : colonnes et rails coupés ou non de la breadboard, modèle de l'alim, capacité et résistance interne de la LiPo. Seuils de « chauffe » retenus : 1 A par contact de breadboard et par fil Dupont (hypothèses). Noms des trous de breadboard repris de projets Wokwi publics (`27t.a`, `tn.6`) : à confirmer à l'étape 3.
 - Pas de `pdftoppm` sur la machine : l'outil Read ne peut pas afficher les pages d'un PDF. Pour lire le texte, installer `pypdf` (Python) dans le dossier temporaire de la session, en l'annonçant à Jean.
 
 ## Commandes

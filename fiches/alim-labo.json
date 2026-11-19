@@ -1,0 +1,79 @@
+{
+  "format": "fiche-composant/1",
+  "id": "alim-labo",
+  "nom": "Alimentation de laboratoire réglable",
+  "categorie": "source",
+  "description": "Alim continue réglable en tension, avec une limite de courant. Le montage règle la tension et la limite. Tant que le courant reste sous la limite, la tension est constante ; au-delà, l'alim passe en courant constant et la tension baisse.",
+  "documents": [
+    {
+      "id": "velleman-labps3005d",
+      "titre": "LABPS3005D, programmable DC lab power supply 0-30 V, manuel",
+      "editeur": "Velleman (copie ELV)",
+      "revision": "V. 05",
+      "date": "2015-05-27",
+      "url": "https://media.elv.com/file/109993_labps3005da5v05_um.pdf",
+      "sha256": "b2a53aef15be90c03fbeb3aaa22f20b59946ccf108be4dfdf2f7830bb264a644"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Le modèle de l'alim de Jean est inconnu : plages prises sur la Velleman LABPS3005D (0-30 V, 0-5 A), un modèle très répandu. Sa résistance interne n'est pas publiée : alim idéale en V1."
+  },
+  "broches": [
+    {
+      "nom": "+",
+      "role": "alim_sortie",
+      "domaine": { "masse": "-" },
+      "note": "Sortie positive."
+    },
+    {
+      "nom": "-",
+      "role": "masse",
+      "note": "Sortie négative : la référence du montage."
+    },
+    {
+      "nom": "terre",
+      "role": "autre",
+      "note": "Reliée au châssis et à la terre de la prise secteur (manuel p. 4, repère 17), pas à la borne −."
+    }
+  ],
+  "parametres": {
+    "tension": {
+      "description": "Tension réglée (mode tension constante). Le montage de référence est à 12 V.",
+      "unite": "V",
+      "defaut": 12,
+      "min": 0,
+      "max": 30,
+      "src": { "type": "datasheet", "doc": "velleman-labps3005d", "page": 4, "ou": "5. Description", "citation": "The output voltage can be adjusted between 0V and 30V" }
+    },
+    "limite_courant": {
+      "description": "Limite de courant ; au-delà, l'alim passe en courant constant. 1 A : réglage du cas 2b, à adapter au montage.",
+      "unite": "A",
+      "defaut": 1,
+      "min": 0,
+      "max": 5,
+      "src": { "type": "datasheet", "doc": "velleman-labps3005d", "page": 4, "ou": "5. Description", "citation": "The output current can be adjusted continuously between 0A and 5A" }
+    }
+  },
+  "modele": {
+    "type": "alim_laboratoire",
+    "valeurs": {
+      "passage_tension_courant_constant": {
+        "valeur": "Au-delà de la limite de courant, l'alim passe d'elle-même en courant constant : la tension baisse pour que le courant reste égal à la limite.",
+        "src": { "type": "datasheet", "doc": "velleman-labps3005d", "page": 5, "ou": "Using the Power Supply in Constant Voltage Mode", "citation": "If the output current exceeds the limit, the power supply automatically goes into constant current mode." }
+      },
+      "tension_max": {
+        "max": 30,
+        "unite": "V",
+        "src": { "type": "datasheet", "doc": "velleman-labps3005d", "page": 4, "ou": "5. Description", "citation": "The output voltage can be adjusted between 0V and 30V" }
+      },
+      "courant_max": {
+        "max": 5,
+        "unite": "A",
+        "src": { "type": "datasheet", "doc": "velleman-labps3005d", "page": 4, "ou": "5. Description", "citation": "The output current can be adjusted continuously between 0A and 5A" }
+      }
+    }
+  }
+}

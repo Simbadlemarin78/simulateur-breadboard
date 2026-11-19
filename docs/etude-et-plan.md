@@ -224,7 +224,8 @@ Mis à jour le 19/11/2026.
 - [ ] Toi : relire les fiches et les passer à « relue ».
 - [x] Moi : fiches ESP32 (puce `esp32` et carte `esp32-devkitc`, noms de broches de Wokwi), en brouillon, et un test de cohérence entre fiches.
 - [ ] Toi : valider le seuil de « grillé » du cas 1 : Espressif ne publie aucune limite de courant d'injection, j'ai pris les 200 mA de l'essai de latch-up (hypothèse).
-- [ ] Moi : fiches breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont (fin de l'étape 2).
+- [x] Moi : fiches breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont, en brouillon (les 11 fiches de l'étape 2 sont écrites).
+- [ ] Toi : vérifier sur ton matériel la breadboard (nombre de colonnes, rails coupés au milieu ou non), le modèle de ton alim et la capacité de ta LiPo.
 
 Questions encore ouvertes :
 
