@@ -149,7 +149,7 @@ Le moteur (étapes 1, 2, 3, 5, 6) est inchangé. L'éditeur ajoute trois étapes
    - Test : la page en ligne s'affiche et la CI est verte.
 2. **Fiches** (environ 6 h, semaine 1). Le schéma et son validateur, puis les fiches ESP32, TMC2209 (puce et module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont. Je les extrais des PDF ; tu les relis.
    - Test : toutes les fiches passent le validateur et sont au statut « relue ».
-3. **Du montage au réseau** (environ 4 h, semaine 2). Lecture du diagram.json et des réglages : tension et limite de courant des alims, courant réglé des drivers, niveau des broches choisi à la main. On construit les nœuds (les points du circuit au même potentiel) en tenant compte des liaisons internes des modules et des bandes du breadboard.
+3. **Du montage au réseau** (environ 4 h, semaine 2, fait le 19/11/2026). Lecture du diagram.json et des réglages : tension et limite de courant des alims, courant réglé des drivers, niveau des broches choisi à la main. On construit les nœuds (les points du circuit au même potentiel) en tenant compte des liaisons internes des modules et des bandes du breadboard.
    - Test : sur la base roulante, les quatre EN sont sur le même nœud que IO13, et le nombre de nœuds est celui compté à la main.
 4. **Affichage 2D du montage** (environ 5 h, semaine 2). Chaque pièce est dessinée à la position que donne le diagram.json, avec ses broches (nom au survol) et ses fils. On ne peut pas encore modifier.
    - Les dessins viennent de wokwi-elements quand la pièce existe, sinon d'un SVG maison qui donne aussi la position de chaque broche.

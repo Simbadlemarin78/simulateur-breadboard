@@ -26,8 +26,8 @@
     { "nom": "2", "role": "autre" }
   ],
   "parametres": {
-    "valeur": {
-      "description": "Résistance, en ohms. Attribut « value » de Wokwi ; 1000 par défaut.",
+    "value": {
+      "description": "Résistance, en ohms. Même nom que l'attribut « value » de Wokwi, pour lire ses diagram.json tels quels ; 1000 par défaut.",
       "unite": "Ω",
       "defaut": 1000,
       "src": { "type": "hypothese", "justification": "Valeur par défaut de l'attribut value de wokwi-resistor (page wokwi-resistor)." }

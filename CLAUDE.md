@@ -57,7 +57,7 @@ Réécrit le 19/11/2026 pour le plan de travail 2D. Le moteur (étapes 1 à 6) n
 
 1. **Socle** (2 h, fait) : Vite + TypeScript + Vitest, CI GitHub Actions, déploiement GitHub Pages. Test : page en ligne, CI verte.
 2. **Fiches** (6 h) : validateur du schéma dans `npm test`, puis fiches ESP32, TMC2209 (puce + module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance, fil Dupont. Test : toutes valides et relues. État au 19/11/2026 : les 11 fiches sont écrites et valides, en brouillon ; reste la relecture de Jean.
-3. **Du montage au réseau** (4 h) : lecture de diagram.json, nœuds avec liaisons internes et bandes du breadboard. Test : les 4 EN sur le même nœud que IO13.
+3. **Du montage au réseau** (4 h, fait le 19/11/2026) : lecture de diagram.json, nœuds avec liaisons internes et bandes du breadboard. Test : les 4 EN sur le même nœud que IO13.
 4. **Affichage 2D du montage** (5 h) : chaque pièce dessinée à sa position du diagram.json, avec ses broches et ses fils, sans encore pouvoir modifier. Test : chaque broche de chaque fiche a une position sur son dessin ; la base roulante s'affiche en ligne.
 5. **Calcul en continu** (8 h) : méthode des nœuds + Newton. Test : 6 circuits calculés à la main à moins de 1 % (dont 12 V via 10 kΩ sur une broche 3,3 V ≈ 0,8 mA dans la diode de protection).
 6. **Vérifications, règles, verdicts** (7 h). Test : les 10 cas donnent le verdict attendu ; le montage corrigé ne donne aucune fausse alerte. Le moteur vérifie alors le vrai montage en ligne de commande.
@@ -110,6 +110,12 @@ docs/        étude et plan
 outils/      scripts annexes
 ```
 
+## Montages et moteur (état actuel)
+
+- **Format d'un montage** : diagram.json de Wokwi. Le `type` d'une pièce est un type Wokwi (`board-esp32-devkit-c-v4`, `wokwi-breadboard`, `wokwi-resistor`, `wokwi-stepper-motor`) ou, pour ce que Wokwi n'a pas, l'id d'une fiche (`tmc2209-module`, `alim-labo`, `lipo-4s`, `condensateur-electrolytique`). Les `attrs` sont les paramètres de la fiche (texte ou nombre), plus `fiche` (forcer une fiche) et `etats` (état des broches d'un microcontrôleur : `entree`, `entree_tirage_haut`, `entree_tirage_bas`, `sortie_haute`, `sortie_basse`). Les noms de broches sont ceux des fiches, donc ceux de Wokwi ; les alias sont acceptés.
+- `montages/base-roulante.diagram.json` : brochage proposé, **sans** les ajouts prévus (condensateurs 100 µF, tirage de EN). 4 drivers enfichés sur la breadboard, ESP32 à côté, rails tp = 3V3, tn = GND, bp = VM, bn = GND. 30 nœuds relient au moins deux broches de composants.
+- `src/moteur/` : `fiche.ts` (types), `catalogue.ts` (fiche d'une pièce par id ou type Wokwi), `fiches-integrees.ts` (charge `fiches/` via Vite), `montage.ts` (`lireMontage` : pièces, réglages, fils, erreurs en français), `reseau.ts` (`construireReseau` : nœuds par union des fils, bandes de breadboard, liaisons directes et renvois module → puce ; liaisons avec valeur gardées comme éléments). Points nommés `piece:broche`, sous-composants `piece/U1:broche`.
+
 ## Bloquants connus
 
 - Datasheet TMC2209 : rév. 1.08 récupérée chez DigiKey (`datasheets/tmc2209-datasheet-rev1.08.pdf`), fiches `tmc2209` et `tmc2209-module` faites (brouillon). La rév. 1.09 n'est que sur analog.com, qui refuse les téléchargements automatiques : Jean la télécharge à la main s'il veut la dernière.
@@ -127,4 +133,5 @@ outils/      scripts annexes
 - `npm test` : lance les tests Vitest une fois (`npm run test:watch` pour les relancer à chaque modification).
 - `npm run build` : vérifie les types TypeScript puis construit le site dans `dist/`.
 - CI : `.github/workflows/ci.yml` lance tests et build à chaque push ; sur `main`, publie `dist/` sur https://simbadlemarin78.github.io/simulateur-breadboard/.
+- `tests/montage.test.ts` et `tests/reseau.test.ts` : étape 3 (lecture des montages, nœuds, bandes de breadboard).
 - Le test du schéma des fiches est `tests/schema.test.ts` (Ajv) ; il valide aussi chaque fichier de `fiches/`. `tests/coherence.test.ts` vérifie ce que le schéma ne voit pas : noms de broches uniques, renvois `vers` vers une broche réelle de la sous-fiche, références de `domaine` et de `liaisons_internes`.
