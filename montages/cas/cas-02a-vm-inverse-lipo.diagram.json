@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "author": "simulateur-breadboard",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "lipo-4s",
+      "id": "batt",
+      "top": 0,
+      "left": -200,
+      "attrs": {
+        "tension_element": 4.2
+      }
+    },
+    {
+      "type": "tmc2209-module",
+      "id": "drv1",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [
+      "batt:+",
+      "drv1:GND.1",
+      "red",
+      []
+    ],
+    [
+      "batt:-",
+      "drv1:VM",
+      "black",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

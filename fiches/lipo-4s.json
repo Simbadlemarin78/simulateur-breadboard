@@ -88,7 +88,23 @@
       "risque_incendie": {
         "valeur": "Une LiPo mal chargée ou mal utilisée (court-circuit, inversion) peut exploser ou prendre feu.",
         "src": { "type": "datasheet", "doc": "adafruit-lipo", "page": 6, "ou": "Protection Circuitry", "citation": "Charging or using the batteries incorrectly can cause explosion or fire" }
+      },
+      "courant_decharge_continu_max": {
+        "max": 34.84,
+        "unite": "A",
+        "conditions": "élément MaxAmps de 670 mAh ; une batterie de plus grande capacité supporte davantage",
+        "src": { "type": "datasheet", "doc": "maxamps-670-1s", "page": 1, "ou": "Technical data", "citation": "MAXIMUM CONTINUOUS DISCHARGE - 34.84A" },
+        "note": "Au-delà, la règle surintensite-batterie signale un risque d'incendie. À remplacer par la valeur de ta batterie."
       }
     }
-  }
+  },
+  "regles": [
+    {
+      "id": "surintensite-batterie",
+      "verdict": "risque_eleve",
+      "explication": "La batterie débite plus que son courant de décharge continu maximal : c'est un court-circuit, ou presque. Une LiPo en court-circuit chauffe très vite et peut gonfler, prendre feu ou exploser.",
+      "correction": "Débrancher la batterie, trouver le court-circuit (fil inversé, masse en double) avant de la rebrancher, et mettre un fusible juste après la batterie.",
+      "src": { "type": "datasheet", "doc": "adafruit-lipo", "page": 16, "ou": "Conclusion, avertissements du fabricant", "citation": "Do NOT short circuit the battery." }
+    }
+  ]
 }

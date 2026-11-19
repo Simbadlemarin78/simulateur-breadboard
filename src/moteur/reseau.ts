@@ -36,6 +36,8 @@ export interface Reseau {
   elements: ElementInterne[];
   /** Fils gardés à part ; vide sans l'option filsSepares. */
   fils: FilSepare[];
+  /** Contacts de breadboard gardés à part (broche enfichée dans un trou) ; vide sans l'option contactsSepares. */
+  contacts: FilSepare[];
   /** Nœud d'un point "piece:broche" (alias acceptés pour les pièces du montage). */
   noeudDe(point: string): Noeud | undefined;
 }
@@ -47,6 +49,11 @@ export interface OptionsReseau {
    * (connexions sans couleur) restent fondus.
    */
   filsSepares?: boolean;
+  /**
+   * Garde aussi à part chaque enfichage dans un trou de breadboard (connexion sans couleur dont
+   * un bout est sur une breadboard) : le calcul y mesure le courant qui traverse le contact.
+   */
+  contactsSepares?: boolean;
 }
 
 /** Union-find : chaque point pointe vers un représentant de son groupe. */
@@ -143,14 +150,20 @@ export function construireReseau(montage: Montage, catalogue: Catalogue, options
 
   for (const piece of montage.pieces) ajouterPiece(piece.id, piece.fiche, piece.parametres);
   const filsAPart: number[] = [];
+  const contactsAPart: number[] = [];
+  const breadboards = new Set(montage.pieces.filter((p) => p.fiche.modele?.type === 'breadboard').map((p) => p.id));
   montage.connexions.forEach((c, i) => {
     const de = `${c.de.piece}:${c.de.broche}`;
     const vers = `${c.vers.piece}:${c.vers.broche}`;
-    if (options.filsSepares && c.couleur !== '') {
-      groupes.ajouter(de);
-      groupes.ajouter(vers);
-      filsAPart.push(i);
-    } else groupes.unir(de, vers);
+    const enfiche = c.couleur === '' && breadboards.has(c.de.piece) !== breadboards.has(c.vers.piece);
+    if (options.filsSepares && c.couleur !== '') filsAPart.push(i);
+    else if (options.contactsSepares && enfiche) contactsAPart.push(i);
+    else {
+      groupes.unir(de, vers);
+      return;
+    }
+    groupes.ajouter(de);
+    groupes.ajouter(vers);
   });
   if (erreurs.length > 0) throw new Error(`Réseau impossible à construire :\n- ${erreurs.join('\n- ')}`);
 
@@ -185,14 +198,14 @@ export function construireReseau(montage: Montage, catalogue: Catalogue, options
     return { ...l, noeuds: [na.id, nb.id] };
   });
 
-  const fils: FilSepare[] = filsAPart.map((i) => {
+  const aPart = (i: number): FilSepare => {
     const c = montage.connexions[i]!;
     const na = indexPoint.get(`${c.de.piece}:${c.de.broche}`)!;
     const nb = indexPoint.get(`${c.vers.piece}:${c.vers.broche}`)!;
     return { connexion: i, noeuds: [na.id, nb.id] };
-  });
+  };
 
-  return { noeuds, elements, fils, noeudDe };
+  return { noeuds, elements, fils: filsAPart.map(aPart), contacts: contactsAPart.map(aPart), noeudDe };
 }
 
 /**

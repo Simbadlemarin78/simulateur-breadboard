@@ -18,6 +18,11 @@ export interface Piece {
   parametres: Record<string, ValeurParametre>;
   /** État des broches choisi à la main (attribut "etats"), par nom de broche canonique. */
   etats: Record<string, EtatBroche>;
+  /**
+   * Groupe de drivers qui doivent avoir les mêmes micro-pas (attribut "groupe", cas 7).
+   * Les drivers sans groupe forment un même groupe.
+   */
+  groupe?: string;
   position: { top: number; left: number };
 }
 
@@ -47,7 +52,7 @@ export class MontageInvalide extends Error {
 }
 
 /** Attributs propres au simulateur, en plus des paramètres de la fiche. */
-const ATTRIBUTS_SIMULATEUR = new Set(['fiche', 'etats']);
+const ATTRIBUTS_SIMULATEUR = new Set(['fiche', 'etats', 'groupe']);
 
 function estObjet(x: unknown): x is Record<string, unknown> {
   return typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -166,6 +171,7 @@ export function lireMontage(donnees: unknown, catalogue: Catalogue): Montage {
       fiche,
       parametres: lireParametres(id, fiche, attrs, erreurs, avertissements),
       etats: lireEtats(id, fiche, attrs['etats'], erreurs),
+      ...(attrs['groupe'] !== undefined ? { groupe: String(attrs['groupe']) } : {}),
       position: {
         top: typeof partie['top'] === 'number' ? partie['top'] : 0,
         left: typeof partie['left'] === 'number' ? partie['left'] : 0,

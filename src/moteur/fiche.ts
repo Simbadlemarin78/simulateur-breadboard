@@ -116,6 +116,12 @@ export function valeurSI(g: Grandeur | undefined, ordre: ('typ' | 'min' | 'max')
   return undefined;
 }
 
+/** Valeur numérique (grandeur) du modèle d'une fiche, ou undefined si ce n'est pas une grandeur. */
+export function grandeurModele(fiche: Fiche, nom: string): Grandeur | undefined {
+  const v = fiche.modele?.valeurs[nom] as Grandeur | undefined;
+  return v && typeof v === 'object' && 'unite' in v ? v : undefined;
+}
+
 /** Trouve une broche par son nom ou l'un de ses alias. */
 export function trouverBroche(fiche: Fiche, nom: string): Broche | undefined {
   return fiche.broches.find((b) => b.nom === nom) ?? fiche.broches.find((b) => b.alias?.includes(nom));

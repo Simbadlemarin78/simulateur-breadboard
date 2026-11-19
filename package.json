@@ -10,7 +10,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "verifier": "node outils/verifier.mjs"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

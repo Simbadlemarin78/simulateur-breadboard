@@ -65,6 +65,8 @@ export interface Options {
   /** Point de départ : tensions et régimes d'un calcul voisin (accélère les recalculs). */
   depart?: { tensions: (number | undefined)[]; regimes?: (RegimeSource | undefined)[] };
   iterationsMax?: number;
+  /** Suivi des itérations, pour la mise au point. */
+  trace?: (iteration: number, info: { ecart: number; limite: boolean; change: boolean; pire: number; tensions: Float64Array }) => void;
 }
 
 function bornes(e: Element): number[] {
@@ -331,14 +333,20 @@ export function resoudre(nbNoeuds: number, elements: Element[], options: Options
       }
     }
 
+    // Convergé quand chaque inconnue bouge de moins de 1 µV (ou 1 µA) plus un millionième de sa
+    // valeur. SPICE se contente de 1 µV et d'un millième : des nœuds presque isolés (reliés par
+    // des diodes bloquées et GMIN) gardent un bruit d'arrondi de l'ordre de 10⁻⁸ V.
     let ecart = 0;
-    let echelle = 0;
+    let pire = -1;
+    let stable = true;
     for (let i = 0; i < m; i++) {
-      ecart = Math.max(ecart, Math.abs(xn[i]! - x[i]!));
-      echelle = Math.max(echelle, Math.abs(xn[i]!));
+      const d = Math.abs(xn[i]! - x[i]!);
+      if (d > ecart) [ecart, pire] = [d, i];
+      if (d > 1e-6 + 1e-6 * Math.abs(xn[i]!)) stable = false;
     }
+    options.trace?.(it, { ecart, limite, change, pire, tensions: xn });
     x.set(xn);
-    if (!change && !limite && ecart <= 1e-9 + 1e-9 * echelle) {
+    if (!change && !limite && stable) {
       return bilan(it);
     }
   }

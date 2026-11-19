@@ -12,7 +12,7 @@
 // - driver : diodes du pont, potentiomètre VREF, et quand il est actif, courant imposé dans
 //   chaque bobine (comme moteur à l'arrêt sur un pas complet) et puissance prise sur VS.
 import type { Catalogue } from './catalogue';
-import { trouverBroche, valeurSI, versUniteDeBase, type Broche, type Fiche, type Grandeur, type ModeleDiode } from './fiche';
+import { grandeurModele, trouverBroche, valeurSI, versUniteDeBase, type Broche, type Fiche, type Grandeur, type ModeleDiode } from './fiche';
 import type { EtatBroche, Montage, Piece, ValeurParametre } from './montage';
 import { construireReseau, type Reseau } from './reseau';
 import { courantSaturation, resoudre, VT_25C, type Element, type RegimeSource, type Solution } from './solveur';
@@ -34,7 +34,8 @@ export type RoleElement =
   | 'potentiometre'
   | 'pont'
   | 'pont_retour'
-  | 'alimentation_driver';
+  | 'alimentation_driver'
+  | 'contact';
 
 /** Ce que représente un élément du calcul : pour le multimètre, les verdicts et les explications. */
 export interface Etiquette {
@@ -58,6 +59,15 @@ export interface EtatDriver {
   courantBobine: number;
   /** Puissance prise sur VS pour les bobines et les pertes du pont (W). */
   puissance: number;
+  /** Puissance dissipée dans la puce : MOSFET du pont et consommation propre (W). */
+  pertesPuce: number;
+  /** VS et VCC_IO au-dessus de leurs seuils de sous-tension. */
+  alimente: boolean;
+  /** Tension de EN (ENN de la puce) par rapport à GND, et seuils bas et haut (V). */
+  tensionEN: number | undefined;
+  seuilsEN: [number, number];
+  /** Courant réglé par l'UART (paramètre courant_uart) plutôt que par VREF. */
+  parUart: boolean;
 }
 
 export interface Calcul {
@@ -72,8 +82,13 @@ export interface Calcul {
   tension(point: string): number | undefined;
   /** Tension entre deux points ; undefined s'ils ne sont reliés par rien (rien ne fixe leur écart). */
   difference(a: string, b: string): number | undefined;
-  /** Courant dans un fil (indice dans montage.connexions), compté de son bout « de » vers « vers ». */
+  /**
+   * Courant dans une connexion (indice dans montage.connexions), compté de son bout « de » vers
+   * « vers » : un fil, ou un enfichage dans la breadboard (courant du contact).
+   */
   courantFil(connexion: number): number | undefined;
+  /** Fiche de chaque pièce du calcul, par chemin ("drv1", "drv1/U1"). */
+  fiches: Map<string, Fiche>;
   sources: { piece: string; regime: RegimeSource; tension: number; courant: number }[];
   drivers: EtatDriver[];
   avertissements: string[];
@@ -121,15 +136,6 @@ function lireDiode(m: ModeleDiode | undefined): { is: number; nvt: number } | un
   return { is: courantSaturation(vf, i, n), nvt: n * VT_25C };
 }
 
-function valeurModele(fiche: Fiche, nom: string): unknown {
-  return fiche.modele?.valeurs[nom];
-}
-
-function grandeurModele(fiche: Fiche, nom: string): Grandeur | undefined {
-  const v = valeurModele(fiche, nom) as Grandeur | undefined;
-  return v && typeof v === 'object' && 'unite' in v ? v : undefined;
-}
-
 /** Paramètre numérique d'une pièce, dans l'unité de base. */
 function parametreSI(pe: PieceElectrique, nom: string): number | undefined {
   const v = pe.parametres[nom];
@@ -163,6 +169,7 @@ interface Driver {
   vrefPleineEchelle: number;
   rdsHaut: number;
   rdsBas: number;
+  courantUart?: number;
   reposActif: number;
   reposInactif: number;
   sousTensionVS: number;
@@ -179,10 +186,22 @@ interface EtatCalculDriver {
   courant: number;
   compliance: number;
   puissance: number;
+  pertesPuce: number;
+  alimente: boolean;
+  tensionEN: number | undefined;
+  seuilsEN: [number, number];
 }
 
-export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
-  const reseau = construireReseau(montage, catalogue, { filsSepares: true });
+export interface OptionsCalcul {
+  /**
+   * Calcul « au démarrage » : on ignore les états réglés à la main (attribut etats) et chaque
+   * broche de microcontrôleur prend son état d'après le reset, tiré de sa fiche.
+   */
+  demarrage?: boolean;
+}
+
+export function calculer(montage: Montage, catalogue: Catalogue, options: OptionsCalcul = {}): Calcul {
+  const reseau = construireReseau(montage, catalogue, { filsSepares: true, contactsSepares: true });
   const avertissements = new Set<string>();
   const pieces = piecesElectriques(montage, catalogue);
 
@@ -194,7 +213,7 @@ export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
 
   // États des broches de microcontrôleur réglés à la main, ramenés aux broches de la puce.
   const etats = new Map<string, EtatBroche>();
-  for (const p of montage.pieces) {
+  for (const p of options.demarrage ? [] : montage.pieces) {
     for (const [nom, etat] of Object.entries(p.etats)) {
       const b = trouverBroche(p.fiche, nom);
       if (!b) continue;
@@ -236,6 +255,31 @@ export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
     resistance(f.noeuds[0], f.noeuds[1], valeurSI(rFil), et);
   }
   if (!rFil) avertissements.add('fiche fil-dupont absente : fils non simulés');
+
+  // Contacts de la breadboard : ampèremètres parfaits (source de 0 V), du trou vers la broche.
+  // Deux contacts qui se referment l'un sur l'autre sans rien entre eux formeraient une boucle de
+  // sources : on garde le premier, le partage du courant entre eux n'est pas calculé.
+  const parentContact = new Map<number, number>();
+  const racineContact = (n: number): number => {
+    let r = n;
+    while (parentContact.has(r) && parentContact.get(r) !== r) r = parentContact.get(r)!;
+    return r;
+  };
+  for (const ct of reseau.contacts) {
+    const c = montage.connexions[ct.connexion]!;
+    const breadboardDe = montage.pieces.find((p) => p.id === c.de.piece)?.fiche.modele?.type === 'breadboard';
+    const [trou, broche] = breadboardDe ? [ct.noeuds[0], ct.noeuds[1]] : [ct.noeuds[1], ct.noeuds[0]];
+    const ext = breadboardDe ? c.de : c.vers;
+    const ra = racineContact(trou);
+    const rb = racineContact(broche);
+    if (ra === rb) {
+      avertissements.add(`contact ${ext.piece}:${ext.broche} en parallèle sur un autre contact : partage du courant non calculé`);
+      continue;
+    }
+    parentContact.set(rb, ra);
+    fixes.push({ type: 'source', plus: trou, moins: broche, v: 0, absorbe: true });
+    etiquettesFixes.push({ piece: ext.piece, role: 'contact', broches: [ext.broche], connexion: ct.connexion });
+  }
 
   // Liaisons internes des modules et cartes.
   for (const l of reseau.elements) {
@@ -403,12 +447,14 @@ export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
         }
         const [vs, gnd, vio, ennId, vrefId, oa1, oa2, ob1, ob2] = ids as number[];
         const diodePont = lireDiode(valeurs['diodes_pont_modele'] as ModeleDiode | undefined) ?? lireDiode(pf.modele?.valeurs['diodes_pont_modele'] as ModeleDiode | undefined);
+        const courantUart = parametreSI(pe, 'courant_uart');
         drivers.push({
           piece: chemin,
           puce,
           n: { vs: vs!, gnd: gnd!, vio: vio!, enn: ennId!, vref: vrefId!, sorties: [oa1!, oa2!, ob1!, ob2!] },
           ...(champs as { [K in keyof typeof champs]: number }),
           ...(diodePont ? { diodePont } : {}),
+          ...(courantUart !== undefined ? { courantUart } : {}),
         });
         if (!diodePont) avertissements.add(`${chemin} : diodes du pont sans modèle, non simulées`);
         break;
@@ -471,7 +517,10 @@ export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
       const vio = v(d.n.vio) ?? 0;
       const enn = v(d.n.enn);
       const vref = Math.min(Math.max(v(d.n.vref) ?? 0, 0), d.vrefPleineEchelle);
-      const courant = (d.vPleineEchelle / (d.rMesure + d.rInterne)) * Math.SQRT1_2 * (vref / d.vrefPleineEchelle);
+      // Pleine échelle (p. 53) ; VREF la réduit, sauf si le programme règle le courant par l'UART.
+      const pleineEchelle = (d.vPleineEchelle / (d.rMesure + d.rInterne)) * Math.SQRT1_2;
+      const courant = d.courantUart !== undefined ? Math.min(d.courantUart, pleineEchelle) : pleineEchelle * (vref / d.vrefPleineEchelle);
+      const seuilsEN: [number, number] = [d.seuilBas * vio, d.seuilHaut * vio];
       let actif = true;
       let indetermine = false;
       let raison = 'actif : EN au niveau bas';
@@ -484,17 +533,32 @@ export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
         raison = `EN à ${enn.toFixed(2)} V, entre les seuils ${(d.seuilBas * vio).toFixed(2)} et ${(d.seuilHaut * vio).toFixed(2)} V : état incertain, compté actif`;
       }
       let puissance = 0;
+      let pertesPont = 0;
       elements.forEach((e, k) => {
         const et = etiquettes[k]!;
         if (e.type !== 'source' || et.role !== 'pont' || et.piece !== d.puce.chemin) return;
         const i = sol.courants[k]!;
         puissance += i * sol.tensionsElements[k]! + d.rdsHaut * i * i;
+        pertesPont += (d.rdsHaut + d.rdsBas) * i * i;
       });
-      return { actif, indetermine, raison, courant: actif ? courant : 0, compliance: Math.max(vs, 0), puissance };
+      const alimente = vs >= d.sousTensionVS && vio >= d.sousTensionIO;
+      const pertesPuce = pertesPont + (vs > 0 ? vs * (actif ? d.reposActif : d.reposInactif) : 0);
+      return { actif, indetermine, raison, courant: actif ? courant : 0, compliance: Math.max(vs, 0), puissance, pertesPuce, alimente, tensionEN: enn, seuilsEN };
     });
 
   // Boucle : on calcule, on relit l'état des drivers, on recommence jusqu'à ce qu'il ne change plus.
-  let etatsDrivers: EtatCalculDriver[] = drivers.map(() => ({ actif: false, indetermine: false, raison: '', courant: 0, compliance: 0, puissance: 0 }));
+  let etatsDrivers: EtatCalculDriver[] = drivers.map(() => ({
+    actif: false,
+    indetermine: false,
+    raison: '',
+    courant: 0,
+    compliance: 0,
+    puissance: 0,
+    pertesPuce: 0,
+    alimente: false,
+    tensionEN: undefined,
+    seuilsEN: [0, 0],
+  }));
   let elements: Element[] = fixes;
   let etiquettes: Etiquette[] = etiquettesFixes;
   let solution: Solution | undefined;
@@ -532,8 +596,15 @@ export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
     return va === undefined || vb === undefined ? undefined : va - vb;
   };
   const courantFil = (connexion: number): number | undefined => {
-    const k = etiquettes.findIndex((e) => e.role === 'fil' && e.connexion === connexion);
-    if (k >= 0) return sol.courants[k];
+    const k = etiquettes.findIndex((e) => (e.role === 'fil' || e.role === 'contact') && e.connexion === connexion);
+    if (k >= 0) {
+      const i = sol.courants[k]!;
+      if (etiquettes[k]!.role === 'fil') return i;
+      // Contact : la source de 0 V compte le courant de la broche vers le trou.
+      const c = montage.connexions[connexion]!;
+      const deEstLaBroche = etiquettes[k]!.piece === c.vers.piece && etiquettes[k]!.broches[0] === c.vers.broche;
+      return deEstLaBroche ? i : -i;
+    }
     // Fil dont les deux bouts sont sur le même nœud : aucun courant ne le traverse.
     return reseau.fils.some((f) => f.connexion === connexion) ? 0 : undefined;
   };
@@ -553,10 +624,23 @@ export function calculer(montage: Montage, catalogue: Catalogue): Calcul {
     tension,
     difference,
     courantFil,
+    fiches: new Map(pieces.map((p) => [p.chemin, p.fiche])),
     sources,
     drivers: drivers.map((d, i) => {
       const e = etatsDrivers[i]!;
-      return { piece: d.piece, actif: e.actif, indetermine: e.indetermine, raison: e.raison, courantBobine: e.courant, puissance: e.puissance };
+      return {
+        piece: d.piece,
+        actif: e.actif,
+        indetermine: e.indetermine,
+        raison: e.raison,
+        courantBobine: e.courant,
+        puissance: e.puissance,
+        pertesPuce: e.pertesPuce,
+        alimente: e.alimente,
+        tensionEN: e.tensionEN,
+        seuilsEN: e.seuilsEN,
+        parUart: d.courantUart !== undefined,
+      };
     }),
     avertissements: [...avertissements],
   };

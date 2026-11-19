@@ -5137,6 +5137,19 @@
         "page": 22,
         "ou": "3 Boot Configurations, tables 3-1 à 3-5 (p. 22 à 25)"
       }
+    },
+    {
+      "id": "entree-seule",
+      "verdict": "ne_marchera_pas",
+      "explication": "GPIO34 à GPIO39 ne savent qu'écouter : elles n'ont pas d'étage de sortie. Branchées sur une entrée d'une autre puce (STEP, DIR, EN...), elles ne peuvent pas la commander.",
+      "correction": "Brancher ce signal sur une broche capable de sortie, par exemple IO32, IO33, IO25 ou IO26.",
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-ds",
+        "page": 61,
+        "ou": "Table 6-1 Notes on ESP32 Pin Lists, note 2",
+        "citation": "GPIO pins 34-39 are input-only. These pins do not feature an output driver"
+      }
     }
   ]
 }

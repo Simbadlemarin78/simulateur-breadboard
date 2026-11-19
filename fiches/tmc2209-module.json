@@ -238,6 +238,13 @@
       "min": 0.2,
       "max": 2.2,
       "src": { "type": "hypothese", "justification": "Plage 0,2-2,2 V imprimée sur btt-schema (« Vref scope ») ; réglage d'usine 1,2 V ± 0,1 V d'après btt-wiki." }
+    },
+    "courant_uart": {
+      "description": "Courant efficace des bobines réglé par le programme via l'UART (registres IRUN et GCONF, référence interne), à saisir à la main faute d'émuler le code. Sans valeur, le courant suit VREF.",
+      "unite": "A",
+      "min": 0,
+      "max": 1.76,
+      "src": { "type": "hypothese", "justification": "Maximum : pleine échelle de la puce avec les résistances de 0,11 Ω, 325 mV / (0,11 + 0,02) Ω / √2 = 1,77 A (tmc2209-ds, p. 53), arrondi en dessous." }
     }
   },
   "modele": {
@@ -253,6 +260,13 @@
     "note": "Le calcul prend le pont de la puce U1 (fiche tmc2209) et y ajoute ces résistances de mesure et le réglage vref du potentiomètre."
   },
   "regles": [
+    {
+      "id": "en-au-demarrage",
+      "verdict": "risque",
+      "explication": "Au démarrage, tant que le programme ne commande pas EN, sa tension ne dépend que des tirages. Si EN n'est pas franchement au niveau haut, le driver peut s'activer : les bobines prennent du courant et le moteur peut bouger avant que le programme soit prêt.",
+      "correction": "Tirer EN vers 3,3 V par une résistance de 10 kΩ : les drivers restent coupés tant que le programme ne les active pas.",
+      "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions TMC2209, ENN", "citation": "power stage becomes switched off ... when this pin becomes driven to a high level" }
+    },
     {
       "id": "condensateur-reservoir",
       "verdict": "risque_eleve",

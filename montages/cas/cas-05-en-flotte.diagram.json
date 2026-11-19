@@ -1,0 +1,907 @@
+{
+  "version": 1,
+  "author": "simulateur-breadboard",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-breadboard",
+      "id": "bb1",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": -20,
+      "left": 720,
+      "attrs": {}
+    },
+    {
+      "type": "alim-labo",
+      "id": "alim",
+      "top": 250,
+      "left": -170,
+      "attrs": {
+        "tension": "12",
+        "limite_courant": "3"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -70,
+      "left": 700,
+      "attrs": {
+        "value": "1000"
+      }
+    },
+    {
+      "type": "tmc2209-module",
+      "id": "drv1",
+      "top": 60,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "mot1",
+      "top": 260,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "tmc2209-module",
+      "id": "drv2",
+      "top": 60,
+      "left": 145,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "mot2",
+      "top": 260,
+      "left": 145,
+      "attrs": {}
+    },
+    {
+      "type": "tmc2209-module",
+      "id": "drv3",
+      "top": 60,
+      "left": 260,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "mot3",
+      "top": 260,
+      "left": 260,
+      "attrs": {}
+    },
+    {
+      "type": "tmc2209-module",
+      "id": "drv4",
+      "top": 60,
+      "left": 375,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "mot4",
+      "top": 260,
+      "left": 375,
+      "attrs": {}
+    },
+    {
+      "type": "condensateur-electrolytique",
+      "id": "c1",
+      "top": 205,
+      "left": 30,
+      "attrs": {
+        "capacite": 100,
+        "tension_nominale": 35
+      }
+    },
+    {
+      "type": "condensateur-electrolytique",
+      "id": "c2",
+      "top": 205,
+      "left": 150,
+      "attrs": {
+        "capacite": 100,
+        "tension_nominale": 35
+      }
+    },
+    {
+      "type": "condensateur-electrolytique",
+      "id": "c3",
+      "top": 205,
+      "left": 270,
+      "attrs": {
+        "capacite": 100,
+        "tension_nominale": 35
+      }
+    },
+    {
+      "type": "condensateur-electrolytique",
+      "id": "c4",
+      "top": 205,
+      "left": 390,
+      "attrs": {
+        "capacite": 100,
+        "tension_nominale": 35
+      }
+    }
+  ],
+  "connections": [
+    [
+      "alim:+",
+      "bb1:bp.1",
+      "red",
+      []
+    ],
+    [
+      "alim:-",
+      "bb1:bn.1",
+      "black",
+      []
+    ],
+    [
+      "esp:3V3",
+      "bb1:tp.1",
+      "orange",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "bb1:tn.1",
+      "black",
+      []
+    ],
+    [
+      "bb1:tn.50",
+      "bb1:bn.50",
+      "black",
+      []
+    ],
+    [
+      "esp:17",
+      "r1:1",
+      "violet",
+      []
+    ],
+    [
+      "drv1:EN",
+      "bb1:3t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:MS1",
+      "bb1:4t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:MS2",
+      "bb1:5t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:PDN_UART",
+      "bb1:6t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:PDN_UART.2",
+      "bb1:7t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:CLK",
+      "bb1:8t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:STEP",
+      "bb1:9t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:DIR",
+      "bb1:10t.d",
+      "",
+      []
+    ],
+    [
+      "drv1:VM",
+      "bb1:3b.g",
+      "",
+      []
+    ],
+    [
+      "drv1:GND.1",
+      "bb1:4b.g",
+      "",
+      []
+    ],
+    [
+      "drv1:A2",
+      "bb1:5b.g",
+      "",
+      []
+    ],
+    [
+      "drv1:A1",
+      "bb1:6b.g",
+      "",
+      []
+    ],
+    [
+      "drv1:B1",
+      "bb1:7b.g",
+      "",
+      []
+    ],
+    [
+      "drv1:B2",
+      "bb1:8b.g",
+      "",
+      []
+    ],
+    [
+      "drv1:VDD",
+      "bb1:9b.g",
+      "",
+      []
+    ],
+    [
+      "drv1:GND.2",
+      "bb1:10b.g",
+      "",
+      []
+    ],
+    [
+      "bb1:3b.j",
+      "bb1:bp.3",
+      "red",
+      []
+    ],
+    [
+      "bb1:4b.j",
+      "bb1:bn.4",
+      "black",
+      []
+    ],
+    [
+      "bb1:9b.j",
+      "bb1:tp.9",
+      "orange",
+      []
+    ],
+    [
+      "bb1:10b.j",
+      "bb1:tn.10",
+      "black",
+      []
+    ],
+    [
+      "esp:32",
+      "bb1:9t.a",
+      "green",
+      []
+    ],
+    [
+      "esp:33",
+      "bb1:10t.a",
+      "blue",
+      []
+    ],
+    [
+      "esp:13",
+      "bb1:3t.a",
+      "yellow",
+      []
+    ],
+    [
+      "r1:2",
+      "bb1:6t.a",
+      "violet",
+      []
+    ],
+    [
+      "esp:16",
+      "bb1:6t.b",
+      "gray",
+      []
+    ],
+    [
+      "bb1:6b.j",
+      "mot1:A+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:5b.j",
+      "mot1:A-",
+      "gold",
+      []
+    ],
+    [
+      "bb1:7b.j",
+      "mot1:B+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:8b.j",
+      "mot1:B-",
+      "gold",
+      []
+    ],
+    [
+      "drv2:EN",
+      "bb1:15t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:MS1",
+      "bb1:16t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:MS2",
+      "bb1:17t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:PDN_UART",
+      "bb1:18t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:PDN_UART.2",
+      "bb1:19t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:CLK",
+      "bb1:20t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:STEP",
+      "bb1:21t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:DIR",
+      "bb1:22t.d",
+      "",
+      []
+    ],
+    [
+      "drv2:VM",
+      "bb1:15b.g",
+      "",
+      []
+    ],
+    [
+      "drv2:GND.1",
+      "bb1:16b.g",
+      "",
+      []
+    ],
+    [
+      "drv2:A2",
+      "bb1:17b.g",
+      "",
+      []
+    ],
+    [
+      "drv2:A1",
+      "bb1:18b.g",
+      "",
+      []
+    ],
+    [
+      "drv2:B1",
+      "bb1:19b.g",
+      "",
+      []
+    ],
+    [
+      "drv2:B2",
+      "bb1:20b.g",
+      "",
+      []
+    ],
+    [
+      "drv2:VDD",
+      "bb1:21b.g",
+      "",
+      []
+    ],
+    [
+      "drv2:GND.2",
+      "bb1:22b.g",
+      "",
+      []
+    ],
+    [
+      "bb1:15b.j",
+      "bb1:bp.15",
+      "red",
+      []
+    ],
+    [
+      "bb1:16b.j",
+      "bb1:bn.16",
+      "black",
+      []
+    ],
+    [
+      "bb1:21b.j",
+      "bb1:tp.21",
+      "orange",
+      []
+    ],
+    [
+      "bb1:22b.j",
+      "bb1:tn.22",
+      "black",
+      []
+    ],
+    [
+      "esp:25",
+      "bb1:21t.a",
+      "green",
+      []
+    ],
+    [
+      "esp:26",
+      "bb1:22t.a",
+      "blue",
+      []
+    ],
+    [
+      "bb1:6t.c",
+      "bb1:18t.a",
+      "violet",
+      []
+    ],
+    [
+      "bb1:16t.a",
+      "bb1:tp.16",
+      "orange",
+      []
+    ],
+    [
+      "bb1:18b.j",
+      "mot2:A+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:17b.j",
+      "mot2:A-",
+      "gold",
+      []
+    ],
+    [
+      "bb1:19b.j",
+      "mot2:B+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:20b.j",
+      "mot2:B-",
+      "gold",
+      []
+    ],
+    [
+      "drv3:EN",
+      "bb1:27t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:MS1",
+      "bb1:28t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:MS2",
+      "bb1:29t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:PDN_UART",
+      "bb1:30t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:PDN_UART.2",
+      "bb1:31t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:CLK",
+      "bb1:32t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:STEP",
+      "bb1:33t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:DIR",
+      "bb1:34t.d",
+      "",
+      []
+    ],
+    [
+      "drv3:VM",
+      "bb1:27b.g",
+      "",
+      []
+    ],
+    [
+      "drv3:GND.1",
+      "bb1:28b.g",
+      "",
+      []
+    ],
+    [
+      "drv3:A2",
+      "bb1:29b.g",
+      "",
+      []
+    ],
+    [
+      "drv3:A1",
+      "bb1:30b.g",
+      "",
+      []
+    ],
+    [
+      "drv3:B1",
+      "bb1:31b.g",
+      "",
+      []
+    ],
+    [
+      "drv3:B2",
+      "bb1:32b.g",
+      "",
+      []
+    ],
+    [
+      "drv3:VDD",
+      "bb1:33b.g",
+      "",
+      []
+    ],
+    [
+      "drv3:GND.2",
+      "bb1:34b.g",
+      "",
+      []
+    ],
+    [
+      "bb1:27b.j",
+      "bb1:bp.27",
+      "red",
+      []
+    ],
+    [
+      "bb1:28b.j",
+      "bb1:bn.28",
+      "black",
+      []
+    ],
+    [
+      "bb1:33b.j",
+      "bb1:tp.33",
+      "orange",
+      []
+    ],
+    [
+      "bb1:34b.j",
+      "bb1:tn.34",
+      "black",
+      []
+    ],
+    [
+      "esp:27",
+      "bb1:33t.a",
+      "green",
+      []
+    ],
+    [
+      "esp:14",
+      "bb1:34t.a",
+      "blue",
+      []
+    ],
+    [
+      "bb1:18t.c",
+      "bb1:30t.a",
+      "violet",
+      []
+    ],
+    [
+      "bb1:29t.a",
+      "bb1:tp.29",
+      "orange",
+      []
+    ],
+    [
+      "bb1:30b.j",
+      "mot3:A+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:29b.j",
+      "mot3:A-",
+      "gold",
+      []
+    ],
+    [
+      "bb1:31b.j",
+      "mot3:B+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:32b.j",
+      "mot3:B-",
+      "gold",
+      []
+    ],
+    [
+      "drv4:EN",
+      "bb1:39t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:MS1",
+      "bb1:40t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:MS2",
+      "bb1:41t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:PDN_UART",
+      "bb1:42t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:PDN_UART.2",
+      "bb1:43t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:CLK",
+      "bb1:44t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:STEP",
+      "bb1:45t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:DIR",
+      "bb1:46t.d",
+      "",
+      []
+    ],
+    [
+      "drv4:VM",
+      "bb1:39b.g",
+      "",
+      []
+    ],
+    [
+      "drv4:GND.1",
+      "bb1:40b.g",
+      "",
+      []
+    ],
+    [
+      "drv4:A2",
+      "bb1:41b.g",
+      "",
+      []
+    ],
+    [
+      "drv4:A1",
+      "bb1:42b.g",
+      "",
+      []
+    ],
+    [
+      "drv4:B1",
+      "bb1:43b.g",
+      "",
+      []
+    ],
+    [
+      "drv4:B2",
+      "bb1:44b.g",
+      "",
+      []
+    ],
+    [
+      "drv4:VDD",
+      "bb1:45b.g",
+      "",
+      []
+    ],
+    [
+      "drv4:GND.2",
+      "bb1:46b.g",
+      "",
+      []
+    ],
+    [
+      "bb1:39b.j",
+      "bb1:bp.39",
+      "red",
+      []
+    ],
+    [
+      "bb1:40b.j",
+      "bb1:bn.40",
+      "black",
+      []
+    ],
+    [
+      "bb1:45b.j",
+      "bb1:tp.45",
+      "orange",
+      []
+    ],
+    [
+      "bb1:46b.j",
+      "bb1:tn.46",
+      "black",
+      []
+    ],
+    [
+      "esp:18",
+      "bb1:45t.a",
+      "green",
+      []
+    ],
+    [
+      "esp:19",
+      "bb1:46t.a",
+      "blue",
+      []
+    ],
+    [
+      "bb1:30t.c",
+      "bb1:42t.a",
+      "violet",
+      []
+    ],
+    [
+      "bb1:40t.a",
+      "bb1:tp.40",
+      "orange",
+      []
+    ],
+    [
+      "bb1:41t.a",
+      "bb1:tp.41",
+      "orange",
+      []
+    ],
+    [
+      "bb1:42b.j",
+      "mot4:A+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:41b.j",
+      "mot4:A-",
+      "gold",
+      []
+    ],
+    [
+      "bb1:43b.j",
+      "mot4:B+",
+      "gold",
+      []
+    ],
+    [
+      "bb1:44b.j",
+      "mot4:B-",
+      "gold",
+      []
+    ],
+    [
+      "bb1:3b.i",
+      "c1:+",
+      "red",
+      []
+    ],
+    [
+      "bb1:4b.i",
+      "c1:-",
+      "black",
+      []
+    ],
+    [
+      "bb1:15b.i",
+      "c2:+",
+      "red",
+      []
+    ],
+    [
+      "bb1:16b.i",
+      "c2:-",
+      "black",
+      []
+    ],
+    [
+      "bb1:27b.i",
+      "c3:+",
+      "red",
+      []
+    ],
+    [
+      "bb1:28b.i",
+      "c3:-",
+      "black",
+      []
+    ],
+    [
+      "bb1:39b.i",
+      "c4:+",
+      "red",
+      []
+    ],
+    [
+      "bb1:40b.i",
+      "c4:-",
+      "black",
+      []
+    ]
+  ],
+  "dependencies": {}
+}
