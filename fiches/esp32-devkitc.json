@@ -911,5 +911,28 @@
         "citation": "GPIO6 to GPIO11 ... are connected to the SPI flash integrated on the module and are not recommended for other uses"
       }
     }
-  ]
+  ],
+  "parametres": {
+    "alimentation_usb": {
+      "description": "La carte est branchée au PC par l'USB : le régulateur AMS1117 fournit le 3,3 V. Mettre false si on alimente soi-même la broche 3V3.",
+      "unite": "1",
+      "defaut": true,
+      "src": {
+        "type": "hypothese",
+        "justification": "Cas de la base roulante : l'ESP32 est alimenté par l'USB pendant les essais. Le régulateur est vu comme une source de 3,3 V qui fournit du courant sans en absorber, sans limite de courant (sa datasheet n'est pas dans datasheets/)."
+      }
+    },
+    "consommation": {
+      "description": "Courant consommé par la puce sur le 3,3 V, vu comme une résistance équivalente. 68 mA : haut de la plage sans Wi-Fi ; jusqu'à 240 mA en émission Wi-Fi (datasheet p. 52).",
+      "unite": "mA",
+      "defaut": 68,
+      "min": 0,
+      "max": 500,
+      "src": {
+        "type": "heritee",
+        "fiche": "esp32",
+        "chemin": "modele/valeurs/consommation_modem_sleep/max"
+      }
+    }
+  }
 }

@@ -288,6 +288,7 @@
                 "vers_alim": { "type": "boolean" },
                 "vers_masse": { "type": "boolean" },
                 "courant_injection_max": { "$ref": "#/$defs/grandeur" },
+                "diode": { "$ref": "#/$defs/diode" },
                 "src": { "$ref": "#/$defs/source" }
               }
             }
@@ -393,10 +394,24 @@
             "oneOf": [
               { "$ref": "#/$defs/grandeur" },
               { "$ref": "#/$defs/fait" },
-              { "$ref": "#/$defs/table" }
+              { "$ref": "#/$defs/table" },
+              { "$ref": "#/$defs/diode" }
             ]
           }
         },
+        "note": { "type": "string" }
+      }
+    },
+
+    "diode": {
+      "description": "Loi d'une diode pour le calcul (loi de Shockley) : chute de tension directe à un courant donné et coefficient d'idéalité n.",
+      "type": "object",
+      "required": ["tension_directe", "courant", "idealite"],
+      "additionalProperties": false,
+      "properties": {
+        "tension_directe": { "$ref": "#/$defs/grandeur" },
+        "courant": { "description": "Courant auquel la chute de tension directe est donnée.", "$ref": "#/$defs/grandeur" },
+        "idealite": { "description": "Coefficient d'idéalité n, sans unité (1 pour une jonction idéale, jusqu'à 2 environ).", "$ref": "#/$defs/grandeur" },
         "note": { "type": "string" }
       }
     },

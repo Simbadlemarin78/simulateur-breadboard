@@ -156,8 +156,9 @@ Le moteur (étapes 1, 2, 3, 5, 6) est inchangé. L'éditeur ajoute trois étapes
    - Une pièce enfichée dans la breadboard est recalée pile sur ses trous. Survoler une broche éclaire tout son nœud.
    - Les fils sont routés automatiquement à angle droit, sans jamais se superposer, en contournant les pièces et sans passer sur un trou qui n'est pas le leur (demande de Jean). Dans l'éditeur (étape 7), un fil restera droit pendant qu'on le tire, puis sera routé ainsi quand on le lâche.
    - Test automatique : chaque broche de chaque fiche a une position sur son dessin. Test à l'œil : la base roulante s'affiche sur la page en ligne.
-5. **Calcul en continu** (environ 8 h, semaine 3). Méthode des nœuds : la loi des nœuds en chaque point donne un système linéaire G·V = I, qu'on résout. Les diodes ne sont pas linéaires : on linéarise et on itère avec la méthode de Newton, vue en prépa. L'alim de labo passe de « tension constante » à « courant constant » quand elle atteint sa limite.
+5. **Calcul en continu** (environ 8 h, semaine 3, fait le 19/11/2026). Méthode des nœuds : la loi des nœuds en chaque point donne un système linéaire G·V = I, qu'on résout. Les diodes ne sont pas linéaires : on linéarise et on itère avec la méthode de Newton, vue en prépa. L'alim de labo passe de « tension constante » à « courant constant » quand elle atteint sa limite.
    - Test : six circuits calculés à la main, à moins de 1 % près. Pont diviseur, LED + résistance, alim limitée en court-circuit, deux sources qui se battent, consommation d'un driver. Et 12 V à travers 10 kΩ sur une broche 3,3 V : environ 0,8 mA dans la diode de protection, soit (12 − 3,3 − 0,6) V / 10 kΩ.
+   - Fait : solveur générique (`src/moteur/solveur.ts`) et traduction du montage en éléments (`src/moteur/circuit.ts`). Les fils ont la résistance de la fiche du fil Dupont, les sources changent de régime d'elles-mêmes, le driver prend sur VS la puissance de ses bobines. La base roulante se calcule en quelques dizaines de millisecondes. Premier résultat : avec les quatre modules, EN est à 2,97 V au démarrage (et non 2,3 V), au-dessus du seuil haut du TMC2209 : les drivers démarrent coupés.
 6. **Vérifications, règles, verdicts** (environ 7 h, semaines 3 et 4). Chaque broche est comparée à sa fiche, la température est estimée (T ≈ T ambiante + Rth × P), et les règles tournent. Chaque verdict sort avec sa valeur, sa limite, sa source, son explication et sa correction.
    - Test : les 10 montages donnent chacun le verdict attendu, sur la bonne broche.
    - Test : le montage corrigé ne donne aucun verdict rouge. C'est le critère « zéro fausse alerte ». Corrigé veut dire : condensateurs, tirage sur EN, masse commune, MS1/MS2 identiques.
@@ -228,12 +229,14 @@ Mis à jour le 19/11/2026.
 - [ ] Toi : valider le seuil de « grillé » du cas 1 : Espressif ne publie aucune limite de courant d'injection, j'ai pris les 200 mA de l'essai de latch-up (hypothèse).
 - [x] Moi : fiches breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont, en brouillon (les 11 fiches de l'étape 2 sont écrites).
 - [ ] Toi : vérifier sur ton matériel la breadboard (nombre de colonnes, rails coupés au milieu ou non), le modèle de ton alim et la capacité de ta LiPo.
+- [x] Moi : étape 5 (calcul en continu), avec de nouvelles valeurs en brouillon dans les fiches : diodes de protection et du pont, consommation de l'ESP32 et du TMC2209, pleine échelle de VREF, résistance de mesure du module.
+- [ ] Toi : valider les hypothèses du calcul : diodes de protection à 0,6 V sous 1 mA (note NXP AN4731), diodes du pont à 1,0 V sous 3 A (TI LMD18245), alim de labo qui n'absorbe pas de courant, ESP32 alimenté par l'USB et consommant 68 mA.
 
 Questions encore ouvertes :
 
 - Que veut dire « près du driver » pour le condensateur ? Je propose d'abord « sur les mêmes bandes du breadboard que VM et GND du driver », à affiner.
 - Les quatre drivers forment-ils un « groupe » déclaré dans le montage (la base roulante) ? Le cas 7 compare les micro-pas à l'intérieur d'un groupe. Je propose oui, via un attribut du montage.
-- Le cas 5 (EN qui flotte) : sur le module BIGTREETECH, EN est tiré vers VDD par 20 kΩ, donc un EN en l'air coupe le driver. Si tes modules sont faits pareil, le cas 5 doit se reformuler. Mais la datasheet de l'ESP32 (p. 69) montre qu'après le reset, IO13 tire vers la masse par 45 kΩ : avec les 20 kΩ du module, EN tombe vers 2,3 V, dans la zone indécise du TMC2209. Le cas 5 reste donc un vrai risque, que seul le calcul voit.
+- Le cas 5 (EN qui flotte) : sur le module BIGTREETECH, EN est tiré vers VDD par 20 kΩ, donc un EN en l'air coupe le driver. Si tes modules sont faits pareil, le cas 5 doit se reformuler. Mais la datasheet de l'ESP32 (p. 69) montre qu'après le reset, IO13 tire vers la masse par 45 kΩ : avec les 20 kΩ d'un module, EN tombe vers 2,3 V, dans la zone indécise du TMC2209. Avec quatre modules en parallèle (5 kΩ), le calcul de l'étape 5 donne 2,97 V : au-dessus du seuil haut, drivers coupés, mais avec seulement 0,66 V de marge. Le cas 5 reste un vrai sujet, que seul le calcul voit, et sa conclusion dépend du nombre de modules et de la vraie valeur du tirage.
 
 ## Sources
 

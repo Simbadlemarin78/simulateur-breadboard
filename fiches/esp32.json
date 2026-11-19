@@ -14,6 +14,15 @@
       "revision": "5.3",
       "url": "https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf",
       "sha256": "a7917e6b47528c9dcab06837a49d452e582751335797db879f1cf2d17cd29adf"
+    },
+    {
+      "id": "nxp-an4731",
+      "titre": "Understanding Injection Current on NXP Automotive Microcontrollers (AN4731)",
+      "editeur": "NXP Semiconductors",
+      "revision": "2",
+      "date": "2017-12",
+      "url": "https://www.nxp.com/docs/en/application-note/AN4731.pdf",
+      "sha256": "93aa8f927a0c9233970c632e2d09de2c40494b20964f856fbffad419fd99c047"
     }
   ],
   "validation": {
@@ -5045,6 +5054,59 @@
           "page": 23,
           "ou": "Table 3-2 Description of Timing Parameters for the Strapping Pins",
           "citation": "tH Hold time ... 1 ms"
+        }
+      },
+      "diodes_protection": {
+        "tension_directe": {
+          "typ": 0.6,
+          "unite": "V",
+          "conditions": "à 1 mA, 25 °C",
+          "src": {
+            "type": "hypothese",
+            "justification": "Espressif ne donne pas la chute de tension des diodes de protection. Note NXP AN4731 rév. 2 (autres microcontrôleurs CMOS) : presque aucun courant tant que la broche reste sous l'alim + 0,5 V environ (p. 13, mesure sur un MPC5554 ; 0,4 V sur un MPC5646C, p. 21), et la résistance de protection se calcule avec l'alim + 0,5 V (p. 12). Un milliampère passe un peu au-delà : 0,6 V retenu, valeur courante d'une jonction au silicium. Un écart de 0,1 V change de 1 à 2 % le courant d'un montage à résistance."
+          }
+        },
+        "courant": {
+          "typ": 1,
+          "unite": "mA",
+          "src": {
+            "type": "hypothese",
+            "justification": "Courant auquel on fixe la chute de 0,6 V : l'ordre de grandeur des courants d'injection tolérés (voir tension_directe)."
+          }
+        },
+        "idealite": {
+          "typ": 1,
+          "unite": "1",
+          "src": {
+            "type": "hypothese",
+            "justification": "Jonction idéale (n = 1) : aucune mesure disponible ; n plus grand ne déplacerait la tension que de quelques dizaines de millivolts par décade de courant."
+          }
+        },
+        "note": "Sert au calcul du courant dans les diodes de protection quand une broche dépasse l'alim ou passe sous la masse (cas 1)."
+      },
+      "resistance_tirage": {
+        "typ": 45,
+        "unite": "kΩ",
+        "conditions": "tirage interne haut ou bas, quand le programme l'active",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-ds",
+          "page": 52,
+          "ou": "Table 5-3 DC Characteristics (3.3 V, 25 °C)",
+          "citation": "RPU / RPD Resistance of internal pull-up / pull-down resistor 45 kΩ"
+        }
+      },
+      "consommation_modem_sleep": {
+        "min": 30,
+        "max": 68,
+        "unite": "mA",
+        "conditions": "Modem-sleep, CPU à 240 MHz, puce double cœur : Wi-Fi et Bluetooth coupés",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-ds",
+          "page": 30,
+          "ou": "Table 4-2 Power Consumption by Power Modes",
+          "citation": "240 MHz Dual-core chip(s) 30 mA ~ 68 mA"
         }
       }
     }

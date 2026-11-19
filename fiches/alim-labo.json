@@ -69,6 +69,10 @@
         "unite": "V",
         "src": { "type": "datasheet", "doc": "velleman-labps3005d", "page": 4, "ou": "5. Description", "citation": "The output voltage can be adjusted between 0V and 30V" }
       },
+      "absorbe_courant": {
+        "valeur": false,
+        "src": { "type": "hypothese", "justification": "Le manuel ne dit rien d'un courant renvoyé dans la sortie. Une alim de labo fournit du courant mais n'en absorbe pas : face à une source plus haute (une batterie chargée), sa sortie monte à la tension de cette source et le courant s'annule. À vérifier : certaines alims ont une diode de protection en inverse sur leur sortie." }
+      },
       "courant_max": {
         "max": 5,
         "unite": "A",

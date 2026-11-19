@@ -24,11 +24,29 @@ export interface ElementInterne {
   valeur?: Grandeur;
 }
 
+/** Un fil gardé à part (option filsSepares) : connexion du montage et nœuds de ses deux bouts. */
+export interface FilSepare {
+  /** Indice de la connexion dans montage.connexions. */
+  connexion: number;
+  noeuds: [number, number];
+}
+
 export interface Reseau {
   noeuds: Noeud[];
   elements: ElementInterne[];
+  /** Fils gardés à part ; vide sans l'option filsSepares. */
+  fils: FilSepare[];
   /** Nœud d'un point "piece:broche" (alias acceptés pour les pièces du montage). */
   noeudDe(point: string): Noeud | undefined;
+}
+
+export interface OptionsReseau {
+  /**
+   * Garde les fils (connexions avec une couleur) comme des éléments entre deux nœuds au lieu de
+   * fondre leurs deux bouts : le calcul leur donne une résistance et un courant. Les enfichages
+   * (connexions sans couleur) restent fondus.
+   */
+  filsSepares?: boolean;
 }
 
 /** Union-find : chaque point pointe vers un représentant de son groupe. */
@@ -77,7 +95,7 @@ export function bandeBreadboard(trou: string, railsCoupes: boolean): string | un
   return undefined;
 }
 
-export function construireReseau(montage: Montage, catalogue: Catalogue): Reseau {
+export function construireReseau(montage: Montage, catalogue: Catalogue, options: OptionsReseau = {}): Reseau {
   const groupes = new Groupes();
   const liaisons: { piece: string; type: ElementInterne['type']; entre: [string, string]; valeur?: Grandeur }[] = [];
   const erreurs: string[] = [];
@@ -124,7 +142,16 @@ export function construireReseau(montage: Montage, catalogue: Catalogue): Reseau
   };
 
   for (const piece of montage.pieces) ajouterPiece(piece.id, piece.fiche, piece.parametres);
-  for (const c of montage.connexions) groupes.unir(`${c.de.piece}:${c.de.broche}`, `${c.vers.piece}:${c.vers.broche}`);
+  const filsAPart: number[] = [];
+  montage.connexions.forEach((c, i) => {
+    const de = `${c.de.piece}:${c.de.broche}`;
+    const vers = `${c.vers.piece}:${c.vers.broche}`;
+    if (options.filsSepares && c.couleur !== '') {
+      groupes.ajouter(de);
+      groupes.ajouter(vers);
+      filsAPart.push(i);
+    } else groupes.unir(de, vers);
+  });
   if (erreurs.length > 0) throw new Error(`Réseau impossible à construire :\n- ${erreurs.join('\n- ')}`);
 
   // Regroupement par racine, ordre stable : nœuds triés par leur premier point.
@@ -158,7 +185,14 @@ export function construireReseau(montage: Montage, catalogue: Catalogue): Reseau
     return { ...l, noeuds: [na.id, nb.id] };
   });
 
-  return { noeuds, elements, noeudDe };
+  const fils: FilSepare[] = filsAPart.map((i) => {
+    const c = montage.connexions[i]!;
+    const na = indexPoint.get(`${c.de.piece}:${c.de.broche}`)!;
+    const nb = indexPoint.get(`${c.vers.piece}:${c.vers.broche}`)!;
+    return { connexion: i, noeuds: [na.id, nb.id] };
+  });
+
+  return { noeuds, elements, fils, noeudDe };
 }
 
 /**

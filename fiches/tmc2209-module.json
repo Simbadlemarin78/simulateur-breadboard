@@ -240,6 +240,18 @@
       "src": { "type": "hypothese", "justification": "Plage 0,2-2,2 V imprimée sur btt-schema (« Vref scope ») ; réglage d'usine 1,2 V ± 0,1 V d'après btt-wiki." }
     }
   },
+  "modele": {
+    "type": "driver_pas_a_pas",
+    "valeurs": {
+      "resistance_mesure": {
+        "typ": 0.11,
+        "unite": "Ω",
+        "conditions": "une par bobine : R2 sur BRA, R4 sur BRB",
+        "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R2 sur BRA, R4 sur BRB", "citation": "R2 0R11 ; R4 0R11" }
+      }
+    },
+    "note": "Le calcul prend le pont de la puce U1 (fiche tmc2209) et y ajoute ces résistances de mesure et le réglage vref du potentiomètre."
+  },
   "regles": [
     {
       "id": "condensateur-reservoir",

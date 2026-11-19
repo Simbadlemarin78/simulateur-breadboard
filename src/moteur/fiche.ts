@@ -68,6 +68,54 @@ export interface Fiche {
   [champ: string]: unknown;
 }
 
+/** Loi d'une diode (schéma : $defs/diode). */
+export interface ModeleDiode {
+  tension_directe: Grandeur;
+  courant: Grandeur;
+  idealite: Grandeur;
+}
+
+/** Facteur qui ramène une unité de fiche à l'unité de base (V, A, Ω, F, W, s, Hz). */
+const FACTEURS: Record<string, number> = {
+  mV: 1e-3,
+  mA: 1e-3,
+  µA: 1e-6,
+  nA: 1e-9,
+  mΩ: 1e-3,
+  kΩ: 1e3,
+  MΩ: 1e6,
+  mF: 1e-3,
+  µF: 1e-6,
+  nF: 1e-9,
+  pF: 1e-12,
+  mH: 1e-3,
+  µH: 1e-6,
+  mW: 1e-3,
+  ms: 1e-3,
+  µs: 1e-6,
+  ns: 1e-9,
+  kHz: 1e3,
+  MHz: 1e6,
+};
+
+/** Convertit un nombre exprimé dans l'unité d'une fiche vers l'unité de base. */
+export function versUniteDeBase(valeur: number, unite: string): number {
+  return valeur * (FACTEURS[unite] ?? 1);
+}
+
+/**
+ * Valeur d'une grandeur dans l'unité de base : le premier champ présent parmi ceux demandés
+ * (typique par défaut, puis max, puis min).
+ */
+export function valeurSI(g: Grandeur | undefined, ordre: ('typ' | 'min' | 'max')[] = ['typ', 'max', 'min']): number | undefined {
+  if (!g) return undefined;
+  for (const champ of ordre) {
+    const v = g[champ];
+    if (v !== undefined) return versUniteDeBase(v, g.unite);
+  }
+  return undefined;
+}
+
 /** Trouve une broche par son nom ou l'un de ses alias. */
 export function trouverBroche(fiche: Fiche, nom: string): Broche | undefined {
   return fiche.broches.find((b) => b.nom === nom) ?? fiche.broches.find((b) => b.alias?.includes(nom));

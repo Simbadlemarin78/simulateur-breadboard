@@ -15,6 +15,24 @@
       "date": "2022-05-25",
       "url": "https://media.digikey.com/pdf/Data%20Sheets/Trinamic%20Motion%20Control%20PDFs/TMC2209_Rev.1.08.pdf",
       "sha256": "24d6fe363ff4e5898c0c3fa2ed06e9d8a04e34481a5ad5cc9e4555e7403fdd44"
+    },
+    {
+      "id": "ti-lmd18245",
+      "titre": "LMD18245 3A, 55V DMOS Full-Bridge Motor Driver",
+      "editeur": "Texas Instruments",
+      "revision": "SNVS110E",
+      "date": "2013-04",
+      "url": "https://www.ti.com/lit/ds/symlink/lmd18245.pdf",
+      "sha256": "3b05f4e2c11e92e302dd8be0dd6db4412b8344e5caaf9887f8828b31c7f866d3"
+    },
+    {
+      "id": "nxp-an4731",
+      "titre": "Understanding Injection Current on NXP Automotive Microcontrollers (AN4731)",
+      "editeur": "NXP Semiconductors",
+      "revision": "2",
+      "date": "2017-12",
+      "url": "https://www.nxp.com/docs/en/application-note/AN4731.pdf",
+      "sha256": "93aa8f927a0c9233970c632e2d09de2c40494b20964f856fbffad419fd99c047"
     }
   ],
   "validation": {
@@ -462,6 +480,31 @@
         "max": 3,
         "unite": "A",
         "src": { "type": "hypothese", "justification": "Repris du courant répétitif maximal du pont (IOx = 3 A, p. 75), faute de valeur propre aux diodes. Cas 2 : au-delà, « grillé » ; en dessous, « risque élevé »." }
+      },
+      "diodes_pont_modele": {
+        "tension_directe": { "typ": 1.0, "unite": "V", "conditions": "à 3 A", "src": { "type": "hypothese", "justification": "Trinamic ne donne pas la chute de tension des diodes internes du pont. Reprise d'un autre pont en H intégré en DMOS, le TI LMD18245 (SNVS110E, p. 5) : « Body Diode Forward Voltage IDIODE = 3A 1.0 V »." } },
+        "courant": { "typ": 3, "unite": "A", "src": { "type": "hypothese", "justification": "Courant de la mesure du LMD18245 (SNVS110E, p. 5), voir tension_directe." } },
+        "idealite": { "typ": 2, "unite": "1", "src": { "type": "hypothese", "justification": "n = 2 : une diode de puissance perd de l'idéalité aux forts courants. Avec n = 2, la chute passe de 1,0 V à 3 A à environ 0,83 V à 0,1 A." } },
+        "note": "Sert au cas 2 : VS sous GND, deux diodes en série (côté GND puis côté VS) conduisent à travers chaque sortie."
+      },
+      "diodes_protection": {
+        "tension_directe": { "typ": 0.6, "unite": "V", "conditions": "à 1 mA, 25 °C", "src": { "type": "hypothese", "justification": "Trinamic ne donne pas la chute de tension des diodes de protection des entrées. Note NXP AN4731 rév. 2 (autres puces CMOS) : presque aucun courant tant que la broche reste sous l'alim + 0,5 V environ (p. 13) ; résistance de protection calculée avec l'alim + 0,5 V (p. 12). 0,6 V retenu à 1 mA, valeur courante d'une jonction au silicium." } },
+        "courant": { "typ": 1, "unite": "mA", "src": { "type": "hypothese", "justification": "Courant auquel on fixe la chute de 0,6 V, du même ordre que les ±10 mA tolérés par les broches logiques (p. 75)." } },
+        "idealite": { "typ": 1, "unite": "1", "src": { "type": "hypothese", "justification": "Jonction idéale (n = 1), faute de mesure." } },
+        "note": "Diodes de protection des entrées logiques, vers VCC_IO et vers GND."
+      },
+      "courant_vs_fonctionnement": {
+        "typ": 7.5,
+        "unite": "mA",
+        "conditions": "VS = 24 V, horloge 12 MHz, découpage à 35 kHz, sans moteur",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 76, "ou": "Power supply current DC-Characteristics", "citation": "Total supply current, operating ... 35kHz chopper, no load 7.5 mA" },
+        "note": "Consommation propre de la puce quand le pont travaille, en plus de la puissance envoyée aux bobines."
+      },
+      "tension_vref_pleine_echelle": {
+        "typ": 2.5,
+        "unite": "V",
+        "conditions": "I_scale_analog = 1 (réglage par défaut) ; au-dessus de 2,5 V, le courant ne monte plus",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 54, "ou": "9 Motor Current Control, Analog current scaling VREF", "citation": "A voltage of 2.5V (or any voltage between 2.5V and 5V) gives the same current" }
       }
     }
   },
