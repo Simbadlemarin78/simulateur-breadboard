@@ -13,15 +13,15 @@
     {
       "type": "board-esp32-devkit-c-v4",
       "id": "esp",
-      "top": -40,
-      "left": -260,
+      "top": -20,
+      "left": 720,
       "attrs": {}
     },
     {
       "type": "alim-labo",
       "id": "alim",
-      "top": 260,
-      "left": -260,
+      "top": 250,
+      "left": -170,
       "attrs": {
         "tension": "12",
         "limite_courant": "3"
@@ -30,8 +30,8 @@
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": -90,
-      "left": -60,
+      "top": -70,
+      "left": 700,
       "attrs": {
         "value": "1000"
       }
@@ -132,97 +132,97 @@
     ],
     [
       "drv1:EN",
-      "bb1:3t.e",
+      "bb1:3t.d",
       "",
       []
     ],
     [
       "drv1:MS1",
-      "bb1:4t.e",
+      "bb1:4t.d",
       "",
       []
     ],
     [
       "drv1:MS2",
-      "bb1:5t.e",
+      "bb1:5t.d",
       "",
       []
     ],
     [
       "drv1:PDN_UART",
-      "bb1:6t.e",
+      "bb1:6t.d",
       "",
       []
     ],
     [
       "drv1:PDN_UART.2",
-      "bb1:7t.e",
+      "bb1:7t.d",
       "",
       []
     ],
     [
       "drv1:CLK",
-      "bb1:8t.e",
+      "bb1:8t.d",
       "",
       []
     ],
     [
       "drv1:STEP",
-      "bb1:9t.e",
+      "bb1:9t.d",
       "",
       []
     ],
     [
       "drv1:DIR",
-      "bb1:10t.e",
+      "bb1:10t.d",
       "",
       []
     ],
     [
       "drv1:VM",
-      "bb1:3b.f",
+      "bb1:3b.g",
       "",
       []
     ],
     [
       "drv1:GND.1",
-      "bb1:4b.f",
+      "bb1:4b.g",
       "",
       []
     ],
     [
       "drv1:A2",
-      "bb1:5b.f",
+      "bb1:5b.g",
       "",
       []
     ],
     [
       "drv1:A1",
-      "bb1:6b.f",
+      "bb1:6b.g",
       "",
       []
     ],
     [
       "drv1:B1",
-      "bb1:7b.f",
+      "bb1:7b.g",
       "",
       []
     ],
     [
       "drv1:B2",
-      "bb1:8b.f",
+      "bb1:8b.g",
       "",
       []
     ],
     [
       "drv1:VDD",
-      "bb1:9b.f",
+      "bb1:9b.g",
       "",
       []
     ],
     [
       "drv1:GND.2",
-      "bb1:10b.f",
+      "bb1:10b.g",
       "",
       []
     ],
@@ -306,97 +306,97 @@
     ],
     [
       "drv2:EN",
-      "bb1:15t.e",
+      "bb1:15t.d",
       "",
       []
     ],
     [
       "drv2:MS1",
-      "bb1:16t.e",
+      "bb1:16t.d",
       "",
       []
     ],
     [
       "drv2:MS2",
-      "bb1:17t.e",
+      "bb1:17t.d",
       "",
       []
     ],
     [
       "drv2:PDN_UART",
-      "bb1:18t.e",
+      "bb1:18t.d",
       "",
       []
     ],
     [
       "drv2:PDN_UART.2",
-      "bb1:19t.e",
+      "bb1:19t.d",
       "",
       []
     ],
     [
       "drv2:CLK",
-      "bb1:20t.e",
+      "bb1:20t.d",
       "",
       []
     ],
     [
       "drv2:STEP",
-      "bb1:21t.e",
+      "bb1:21t.d",
       "",
       []
     ],
     [
       "drv2:DIR",
-      "bb1:22t.e",
+      "bb1:22t.d",
       "",
       []
     ],
     [
       "drv2:VM",
-      "bb1:15b.f",
+      "bb1:15b.g",
       "",
       []
     ],
     [
       "drv2:GND.1",
-      "bb1:16b.f",
+      "bb1:16b.g",
       "",
       []
     ],
     [
       "drv2:A2",
-      "bb1:17b.f",
+      "bb1:17b.g",
       "",
       []
     ],
     [
       "drv2:A1",
-      "bb1:18b.f",
+      "bb1:18b.g",
       "",
       []
     ],
     [
       "drv2:B1",
-      "bb1:19b.f",
+      "bb1:19b.g",
       "",
       []
     ],
     [
       "drv2:B2",
-      "bb1:20b.f",
+      "bb1:20b.g",
       "",
       []
     ],
     [
       "drv2:VDD",
-      "bb1:21b.f",
+      "bb1:21b.g",
       "",
       []
     ],
     [
       "drv2:GND.2",
-      "bb1:22b.f",
+      "bb1:22b.g",
       "",
       []
     ],
@@ -480,97 +480,97 @@
     ],
     [
       "drv3:EN",
-      "bb1:27t.e",
+      "bb1:27t.d",
       "",
       []
     ],
     [
       "drv3:MS1",
-      "bb1:28t.e",
+      "bb1:28t.d",
       "",
       []
     ],
     [
       "drv3:MS2",
-      "bb1:29t.e",
+      "bb1:29t.d",
       "",
       []
     ],
     [
       "drv3:PDN_UART",
-      "bb1:30t.e",
+      "bb1:30t.d",
       "",
       []
     ],
     [
       "drv3:PDN_UART.2",
-      "bb1:31t.e",
+      "bb1:31t.d",
       "",
       []
     ],
     [
       "drv3:CLK",
-      "bb1:32t.e",
+      "bb1:32t.d",
       "",
       []
     ],
     [
       "drv3:STEP",
-      "bb1:33t.e",
+      "bb1:33t.d",
       "",
       []
     ],
     [
       "drv3:DIR",
-      "bb1:34t.e",
+      "bb1:34t.d",
       "",
       []
     ],
     [
       "drv3:VM",
-      "bb1:27b.f",
+      "bb1:27b.g",
       "",
       []
     ],
     [
       "drv3:GND.1",
-      "bb1:28b.f",
+      "bb1:28b.g",
       "",
       []
     ],
     [
       "drv3:A2",
-      "bb1:29b.f",
+      "bb1:29b.g",
       "",
       []
     ],
     [
       "drv3:A1",
-      "bb1:30b.f",
+      "bb1:30b.g",
       "",
       []
     ],
     [
       "drv3:B1",
-      "bb1:31b.f",
+      "bb1:31b.g",
       "",
       []
     ],
     [
       "drv3:B2",
-      "bb1:32b.f",
+      "bb1:32b.g",
       "",
       []
     ],
     [
       "drv3:VDD",
-      "bb1:33b.f",
+      "bb1:33b.g",
       "",
       []
     ],
     [
       "drv3:GND.2",
-      "bb1:34b.f",
+      "bb1:34b.g",
       "",
       []
     ],
@@ -654,97 +654,97 @@
     ],
     [
       "drv4:EN",
-      "bb1:39t.e",
+      "bb1:39t.d",
       "",
       []
     ],
     [
       "drv4:MS1",
-      "bb1:40t.e",
+      "bb1:40t.d",
       "",
       []
     ],
     [
       "drv4:MS2",
-      "bb1:41t.e",
+      "bb1:41t.d",
       "",
       []
     ],
     [
       "drv4:PDN_UART",
-      "bb1:42t.e",
+      "bb1:42t.d",
       "",
       []
     ],
     [
       "drv4:PDN_UART.2",
-      "bb1:43t.e",
+      "bb1:43t.d",
       "",
       []
     ],
     [
       "drv4:CLK",
-      "bb1:44t.e",
+      "bb1:44t.d",
       "",
       []
     ],
     [
       "drv4:STEP",
-      "bb1:45t.e",
+      "bb1:45t.d",
       "",
       []
     ],
     [
       "drv4:DIR",
-      "bb1:46t.e",
+      "bb1:46t.d",
       "",
       []
     ],
     [
       "drv4:VM",
-      "bb1:39b.f",
+      "bb1:39b.g",
       "",
       []
     ],
     [
       "drv4:GND.1",
-      "bb1:40b.f",
+      "bb1:40b.g",
       "",
       []
     ],
     [
       "drv4:A2",
-      "bb1:41b.f",
+      "bb1:41b.g",
       "",
       []
     ],
     [
       "drv4:A1",
-      "bb1:42b.f",
+      "bb1:42b.g",
       "",
       []
     ],
     [
       "drv4:B1",
-      "bb1:43b.f",
+      "bb1:43b.g",
       "",
       []
     ],
     [
       "drv4:B2",
-      "bb1:44b.f",
+      "bb1:44b.g",
       "",
       []
     ],
     [
       "drv4:VDD",
-      "bb1:45b.f",
+      "bb1:45b.g",
       "",
       []
     ],
     [
       "drv4:GND.2",
-      "bb1:46b.f",
+      "bb1:46b.g",
       "",
       []
     ],

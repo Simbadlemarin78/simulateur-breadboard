@@ -44,7 +44,7 @@ Pour la V1, on part de zéro, sur des briques MIT. On décide entre forker Velxi
 4. **Le bon modèle n'est pas SPICE seul.** Un driver qui règle le courant de ses bobines se décrit mieux par un comportement que par ses transistors. Il consomme une puissance sur VM et impose un courant aux bobines. On maîtrise mieux ça dans notre propre solveur.
 5. **On garde la porte ouverte.** Du code MIT peut entrer tel quel dans un fork AGPL de Velxio, ou lui être proposé. On lit et on écrit du diagram.json, donc un montage passe d'un outil à l'autre.
 
-Mise à jour du 19/11/2026 : tu veux l'éditeur en glisser-déposer dès la V1. On le construit nous-mêmes, après le moteur, sur les dessins de [wokwi-elements](https://github.com/wokwi/wokwi-elements) (MIT) quand la pièce existe : moteur pas à pas, résistance, LED, potentiomètre, ESP32 DevKit V1 (30 broches). Le reste est dessiné en SVG maison : breadboard, module TMC2209, alim de labo, LiPo, condensateur, et ta carte ESP32 à 38 broches. Ce qu'on perd encore en V1 : l'émulation du code, qui se teste dans Wokwi, et la 3D.
+Mise à jour du 19/11/2026 : tu veux l'éditeur en glisser-déposer dès la V1. On le construit nous-mêmes, après le moteur. Toutes les pièces sont dessinées en SVG maison (breadboard, ESP32 à 38 broches, module TMC2209, moteur, résistance, alim, LiPo, condensateur) ; [wokwi-elements](https://github.com/wokwi/wokwi-elements) (MIT) reste une option pour plus tard. Ce qu'on perd encore en V1 : l'émulation du code, qui se teste dans Wokwi, et la 3D.
 
 Critère de choix pour la V2 :
 
@@ -151,8 +151,10 @@ Le moteur (étapes 1, 2, 3, 5, 6) est inchangé. L'éditeur ajoute trois étapes
    - Test : toutes les fiches passent le validateur et sont au statut « relue ».
 3. **Du montage au réseau** (environ 4 h, semaine 2, fait le 19/11/2026). Lecture du diagram.json et des réglages : tension et limite de courant des alims, courant réglé des drivers, niveau des broches choisi à la main. On construit les nœuds (les points du circuit au même potentiel) en tenant compte des liaisons internes des modules et des bandes du breadboard.
    - Test : sur la base roulante, les quatre EN sont sur le même nœud que IO13, et le nombre de nœuds est celui compté à la main.
-4. **Affichage 2D du montage** (environ 5 h, semaine 2). Chaque pièce est dessinée à la position que donne le diagram.json, avec ses broches (nom au survol) et ses fils. On ne peut pas encore modifier.
-   - Les dessins viennent de wokwi-elements quand la pièce existe, sinon d'un SVG maison qui donne aussi la position de chaque broche.
+4. **Affichage 2D du montage** (environ 5 h, semaine 2, fait le 19/11/2026). Chaque pièce est dessinée à la position que donne le diagram.json, avec ses broches (nom au survol) et ses fils. On ne peut pas encore modifier.
+   - Toutes les pièces sont dessinées en SVG maison, qui donne aussi la position de chaque broche. wokwi-elements a été écarté pour la V1 : il ajoutait une dépendance et ne donne ses positions de broches que dans un navigateur.
+   - Une pièce enfichée dans la breadboard est recalée pile sur ses trous. Survoler une broche éclaire tout son nœud.
+   - Les fils sont routés automatiquement à angle droit, sans jamais se superposer, en contournant les pièces et sans passer sur un trou qui n'est pas le leur (demande de Jean). Dans l'éditeur (étape 7), un fil restera droit pendant qu'on le tire, puis sera routé ainsi quand on le lâche.
    - Test automatique : chaque broche de chaque fiche a une position sur son dessin. Test à l'œil : la base roulante s'affiche sur la page en ligne.
 5. **Calcul en continu** (environ 8 h, semaine 3). Méthode des nœuds : la loi des nœuds en chaque point donne un système linéaire G·V = I, qu'on résout. Les diodes ne sont pas linéaires : on linéarise et on itère avec la méthode de Newton, vue en prépa. L'alim de labo passe de « tension constante » à « courant constant » quand elle atteint sa limite.
    - Test : six circuits calculés à la main, à moins de 1 % près. Pont diviseur, LED + résistance, alim limitée en court-circuit, deux sources qui se battent, consommation d'un driver. Et 12 V à travers 10 kΩ sur une broche 3,3 V : environ 0,8 mA dans la diode de protection, soit (12 − 3,3 − 0,6) V / 10 kΩ.
@@ -160,7 +162,7 @@ Le moteur (étapes 1, 2, 3, 5, 6) est inchangé. L'éditeur ajoute trois étapes
    - Test : les 10 montages donnent chacun le verdict attendu, sur la bonne broche.
    - Test : le montage corrigé ne donne aucun verdict rouge. C'est le critère « zéro fausse alerte ». Corrigé veut dire : condensateurs, tirage sur EN, masse commune, MS1/MS2 identiques.
    - À la fin de cette étape, le moteur vérifie déjà ton vrai montage en ligne de commande, avant l'interface.
-7. **Éditeur** (environ 12 h, semaines 5 et 6). Palette de composants, pièces qu'on place et déplace, enfichage dans la breadboard (la broche s'accroche au trou le plus proche), fils tracés et supprimés à la souris, annulation, import et export du diagram.json.
+7. **Éditeur** (environ 12 h, semaines 5 et 6). Palette de composants, pièces qu'on place et déplace, enfichage dans la breadboard (la broche s'accroche au trou le plus proche), fils tracés et supprimés à la souris (droits pendant le tracé, routés au lâcher), annulation, import et export du diagram.json.
    - Test automatique : une broche posée sur un trou est reliée à toute sa bande ; un fil tracé apparaît dans le diagram.json ; exporter puis réimporter redonne le même montage.
 8. **Mise sous tension et mesures** (environ 8 h, semaines 6 et 7). Bouton « Mettre sous tension », verdict affiché sur chaque pièce et panneau d'explications. Multimètre : deux sondes donnent la tension entre deux points, un clic sur un fil donne le courant. Réglages à la main (niveaux des broches, EN, UART, VREF, tension et limite de l'alim), choix parmi les 10 scénarios. Animations : rouge et fumée pour « grillé », orange pulsé pour « chauffe ».
    - Le multimètre ne coûte presque rien : la méthode des nœuds calcule déjà la tension de chaque point et le courant de chaque fil.

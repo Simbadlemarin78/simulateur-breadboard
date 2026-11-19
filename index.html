@@ -6,13 +6,29 @@
     <title>Simulateur de breadboard</title>
     <style>
       :root { color-scheme: light dark; font-family: system-ui, sans-serif; line-height: 1.5; }
-      body { max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
+      body { max-width: 80rem; margin: 2rem auto; padding: 0 1rem; }
+      #plan { overflow-x: auto; border: 1px solid #8884; border-radius: 8px; background: #8881; }
+      #plan svg { display: block; width: 100%; min-width: 60rem; height: auto; }
+      #info { min-height: 3em; font-size: 0.9rem; }
+      .plan text { font-size: 6px; pointer-events: none; }
+      .plan .etiquette { fill: #f2f2f2; }
+      .plan .etiquette-sombre { fill: #222; font-weight: 600; }
+      .plan .etiquette-bb { fill: #9a9380; font-size: 5px; text-anchor: middle; }
+      .plan .afficheur { fill: #6cf2a0; font-size: 14px; font-family: ui-monospace, monospace; }
+      .plan .fil { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .plan .fil-halo { fill: none; stroke: Canvas; stroke-width: 4.5; stroke-linejoin: round; opacity: 0.85; }
+      .plan .fil-groupe:hover .fil { stroke-width: 3.5; }
+      .plan .broche { fill: #c9a227; stroke: #6b5512; stroke-width: 0.5; cursor: crosshair; }
+      .plan .broche.trou { fill: #3d3a33; stroke: none; }
+      .plan .broche.allumee { fill: #ff3b30; stroke: #fff; stroke-width: 1; }
     </style>
   </head>
   <body>
     <h1>Simulateur de breadboard</h1>
     <p>Avant de câbler un vrai montage, savoir s'il va marcher et s'il va griller quelque chose.</p>
     <p id="etat">Chargement…</p>
+    <div id="plan"></div>
+    <p id="info"></p>
     <p><a href="https://github.com/Simbadlemarin78/simulateur-breadboard">Code source (licence MIT)</a></p>
     <script type="module" src="/src/ui/main.ts"></script>
   </body>
