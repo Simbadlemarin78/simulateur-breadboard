@@ -8,7 +8,7 @@ import { verifier, type Rapport } from '../moteur/verifications';
 import { htmlConstats, htmlReglages, marquesVerdicts, mesurerCourant, mesurerTension } from './affichage';
 import { diagrammeVide, Editeur, fichesPosables, type Diagramme } from './edition';
 import { P, type Point } from './pieces/dessins';
-import { cadreDe, dessinerPlan, placerPieces, positionBroche, type Cadre, type Placement } from './plan';
+import { cadreDe, dessinerPlan, placerPieces, positionBroche, zoomerCadre, type Cadre, type Placement } from './plan';
 
 const MONTAGES = import.meta.glob<Diagramme>(['../../montages/*.diagram.json', '../../montages/cas/*.diagram.json'], { eager: true, import: 'default' });
 const SVG = 'http://www.w3.org/2000/svg';
@@ -60,6 +60,37 @@ let outil: 'editer' | 'mesurer' = 'editer';
 /** Multimètre : deux sondes sur des points, ou un fil dont on lit le courant. */
 let sondes: { rouge?: string; noir?: string } = {};
 let filMesure: number | undefined;
+
+/** Zone du plan choisie par zoom ou déplacement ; undefined : tout le montage (« Ajuster »). */
+let vue: Cadre | undefined;
+/** Vue en train d'être déplacée (glisser le fond du plan). */
+let panoramique: { depart: Point; vue0: Cadre; bouge: boolean } | undefined;
+const texteZoom = element<HTMLSpanElement>('#zoom');
+
+function cadreAffiche(): Cadre {
+  return vue ?? cadre ?? { x: 0, y: 0, largeur: 800, hauteur: 400 };
+}
+
+/** Met le cadre affiché sur le SVG sans tout redessiner, et le pourcentage de zoom. */
+function appliquerVue(): void {
+  const c = cadreAffiche();
+  conteneur.querySelector('svg')?.setAttribute('viewBox', `${c.x} ${c.y} ${c.largeur} ${c.hauteur}`);
+  texteZoom.textContent = `${Math.round(((cadre?.largeur ?? c.largeur) / c.largeur) * 100)} %`;
+}
+
+/** Zoome d'un facteur autour d'un point du plan (par défaut, le centre de la vue). */
+function zoomer(facteur: number, centre?: Point): void {
+  const c = cadreAffiche();
+  const base = cadre ?? c;
+  // Entre 8 fois plus près et 2 fois plus loin que la vue d'ensemble.
+  vue = zoomerCadre(c, facteur, centre ?? { x: c.x + c.largeur / 2, y: c.y + c.hauteur / 2 }, base.largeur / 8, base.largeur * 2);
+  appliquerVue();
+}
+
+function ajuster(): void {
+  vue = undefined;
+  afficher(true);
+}
 
 /** Rapport du moteur pour le montage affiché ; recalculé seulement quand le montage change. */
 function rapportCourant(): Rapport {
@@ -135,6 +166,7 @@ function afficher(recadrer = false): void {
   reseau = construireReseau(montage, catalogue);
   const juste = cadreDe(placements, 8 * P);
   cadre = recadrer || !cadre ? juste : unir(cadre, juste);
+  if (recadrer) vue = undefined;
   // Les sondes ne survivent pas à la disparition de leur point.
   for (const couleur of ['rouge', 'noir'] as const) {
     const point = sondes[couleur];
@@ -143,7 +175,7 @@ function afficher(recadrer = false): void {
   if (filMesure !== undefined && !montage.connexions.some((c) => c.indice === filMesure)) filMesure = undefined;
   const r = sousTension ? rapportCourant() : undefined;
   conteneur.innerHTML = dessinerPlan(montage, reseau, {
-    cadre,
+    cadre: cadreAffiche(),
     choix,
     sondes,
     ...(r?.converge ? { verdicts: marquesVerdicts(r, montage) } : {}),
@@ -151,6 +183,7 @@ function afficher(recadrer = false): void {
   boutonAnnuler.disabled = !editeur.peutAnnuler();
   boutonRetablir.disabled = !editeur.peutRetablir();
   boutonSupprimer.disabled = choix.piece === undefined && choix.fil === undefined;
+  appliquerVue();
   boutonTension.textContent = sousTension ? 'Couper le courant' : 'Mettre sous tension';
   boutonTension.classList.toggle('allume', sousTension);
   const fils = montage.connexions.filter((c) => c.couleur !== '').length;
@@ -216,6 +249,12 @@ function terminerFil(vers: string): void {
 
 // ------------------------------------------------------------------------------- souris
 conteneur.addEventListener('pointerdown', (e) => {
+  // Molette enfoncée, ou Maj : on déplace la vue, même au-dessus d'une pièce.
+  if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+    abandonnerFil();
+    commencerPanoramique(e);
+    return;
+  }
   if (e.button !== 0) return;
   const cible = e.target instanceof Element ? e.target : null;
   const point = pointDe(cible);
@@ -228,7 +267,10 @@ conteneur.addEventListener('pointerdown', (e) => {
     } else if (fil) {
       sondes = {};
       filMesure = Number(fil.dataset['connexion']);
-    } else return;
+    } else {
+      commencerPanoramique(e);
+      return;
+    }
     if (!sousTension) message('Hors tension : mets le montage sous tension pour lire une valeur.');
     afficher();
     e.preventDefault();
@@ -278,13 +320,39 @@ conteneur.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     return;
   }
-  if (choix.piece !== undefined || choix.fil !== undefined) {
-    choix = {};
-    afficher();
-  }
+  // Le fond : on déplace la vue (un simple clic, sans bouger, efface la sélection).
+  commencerPanoramique(e);
 });
 
+function commencerPanoramique(e: PointerEvent): void {
+  panoramique = { depart: { x: e.clientX, y: e.clientY }, vue0: cadreAffiche(), bouge: false };
+  conteneur.setPointerCapture(e.pointerId);
+  e.preventDefault();
+}
+
+// Molette (ou pincement du pavé tactile) : zoom autour de la souris.
+conteneur.addEventListener(
+  'wheel',
+  (e) => {
+    e.preventDefault();
+    zoomer(Math.pow(1.0015, -e.deltaY * (e.deltaMode === 1 ? 40 : 1)), versPlan(e));
+  },
+  { passive: false },
+);
+
 conteneur.addEventListener('pointermove', (e) => {
+  if (panoramique) {
+    const svg = conteneur.querySelector('svg');
+    const echelle = svg ? panoramique.vue0.largeur / svg.clientWidth : 1;
+    const dx = e.clientX - panoramique.depart.x;
+    const dy = e.clientY - panoramique.depart.y;
+    if (Math.hypot(dx, dy) > 3) panoramique.bouge = true;
+    if (panoramique.bouge) {
+      vue = { ...panoramique.vue0, x: panoramique.vue0.x - dx * echelle, y: panoramique.vue0.y - dy * echelle };
+      appliquerVue();
+    }
+    return;
+  }
   const p = versPlan(e);
   if (filEnCours) {
     filEnCours.ligne.setAttribute('x2', String(p.x));
@@ -305,6 +373,15 @@ conteneur.addEventListener('pointermove', (e) => {
 });
 
 conteneur.addEventListener('pointerup', (e) => {
+  if (panoramique) {
+    const { bouge } = panoramique;
+    panoramique = undefined;
+    if (!bouge && outil === 'editer' && (choix.piece !== undefined || choix.fil !== undefined)) {
+      choix = {};
+      afficher();
+    }
+    return;
+  }
   if (filEnCours) {
     const point = pointDe(document.elementFromPoint(e.clientX, e.clientY));
     if (point && point !== filEnCours.de) terminerFil(point);
@@ -396,8 +473,14 @@ document.addEventListener('keydown', (e) => {
   } else if (ctrl && (e.key.toLowerCase() === 'y' || (e.key.toLowerCase() === 'z' && e.shiftKey))) {
     retablir();
     e.preventDefault();
-  }
+  } else if (!ctrl && (e.key === '+' || e.key === '=')) zoomer(1.25);
+  else if (!ctrl && e.key === '-') zoomer(1 / 1.25);
+  else if (!ctrl && e.key === '0') ajuster();
 });
+
+element<HTMLButtonElement>('#zoom-plus').addEventListener('click', () => zoomer(1.25));
+element<HTMLButtonElement>('#zoom-moins').addEventListener('click', () => zoomer(1 / 1.25));
+element<HTMLButtonElement>('#zoom-ajuster').addEventListener('click', ajuster);
 
 boutonTension.addEventListener('click', () => {
   sousTension = !sousTension;
@@ -492,6 +575,11 @@ for (const fiche of fichesPosables(catalogue)) {
     const y = placements.size > 0 ? occupe.y + occupe.hauteur + 4 * P : 0;
     const id = editeur.ajouterPiece(fiche.id, x, y);
     choix = { piece: id };
+    // Zoomé, on amène la vue sur la nouvelle pièce pour qu'elle soit visible.
+    if (vue) {
+      const pl = placerPieces(editeur.montage()).get(id);
+      if (pl) vue = { ...vue, x: pl.x + pl.dessin.largeur / 2 - vue.largeur / 2, y: pl.y + pl.dessin.hauteur / 2 - vue.hauteur / 2 };
+    }
     afficher();
     message(`${id} posée sous le montage : glisse-la où tu veux (sur la breadboard pour l'enficher).`);
   });

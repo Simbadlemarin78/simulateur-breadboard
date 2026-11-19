@@ -6,7 +6,7 @@ import { catalogueIntegre as catalogue } from '../src/moteur/fiches-integrees';
 import { lireMontage } from '../src/moteur/montage';
 import { construireReseau } from '../src/moteur/reseau';
 import { dessinPour, P } from '../src/ui/pieces/dessins';
-import { dessinerPlan, filsVisibles, placerPieces, positionBroche } from '../src/ui/plan';
+import { dessinerPlan, filsVisibles, placerPieces, positionBroche, zoomerCadre } from '../src/ui/plan';
 
 describe.each(catalogue.fiches.map((f) => [f.id, f] as const))('dessin de %s', (_id, fiche) => {
   const dessin = dessinPour(fiche);
@@ -40,6 +40,30 @@ describe('géométrie des dessins', () => {
     const bb = dessinPour(catalogue.fiche('breadboard-830')!);
     expect(drv.broches.get('VM')!.y - drv.broches.get('EN')!.y).toBe(5 * P);
     expect(bb.broches.get('10b.g')!.y - bb.broches.get('10t.d')!.y).toBe(5 * P);
+  });
+});
+
+describe('zoom du plan', () => {
+  const cadre = { x: 0, y: 0, largeur: 800, hauteur: 400 };
+
+  it('garde immobile le point sous la souris et les proportions', () => {
+    const centre = { x: 200, y: 100 };
+    const z = zoomerCadre(cadre, 2, centre, 10, 10000);
+    expect(z).toEqual({ x: 100, y: 50, largeur: 400, hauteur: 200 });
+    // Le point sous la souris est à la même fraction du cadre avant et après.
+    expect((centre.x - z.x) / z.largeur).toBeCloseTo((centre.x - cadre.x) / cadre.largeur, 12);
+    expect((centre.y - z.y) / z.hauteur).toBeCloseTo((centre.y - cadre.y) / cadre.hauteur, 12);
+  });
+
+  it('reste dans les bornes de largeur', () => {
+    expect(zoomerCadre(cadre, 100, { x: 400, y: 200 }, 200, 3200).largeur).toBe(200);
+    expect(zoomerCadre(cadre, 0.01, { x: 400, y: 200 }, 200, 3200).largeur).toBe(3200);
+  });
+
+  it('zoomer puis dézoomer du même facteur revient au cadre de départ', () => {
+    const centre = { x: 123, y: 321 };
+    const retour = zoomerCadre(zoomerCadre(cadre, 1.25, centre, 10, 10000), 1 / 1.25, centre, 10, 10000);
+    for (const k of ['x', 'y', 'largeur', 'hauteur'] as const) expect(retour[k]).toBeCloseTo(cadre[k], 9);
   });
 });
 

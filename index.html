@@ -12,6 +12,8 @@
       #barre select, #barre button, .bouton { font: inherit; font-size: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid #8886; background: #8881; color: inherit; cursor: pointer; }
       #barre button:disabled { opacity: 0.45; cursor: default; }
       .bouton input { display: none; }
+      .zoom { display: inline-flex; align-items: center; gap: 0.3rem; }
+      #zoom { font-size: 0.85rem; min-width: 3.2rem; text-align: center; font-variant-numeric: tabular-nums; }
       #atelier { display: grid; grid-template-columns: 11rem 1fr; gap: 0.6rem; align-items: start; }
       #palette { display: flex; flex-direction: column; gap: 0.35rem; }
       #palette p { margin: 0 0 0.2rem; font-size: 0.8rem; opacity: 0.75; }
@@ -99,6 +101,12 @@
         <label><input type="radio" name="outil" value="editer" checked />Éditer</label>
         <label><input type="radio" name="outil" value="mesurer" />Multimètre</label>
       </span>
+      <span class="zoom">
+        <button id="zoom-moins" title="Dézoomer (touche -)">−</button>
+        <span id="zoom" title="Zoom">100 %</span>
+        <button id="zoom-plus" title="Zoomer (touche +)">+</button>
+        <button id="zoom-ajuster" title="Voir tout le montage (touche 0)">Ajuster</button>
+      </span>
     </div>
     <div id="atelier">
       <aside id="palette"><p>Ajouter une pièce</p></aside>
@@ -127,6 +135,7 @@
       Glisse une pièce pour la déplacer : lâchée sur la breadboard, elle s'enfiche dans les trous.
       Tire d'une broche (ou d'un trou) à une autre pour tracer un fil : il reste droit pendant que tu tires, puis se range à angle droit.
       Clique un fil ou une pièce, puis Suppr pour l'enlever. Ctrl+Z annule, Ctrl+Y rétablit, Échap abandonne.
+      Molette : zoom autour de la souris (ou boutons − + et touches - + 0). Glisser le fond, ou glisser avec Maj ou la molette enfoncée : déplacer la vue.
       Sous tension, chaque modification relance le calcul. En ligne de commande : <code>npm run verifier -- montage.diagram.json</code>.
     </p>
     <p><a href="https://github.com/Simbadlemarin78/simulateur-breadboard">Code source (licence MIT)</a></p>

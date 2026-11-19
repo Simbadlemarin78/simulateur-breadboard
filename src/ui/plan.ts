@@ -103,6 +103,22 @@ export function cadreDe(placements: Map<string, Placement>, marge = 2 * P): Cadr
   return { x: minX, y: minY, largeur: maxX - minX, hauteur: maxY - minY };
 }
 
+/**
+ * Zoom du cadre affiché d'un facteur (plus grand que 1 : on se rapproche), en gardant immobile
+ * le point « centre » du plan (celui sous la souris). La largeur reste entre largeurMin et
+ * largeurMax ; les proportions ne changent pas.
+ */
+export function zoomerCadre(cadre: Cadre, facteur: number, centre: Point, largeurMin: number, largeurMax: number): Cadre {
+  const largeur = Math.min(Math.max(cadre.largeur / facteur, largeurMin), largeurMax);
+  const f = cadre.largeur / largeur;
+  return {
+    x: centre.x - (centre.x - cadre.x) / f,
+    y: centre.y - (centre.y - cadre.y) / f,
+    largeur,
+    hauteur: cadre.hauteur / f,
+  };
+}
+
 export interface OptionsPlan {
   /** Zone affichée ; par défaut, juste autour des pièces. */
   cadre?: Cadre;
