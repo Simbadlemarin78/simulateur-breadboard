@@ -2,16 +2,18 @@
 
 19/11/2026 · Jean Alaniou
 
+> **Mise à jour du 19/11/2026.** Jean veut dès la V1 un plan de travail 2D interactif : composants dessinés avec leurs broches, breadboard, fils tracés à la souris, multimètre, mise sous tension. Il remplace la « vue schéma ». Le moteur d'analyse ne change pas ; le plan passe de 7 à 9 étapes et d'environ 36 h à environ 55 h. Les sections « En bref », « Recommandation », « Plan de V1 » et « Prochaines étapes » sont réécrites en conséquence.
+
 ## En bref
 
 Pour la V1, on ne forke pas Velxio. On écrit notre propre moteur d'analyse en TypeScript : fiches composants, calcul électrique et règles. Il sera publié sous licence MIT sur GitHub Pages. Velxio reste la cible d'intégration pour la V2.
 
-- **Contexte retenu** : V1 avant de câbler la base (moins d'un mois), au moins 8 h par semaine, code public, notions de TypeScript.
+- **Contexte retenu** : au moins 8 h par semaine, code public, notions de TypeScript. Le moteur doit vérifier le montage avant le câblage de la base (environ quatre semaines) ; l'éditeur 2D vient juste après.
 - **Pourquoi pas de fork** : les 10 cas reposent sur des fiches et des règles qu'aucun outil existant ne possède. Velxio est un gros projet : à mon estimation, on passerait la moitié du mois à le comprendre.
-- **Interface de la V1** : une vue schéma, dans l'esprit de ton [schéma interactif de la base roulante](https://claude.ai/artifact/CLAxfvyscJcJFKTC59LJJ5). Pas encore de breadboard en glisser-déposer. Le montage est un fichier diagram.json, le format de Wokwi.
+- **Interface de la V1** : un plan de travail 2D dans l'esprit de Wokwi. On pose les composants, avec ou sans breadboard, on trace les fils, on met sous tension et on mesure au multimètre ; chaque pièce affiche son verdict. Le montage est un fichier diagram.json, le format de Wokwi, qui garde déjà la position des pièces et le trajet des fils. La 3D viendra après la V1.
 - **Calcul** : méthode des nœuds écrite par nous, en régime continu. ngspice arrive en V2, pour les pics brefs.
 - **Deux cas de test à reformuler** pour respecter ta règle « risque, pas grillé » : le cas 3 (débranchement à chaud) et le cas 2 (inversion VM/GND). Détails dans « Limites de la V1 ».
-- **Bloquant** : la datasheet du TMC2209 et la marque exacte de tes modules.
+- **Bloquant** : la marque exacte de tes modules TMC2209 (la datasheet est récupérée).
 
 ## Étude de l'existant
 
@@ -42,12 +44,12 @@ Pour la V1, on part de zéro, sur des briques MIT. On décide entre forker Velxi
 4. **Le bon modèle n'est pas SPICE seul.** Un driver qui règle le courant de ses bobines se décrit mieux par un comportement que par ses transistors. Il consomme une puissance sur VM et impose un courant aux bobines. On maîtrise mieux ça dans notre propre solveur.
 5. **On garde la porte ouverte.** Du code MIT peut entrer tel quel dans un fork AGPL de Velxio, ou lui être proposé. On lit et on écrit du diagram.json, donc un montage passe d'un outil à l'autre.
 
-Ce qu'on perd en V1 : pas d'éditeur en glisser-déposer, pas d'émulation du code. Le code se teste déjà dans Wokwi. Les fils se modifient dans une liste, et tu peux dessiner le montage dans Wokwi puis l'importer.
+Mise à jour du 19/11/2026 : tu veux l'éditeur en glisser-déposer dès la V1. On le construit nous-mêmes, après le moteur, sur les dessins de [wokwi-elements](https://github.com/wokwi/wokwi-elements) (MIT) quand la pièce existe : moteur pas à pas, résistance, LED, potentiomètre, ESP32 DevKit V1 (30 broches). Le reste est dessiné en SVG maison : breadboard, module TMC2209, alim de labo, LiPo, condensateur, et ta carte ESP32 à 38 broches. Ce qu'on perd encore en V1 : l'émulation du code, qui se teste dans Wokwi, et la 3D.
 
 Critère de choix pour la V2 :
 
 - Velxio a ajouté la casse de composants, ou accepte des fiches externes : on y contribue avec notre moteur.
-- Sinon, on compare deux devis en heures : fork de Velxio, ou notre éditeur sur wokwi-elements.
+- Sinon, Velxio ne sert plus qu'à une chose : émuler le code de l'ESP32. On compare alors son intégration à un simple réglage des broches à la main, qui existe déjà.
 
 Licences : MIT = libre avec mention de l'auteur. GPL et AGPL obligent à publier le code dérivé sous la même licence ; l'AGPL l'impose aussi pour un site en ligne. Notre code étant public, l'AGPL d'un éventuel fork ne te gênerait pas.
 
@@ -55,7 +57,9 @@ Licences : MIT = libre avec mention de l'auteur. GPL et AGPL obligent à publier
 
 ![Architecture de la V1](architecture-v1.png)
 
-Les règles lisent aussi le réseau et les fiches directement : les cas 3 à 8 n'ont pas besoin du calcul. En V2, on pourra remplacer l'interface (fork de Velxio ou éditeur maison) sans toucher au moteur.
+Les règles lisent aussi le réseau et les fiches directement : les cas 3 à 8 n'ont pas besoin du calcul.
+
+Mise à jour : la case « Interface (vue schéma) » du dessin devient le plan de travail 2D. Il produit le montage (diagram.json) quand on place les pièces et trace les fils, puis il interroge le moteur pour les verdicts et pour le multimètre. Le moteur ne dépend pas de l'interface : la 3D pourra la remplacer sans y toucher.
 
 ## Format d'une fiche composant
 
@@ -104,6 +108,8 @@ Chaque verdict affiche le composant, la broche, la valeur calculée, la limite, 
 
 ## Fiche TMC2209 : en attente de la datasheet
 
+> Mise à jour du 19/11/2026 : fiches `tmc2209` et `tmc2209-module` faites (brouillon) depuis la datasheet rév. 1.08 et le schéma du module BIGTREETECH V1.2. 29 V est le haut de la plage de fonctionnement ; le maximum absolu de VS est 32 V (p. 75).
+
 La fiche n'est pas faite : la datasheet n'était pas jointe. Je refuse de citer des pages de mémoire. Dès réception du PDF, je produis deux fiches : `tmc2209` (la puce) et `tmc2209-module` (ta carte).
 
 Ce dont j'ai besoin :
@@ -133,45 +139,53 @@ Les autres fiches de la V1 et leur source :
 
 ## Plan de V1
 
-Sept étapes, environ 36 h, sur quatre semaines à partir du 19 novembre. Chaque étape se termine par un test qu'on peut relancer. Les 10 cas deviennent 10 fichiers de montage, vérifiés automatiquement à chaque modification du code.
+Neuf étapes, environ 55 h, sur six à sept semaines à partir du 19 novembre (réécrit le même jour pour le plan de travail 2D). Chaque étape se termine par un test qu'on peut relancer. Les 10 cas deviennent 11 fichiers de montage (le cas 2 en donne deux), vérifiés automatiquement à chaque modification du code.
 
-1. **Socle** (environ 2 h, semaine 1). Dépôt GitHub public sous licence MIT, avec Vite, TypeScript et Vitest, et une mise en ligne automatique sur GitHub Pages.
+Le moteur (étapes 1, 2, 3, 5, 6) est inchangé. L'éditeur ajoute trois étapes : l'affichage 2D tôt (4), pour voir le montage dès que le réseau existe, puis l'édition (7) et la mise sous tension avec le multimètre (8). Vers la fin de la quatrième semaine, le moteur vérifie déjà ton vrai montage en ligne de commande.
+
+1. **Socle** (environ 2 h, semaine 1, fait le 19/11/2026). Dépôt GitHub public sous licence MIT, avec Vite, TypeScript et Vitest, et une mise en ligne automatique sur GitHub Pages.
    - Vite construit et sert l'appli web ; Vitest lance les tests automatiques.
    - La CI (intégration continue) : GitHub relance tous les tests à chaque envoi de code.
    - Test : la page en ligne s'affiche et la CI est verte.
-2. **Fiches** (environ 5 h, semaine 1). Le schéma et son validateur, puis les fiches ESP32, TMC2209 (puce et module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont. Je les extrais des PDF ; tu les relis.
+2. **Fiches** (environ 6 h, semaine 1). Le schéma et son validateur, puis les fiches ESP32, TMC2209 (puce et module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont. Je les extrais des PDF ; tu les relis.
    - Test : toutes les fiches passent le validateur et sont au statut « relue ».
 3. **Du montage au réseau** (environ 4 h, semaine 2). Lecture du diagram.json et des réglages : tension et limite de courant des alims, courant réglé des drivers, niveau des broches choisi à la main. On construit les nœuds (les points du circuit au même potentiel) en tenant compte des liaisons internes des modules et des bandes du breadboard.
    - Test : sur la base roulante, les quatre EN sont sur le même nœud que IO13, et le nombre de nœuds est celui compté à la main.
-4. **Calcul en continu** (environ 8 h, semaine 2). Méthode des nœuds : la loi des nœuds en chaque point donne un système linéaire G·V = I, qu'on résout. Les diodes ne sont pas linéaires : on linéarise et on itère avec la méthode de Newton, vue en prépa. L'alim de labo passe de « tension constante » à « courant constant » quand elle atteint sa limite.
+4. **Affichage 2D du montage** (environ 5 h, semaine 2). Chaque pièce est dessinée à la position que donne le diagram.json, avec ses broches (nom au survol) et ses fils. On ne peut pas encore modifier.
+   - Les dessins viennent de wokwi-elements quand la pièce existe, sinon d'un SVG maison qui donne aussi la position de chaque broche.
+   - Test automatique : chaque broche de chaque fiche a une position sur son dessin. Test à l'œil : la base roulante s'affiche sur la page en ligne.
+5. **Calcul en continu** (environ 8 h, semaine 3). Méthode des nœuds : la loi des nœuds en chaque point donne un système linéaire G·V = I, qu'on résout. Les diodes ne sont pas linéaires : on linéarise et on itère avec la méthode de Newton, vue en prépa. L'alim de labo passe de « tension constante » à « courant constant » quand elle atteint sa limite.
    - Test : six circuits calculés à la main, à moins de 1 % près. Pont diviseur, LED + résistance, alim limitée en court-circuit, deux sources qui se battent, consommation d'un driver. Et 12 V à travers 10 kΩ sur une broche 3,3 V : environ 0,8 mA dans la diode de protection, soit (12 − 3,3 − 0,6) V / 10 kΩ.
-5. **Vérifications, règles, verdicts** (environ 7 h, semaine 3). Chaque broche est comparée à sa fiche, la température est estimée (T ≈ T ambiante + Rth × P), et les règles tournent. Chaque verdict sort avec sa valeur, sa limite, sa source, son explication et sa correction.
+6. **Vérifications, règles, verdicts** (environ 7 h, semaines 3 et 4). Chaque broche est comparée à sa fiche, la température est estimée (T ≈ T ambiante + Rth × P), et les règles tournent. Chaque verdict sort avec sa valeur, sa limite, sa source, son explication et sa correction.
    - Test : les 10 montages donnent chacun le verdict attendu, sur la bonne broche.
    - Test : le montage corrigé ne donne aucun verdict rouge. C'est le critère « zéro fausse alerte ». Corrigé veut dire : condensateurs, tirage sur EN, masse commune, MS1/MS2 identiques.
    - À la fin de cette étape, le moteur vérifie déjà ton vrai montage en ligne de commande, avant l'interface.
-6. **Interface** (environ 8 h, semaines 3 et 4). Vue schéma générée depuis le montage, bouton « Mettre sous tension » et panneau d'explications. Animations : rouge et fumée pour « grillé », orange pulsé pour « chauffe ». Réglages à la main (niveaux des broches, EN, UART), choix parmi les 10 scénarios, édition des fils en liste, import et export du diagram.json.
-   - Test : les 10 scénarios rejoués à la main dans le navigateur, avec une liste à cocher.
-7. **Confrontation au vrai montage** (environ 2 h, semaine 4). On mesure trois grandeurs au multimètre sur la base câblée et on les compare au calcul. Les trois grandeurs : courant sur VM moteurs activés à l'arrêt, tension sur EN au démarrage, chute de tension sur le rail VM.
+7. **Éditeur** (environ 12 h, semaines 5 et 6). Palette de composants, pièces qu'on place et déplace, enfichage dans la breadboard (la broche s'accroche au trou le plus proche), fils tracés et supprimés à la souris, annulation, import et export du diagram.json.
+   - Test automatique : une broche posée sur un trou est reliée à toute sa bande ; un fil tracé apparaît dans le diagram.json ; exporter puis réimporter redonne le même montage.
+8. **Mise sous tension et mesures** (environ 8 h, semaines 6 et 7). Bouton « Mettre sous tension », verdict affiché sur chaque pièce et panneau d'explications. Multimètre : deux sondes donnent la tension entre deux points, un clic sur un fil donne le courant. Réglages à la main (niveaux des broches, EN, UART, VREF, tension et limite de l'alim), choix parmi les 10 scénarios. Animations : rouge et fumée pour « grillé », orange pulsé pour « chauffe ».
+   - Le multimètre ne coûte presque rien : la méthode des nœuds calcule déjà la tension de chaque point et le courant de chaque fil.
+   - Test automatique : les valeurs affichées par le multimètre égalent celles du moteur. Test à la main : les 10 scénarios rejoués dans le navigateur, avec une liste à cocher.
+9. **Confrontation au vrai montage** (environ 2 h, semaine 7). On mesure trois grandeurs au multimètre sur la base câblée et on les compare au calcul. Les trois grandeurs : courant sur VM moteurs activés à l'arrêt, tension sur EN au démarrage, chute de tension sur le rail VM.
    - Test : les écarts sont notés dans le README. Au-delà de 20 %, on corrige la fiche ou le modèle.
 
-Si le temps manque, on coupe d'abord les animations puis l'édition des fils. Le moteur et les 10 tests sont le cœur de la V1.
+Si le temps manque, on coupe d'abord les animations, puis la mesure de courant au clic. Le moteur, les 10 tests et l'édition de base (placer, enficher, tracer les fils) sont le cœur de la V1. La 3D est hors V1.
 
 Les 10 cas et ce qui doit les détecter :
 
 | # | Cas | Détecté par | Verdict attendu | Étape |
 | --- | --- | --- | --- | --- |
-| 1 | 12 V sur une broche de l'ESP32 | Calcul : tension de broche au-delà du maximum absolu, courant dans la diode de protection | Grillé (source sans résistance) | 4, 5 |
-| 2 | VM et GND inversés sur un TMC2209 | Calcul : tension inverse sur VS, courant fourni par la source | Grillé ou risque élevé selon la source (voir Limites) | 4, 5 |
-| 3 | Moteur débranché avec VM alimenté | Règle : fil de bobine retiré pendant que VM est sous tension | Risque élevé (voir Limites) | 5 |
-| 4 | Pas de 100 µF près d'un driver | Règle : condensateur assez gros entre VM et GND du driver, à quelques trous | Risque élevé | 5 |
-| 5 | EN qui flotte au démarrage | Règle : état de démarrage de la broche ESP32 (fiche) et aucun tirage sur le nœud EN | Risque | 5 |
-| 6 | STEP ou DIR sur IO34 à IO39 | Règle : broche sans capacité de sortie reliée à une entrée qui attend un signal | Ne marchera pas | 5 |
-| 7 | MS1/MS2 différents d'un driver à l'autre, sans UART | Règle : micro-pas déduit des niveaux (table de la fiche), comparé entre drivers | Ne marchera pas (vitesses différentes) | 5 |
-| 8 | Masses non reliées | Connexité : la masse de référence de l'émetteur et du récepteur n'est pas le même nœud | Ne marchera pas | 3, 5 |
-| 9 | Plus d'environ 1 A dans un contact | Calcul : courant dans chaque contact, comparé à la fiche du breadboard | Chauffe | 4, 5 |
-| 10 | Courant moteur réglé au-delà de 1,7 A | Calcul : réglage comparé au nominal du moteur ; puissance perdue dans le driver | Chauffe ; risque si la température estimée dépasse le seuil de la fiche | 4, 5 |
+| 1 | 12 V sur une broche de l'ESP32 | Calcul : tension de broche au-delà du maximum absolu, courant dans la diode de protection | Grillé (source sans résistance) | 5, 6 |
+| 2 | VM et GND inversés sur un TMC2209 | Calcul : tension inverse sur VS, courant fourni par la source | Grillé ou risque élevé selon la source (voir Limites) | 5, 6 |
+| 3 | Moteur débranché avec VM alimenté | Règle : fil de bobine retiré pendant que VM est sous tension | Risque élevé (voir Limites) | 6 |
+| 4 | Pas de 100 µF près d'un driver | Règle : condensateur assez gros entre VM et GND du driver, à quelques trous | Risque élevé | 6 |
+| 5 | EN qui flotte au démarrage | Règle : état de démarrage de la broche ESP32 (fiche) et aucun tirage sur le nœud EN | Risque | 6 |
+| 6 | STEP ou DIR sur IO34 à IO39 | Règle : broche sans capacité de sortie reliée à une entrée qui attend un signal | Ne marchera pas | 6 |
+| 7 | MS1/MS2 différents d'un driver à l'autre, sans UART | Règle : micro-pas déduit des niveaux (table de la fiche), comparé entre drivers | Ne marchera pas (vitesses différentes) | 6 |
+| 8 | Masses non reliées | Connexité : la masse de référence de l'émetteur et du récepteur n'est pas le même nœud | Ne marchera pas | 3, 6 |
+| 9 | Plus d'environ 1 A dans un contact | Calcul : courant dans chaque contact, comparé à la fiche du breadboard | Chauffe | 5, 6 |
+| 10 | Courant moteur réglé au-delà de 1,7 A | Calcul : réglage comparé au nominal du moteur ; puissance perdue dans le driver | Chauffe ; risque si la température estimée dépasse le seuil de la fiche | 5, 6 |
 
-Une prédiction à vérifier à l'étape 7 : ton montage de référence déclenchera sans doute le cas 9. Réglé à 1 A efficace, le courant d'une bobine monte jusqu'à √2 × 1 A ≈ 1,4 A en crête. Sur tes photos, les sorties moteur passent par les contacts du breadboard.
+Une prédiction à vérifier à l'étape 9 : ton montage de référence déclenchera sans doute le cas 9. Réglé à 1 A efficace, le courant d'une bobine monte jusqu'à √2 × 1 A ≈ 1,4 A en crête. Sur tes photos, les sorties moteur passent par les contacts du breadboard.
 
 ## Limites de la V1, et deux cas à reformuler
 
@@ -185,6 +199,7 @@ La V1 calcule le régime établi, rien de ce qui dure une fraction de seconde. P
 | Échauffement au fil du temps | On estime la température finale seulement | V2 |
 | Décharges électrostatiques, faux contacts | Non couvert | Hors projet |
 | Le programme de l'ESP32 | Niveaux des broches réglés à la main ; le code se teste dans Wokwi | Plus tard |
+| Vue en 3D | Le montage se voit et s'édite en 2D | Après la V1 |
 
 **Cas 3, à reformuler : « risque élevé » au lieu de « grillé ».** Débrancher un moteur sous tension casse souvent un driver, mais pas toujours. L'issue dépend du courant dans la bobine à l'instant où le contact s'ouvre. Un calcul en continu ne peut pas le savoir. D'après ta propre règle, le verdict honnête est « risque élevé : casse fréquente, ne jamais le faire ».
 
@@ -197,18 +212,23 @@ Un détail que seul le calcul voit : si un seul driver est inversé et les trois
 
 ## Prochaines étapes
 
-Rien n'est codé tant que tu n'as pas validé ce document. Ensuite, je commence par l'étape 1 du plan.
+Mis à jour le 19/11/2026.
 
-- [ ] Toi : joindre la datasheet TMC2209 et la référence (ou une photo) de tes modules.
-- [ ] Toi : valider les deux reformulations (cas 2 découpé en 2a/2b, cas 3 en « risque élevé »).
-- [ ] Toi : choisir le nom du dépôt sur ton compte GitHub Simbadlemarin78, et me dire si je peux y pousser le socle.
-- [ ] Moi : fiches TMC2209 (puce et module) dès réception du PDF, puis ESP32 et 17HS4401.
-- [ ] Moi : étape 1 (socle) après ton feu vert.
+- [x] Toi : valider les deux reformulations (cas 2 découpé en 2a/2b, cas 3 en « risque élevé »).
+- [x] Toi : choisir le dépôt (`Simbadlemarin78/simulateur-breadboard`) et autoriser le push.
+- [x] Moi : étape 1 (socle), en ligne sur GitHub Pages.
+- [x] Moi : fiches TMC2209 (puce et module, datasheet rév. 1.08) et 17HS4401 (pages web concordantes), en brouillon.
+- [x] Toi : choisir l'interface de la V1 : plan de travail 2D interactif.
+- [ ] Toi : la marque de tes modules TMC2209, ou mesurer au multimètre la résistance entre EN et VDD (20 kΩ sur le modèle BIGTREETECH).
+- [ ] Toi : le nom gravé sur le capot du module de ta carte ESP32 (WROOM-32, 32D ou 32E).
+- [ ] Toi : relire les fiches et les passer à « relue ».
+- [ ] Moi : fiches ESP32, breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont (fin de l'étape 2).
 
 Questions encore ouvertes :
 
 - Que veut dire « près du driver » pour le condensateur ? Je propose d'abord « sur les mêmes bandes du breadboard que VM et GND du driver », à affiner.
 - Les quatre drivers forment-ils un « groupe » déclaré dans le montage (la base roulante) ? Le cas 7 compare les micro-pas à l'intérieur d'un groupe. Je propose oui, via un attribut du montage.
+- Le cas 5 (EN qui flotte) : sur le module BIGTREETECH, EN est tiré vers VDD par 20 kΩ, donc un EN en l'air coupe le driver. Si tes modules sont faits pareil, le cas 5 doit se reformuler.
 
 ## Sources
 
@@ -219,7 +239,7 @@ Pages consultées le 19 novembre 2026 :
 - [Annonce de Velxio sur le forum Arduino](https://forum.arduino.cc/t/velxio-an-open-source-arduino-rp2040-emulator-running-entirely-in-the-browser/1434847) : travaux sur les limites de courant et la casse, version 2.5 avec ngspice.
 - [Wokwi, format diagram.json](https://docs.wokwi.com/diagram-format)
 - [Wokwi, pièce A4988](https://docs.wokwi.com/parts/wokwi-a4988) : VMOT non utilisé dans la simulation.
-- [wokwi-elements](https://github.com/wokwi/wokwi-elements) : licence MIT.
+- [wokwi-elements](https://github.com/wokwi/wokwi-elements) : licence MIT ; liste des pièces dessinées (dossier `src`) : ESP32 DevKit V1, moteur pas à pas, résistance, LED, potentiomètre..., ni breadboard ni driver pas à pas.
 - [eecircuit-engine](https://github.com/eelab-dev/EEcircuit-engine) : licence MIT, API.
 - [CircuitJS1](https://lushprojects.com/circuitjs/) : GPLv2, pas de temps de 5 µs, composants idéaux.
 - [Schéma interactif de la base roulante](https://claude.ai/artifact/CLAxfvyscJcJFKTC59LJJ5) : broches, câblage, chiffre de 29 V à vérifier.

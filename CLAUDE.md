@@ -3,6 +3,7 @@
 Contexte complet : `docs/etude-et-plan.md` (étude de l'existant, format des fiches, plan de V1, limites).
 Version en ligne du même document : https://claude.ai/artifact/TKwzr5rAX12MMULFPdoZy5
 Ces décisions ont été prises dans une discussion claude.ai le 19/11/2026. Ce fichier les résume pour chaque session.
+Le même jour, Jean a remplacé la « vue schéma » par un plan de travail 2D interactif : la version en ligne ci-dessus date d'avant ce changement, `docs/etude-et-plan.md` est à jour.
 
 ## Qui je suis, comment me parler
 
@@ -14,18 +15,20 @@ Ces décisions ont été prises dans une discussion claude.ai le 19/11/2026. Ce 
 
 ## Le projet en une phrase
 
-Une appli web dans l'esprit de Wokwi : je décris un montage, je le mets « sous tension », l'appli calcule tensions et courants, compare chaque broche à la fiche de son composant et montre ce qui grille, ce qui chauffe et ce qui ne marchera pas, avec l'explication (broche, valeur, limite, page de la datasheet, correction).
+Une appli web dans l'esprit de Wokwi : je pose mes composants sur un plan de travail 2D, avec ou sans breadboard, je trace les fils, je mets « sous tension » et je mesure ce que je veux. L'appli calcule tensions et courants, compare chaque broche à la fiche de son composant et montre ce qui grille, ce qui chauffe et ce qui ne marchera pas, avec l'explication (broche, valeur, limite, page de la datasheet, correction).
 
 ## Décisions de la V1
 
-- **Pas de fork de Velxio.** Moteur d'analyse maison en TypeScript, licence MIT. Velxio (AGPLv3) reste la cible d'intégration en V2 ; décision à la fin de la V1.
+- **Pas de fork de Velxio.** Moteur d'analyse et éditeur maison en TypeScript, licence MIT. Velxio (AGPLv3) reste une piste pour la V2, surtout pour émuler le code ; décision à la fin de la V1.
 - **Site statique** sur GitHub Pages, sans serveur. Dépôt public.
 - **Pile technique** : Vite (outil de build), TypeScript, Vitest (tests). Pas de framework lourd sans raison ; pas de code copié depuis un projet GPL ou AGPL.
 - **Montage** au format `diagram.json` de Wokwi (https://docs.wokwi.com/diagram-format), réglages dans `attrs`.
-- **Interface V1** : vue schéma générée depuis le montage. Pas de breadboard en glisser-déposer en V1.
+- **Interface V1 : plan de travail 2D interactif** (décision de Jean, 19/11/2026, remplace la « vue schéma »). Composants dessinés avec leurs broches, breadboard, pièces qu'on place et déplace, fils tracés à la souris, multimètre (tension entre deux points, courant dans un fil), bouton « Mettre sous tension » avec le verdict affiché sur chaque pièce. La 3D viendra après la V1.
+- **Dessins 2D** : [wokwi-elements](https://github.com/wokwi/wokwi-elements) (MIT) quand la pièce existe (moteur pas à pas, résistance, LED...). Sinon, dessins SVG maison : breadboard, module TMC2209, alim de labo, LiPo, condensateur, ESP32 38 broches (wokwi-elements n'a que le DevKit V1 à 30 broches). Les dessins et la position des broches vivent dans `src/ui/` : le moteur n'en dépend pas.
 - **Calcul** : régime continu par la méthode des nœuds (système G·V = I), solveur maison, Newton pour les diodes, alim de labo qui passe de tension constante à courant constant à sa limite. ngspice (paquet `eecircuit-engine`, MIT) seulement en V2, pour les phénomènes brefs.
 - **Règles** pour ce que le calcul ne voit pas (débranchement à chaud, condensateur absent, état des broches au démarrage...). Le code d'une règle vit dans le moteur ; ses chiffres et sa source vivent dans la fiche.
 - **Pas d'émulation du code ESP32** : l'état des broches se règle à la main ; le code se teste dans Wokwi.
+- **Composant sans datasheet officielle** (décision de Jean, 19/11/2026) : prendre des valeurs réalistes sur des pages web, celles où les sources concordent ; les petits écarts entre sources ne comptent pas. Ces valeurs portent une source `hypothese` qui nomme les documents et dit où elles divergent.
 
 ## Règles non négociables
 
@@ -48,17 +51,21 @@ Une appli web dans l'esprit de Wokwi : je décris un montage, je le mets « sous
 | `chauffe` | Courant ou puissance au-delà du nominal | Calcul + estimation thermique |
 | `ne_marchera_pas` | Fonctionnement impossible ou faux | Calcul ou règle |
 
-## Plan de V1 (environ 36 h, quatre semaines à partir du 19/11/2026)
+## Plan de V1 (environ 55 h, six à sept semaines à partir du 19/11/2026)
 
-1. **Socle** : Vite + TypeScript + Vitest, CI GitHub Actions, déploiement GitHub Pages. Test : page en ligne, CI verte.
-2. **Fiches** : validateur du schéma dans `npm test`, puis fiches ESP32, TMC2209 (puce + module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance, fil Dupont. Test : toutes valides et relues.
-3. **Du montage au réseau** : lecture de diagram.json, nœuds avec liaisons internes et bandes du breadboard. Test : les 4 EN sur le même nœud que IO13.
-4. **Calcul en continu** : méthode des nœuds + Newton. Test : 6 circuits calculés à la main à moins de 1 % (dont 12 V via 10 kΩ sur une broche 3,3 V ≈ 0,8 mA dans la diode de protection).
-5. **Vérifications, règles, verdicts**. Test : les 10 cas donnent le verdict attendu ; le montage corrigé ne donne aucune fausse alerte.
-6. **Interface** : vue schéma, « Mettre sous tension », explications, animations, réglages manuels, 10 scénarios, import/export. Test : scénarios rejoués à la main.
-7. **Confrontation au vrai montage** au multimètre. Écarts notés dans le README.
+Réécrit le 19/11/2026 pour le plan de travail 2D. Le moteur (étapes 1 à 6) ne change pas ; l'éditeur ajoute les étapes 4, 7 et 8. Vers la fin de la quatrième semaine, le moteur doit déjà vérifier le vrai montage, avant le câblage de la base.
 
-Si le temps manque : couper les animations, puis l'édition des fils. Le moteur et les 10 tests passent avant tout.
+1. **Socle** (2 h, fait) : Vite + TypeScript + Vitest, CI GitHub Actions, déploiement GitHub Pages. Test : page en ligne, CI verte.
+2. **Fiches** (6 h) : validateur du schéma dans `npm test`, puis fiches ESP32, TMC2209 (puce + module), 17HS4401, breadboard, alim de labo, LiPo 4S, condensateur, résistance, fil Dupont. Test : toutes valides et relues.
+3. **Du montage au réseau** (4 h) : lecture de diagram.json, nœuds avec liaisons internes et bandes du breadboard. Test : les 4 EN sur le même nœud que IO13.
+4. **Affichage 2D du montage** (5 h) : chaque pièce dessinée à sa position du diagram.json, avec ses broches et ses fils, sans encore pouvoir modifier. Test : chaque broche de chaque fiche a une position sur son dessin ; la base roulante s'affiche en ligne.
+5. **Calcul en continu** (8 h) : méthode des nœuds + Newton. Test : 6 circuits calculés à la main à moins de 1 % (dont 12 V via 10 kΩ sur une broche 3,3 V ≈ 0,8 mA dans la diode de protection).
+6. **Vérifications, règles, verdicts** (7 h). Test : les 10 cas donnent le verdict attendu ; le montage corrigé ne donne aucune fausse alerte. Le moteur vérifie alors le vrai montage en ligne de commande.
+7. **Éditeur** (12 h) : palette de composants, placer et déplacer, enficher dans la breadboard (accrochage aux trous), tracer et supprimer des fils, annuler, import/export du diagram.json. Test : tests automatiques de l'édition (une broche posée sur un trou est reliée à sa bande, un fil tracé apparaît dans le diagram.json, export puis import redonne le même montage).
+8. **Mise sous tension et mesures** (8 h) : bouton « Mettre sous tension », verdict affiché sur chaque pièce et panneau d'explications, multimètre (tension entre deux points, courant dans un fil), réglages à la main (niveaux des broches, VREF, tension et limite de l'alim), les 10 scénarios, animations. Test : les mesures affichées égalent celles du moteur ; les 10 scénarios rejoués à la main.
+9. **Confrontation au vrai montage** (2 h) au multimètre. Écarts notés dans le README.
+
+Si le temps manque : couper les animations, puis la mesure de courant au clic. Le moteur, les 10 tests et l'édition de base (placer, enficher, tracer les fils) passent avant tout. La 3D est hors V1.
 
 ## Les 10 cas de test (critères de réussite)
 
@@ -86,7 +93,7 @@ Si un seul driver est inversé et les autres bien câblés, ses deux GND (relié
 - Brochage proposé (à confirmer dans le code du robot) : STEP/DIR — avant gauche IO32/IO33, avant droite IO25/IO26, arrière gauche IO27/IO14, arrière droite IO18/IO19. EN commun sur IO13. UART : TX IO17 (via 1 kΩ), RX IO16, sur PDN_UART des 4 drivers. Adresses MS1-MS2 : 0-0, 1-0, 0-1, 1-1.
 - À ajouter sur le vrai montage : tirage 10 kΩ de EN vers 3,3 V ; un condensateur 100 µF 35 V par driver entre VM et GND.
 - Schéma interactif : https://claude.ai/artifact/CLAxfvyscJcJFKTC59LJJ5
-- À vérifier dans la datasheet : le schéma donne 29 V comme « maximum absolu » du TMC2209 ; c'est peut-être le haut de la plage de fonctionnement.
+- Vérifié (datasheet TMC2209 rév. 1.08, p. 75) : 29 V est le haut de la plage de fonctionnement de VS ; le maximum absolu est 32 V (33 V pour VVMAX), et −0,5 V en inverse.
 
 ## Structure prévue du dépôt
 
@@ -95,7 +102,8 @@ schema/      schéma JSON des fiches
 fiches/      une fiche JSON par composant
 montages/    base-roulante.diagram.json + cas/ (les 10 cas)
 src/moteur/  réseau, calcul, vérifications, règles (aucune dépendance à l'interface)
-src/ui/      interface
+src/ui/      interface : plan de travail 2D, éditeur, multimètre
+src/ui/pieces/  dessins 2D des composants et position de leurs broches
 tests/       tests Vitest
 datasheets/  PDF des fabricants (non publiés)
 docs/        étude et plan
@@ -104,9 +112,11 @@ outils/      scripts annexes
 
 ## Bloquants connus
 
-- Datasheet TMC2209 (PDF) à déposer dans `datasheets/`.
-- Marque et version des modules TMC2209 inconnues (photo recto-verso sinon).
-- Datasheets ESP32 (Espressif) et 17HS4401 à récupérer pour l'étape 2.
+- Datasheet TMC2209 : rév. 1.08 récupérée chez DigiKey (`datasheets/tmc2209-datasheet-rev1.08.pdf`), fiches `tmc2209` et `tmc2209-module` faites (brouillon). La rév. 1.09 n'est que sur analog.com, qui refuse les téléchargements automatiques : Jean la télécharge à la main s'il veut la dernière.
+- Marque et version des modules TMC2209 inconnues (photo recto-verso sinon). La fiche `tmc2209-module` suit le schéma BIGTREETECH V1.2 : il tire EN vers VDD par 20 kΩ, ce qui change le cas 5 ; à vérifier au multimètre sur un vrai module.
+- 17HS4401 : pas de datasheet officielle. Fiche `fiches/17hs4401.json` (brouillon) faite le 19/11/2026 depuis trois pages web, avec les valeurs sur lesquelles deux sources concordent. À remplacer par la fiche du vendeur si elle arrive.
+- ESP32 : datasheet v5.3, WROOM-32 v3.8 et schéma DevKitC V4 récupérés le 19/11/2026 (liste et empreintes dans `datasheets/LISEZMOI.md`). Reste à confirmer le module exact (WROOM-32, 32D ou 32E) de la carte Keyestudio.
+- Pas de `pdftoppm` sur la machine : l'outil Read ne peut pas afficher les pages d'un PDF. Pour lire le texte, installer `pypdf` (Python) dans le dossier temporaire de la session, en l'annonçant à Jean.
 
 ## Commandes
 

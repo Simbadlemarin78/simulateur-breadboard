@@ -2,7 +2,7 @@
 
 Avant de câbler un vrai montage, savoir s'il va marcher et s'il va griller quelque chose.
 
-On décrit le montage, on le met « sous tension ». L'appli calcule tensions et courants, compare chaque broche à la fiche de son composant, et montre ce qui grille, ce qui chauffe et ce qui ne marchera pas. Chaque verdict donne la broche, la valeur, la limite, la page de la datasheet et la correction.
+On pose les composants sur un plan de travail 2D, avec ou sans breadboard, on trace les fils et on met le montage « sous tension ». L'appli calcule tensions et courants, compare chaque broche à la fiche de son composant, et montre ce qui grille, ce qui chauffe et ce qui ne marchera pas. Chaque verdict donne la broche, la valeur, la limite, la page de la datasheet et la correction.
 
 **État : en construction (V1).** Étude, format des fiches et plan : [docs/etude-et-plan.md](docs/etude-et-plan.md).
 

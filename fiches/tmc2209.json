@@ -1,0 +1,500 @@
+{
+  "format": "fiche-composant/1",
+  "id": "tmc2209",
+  "nom": "Driver de moteur pas à pas TMC2209 (puce)",
+  "categorie": "puce",
+  "fabricant": "TRINAMIC Motion Control (Analog Devices)",
+  "reference": "TMC2209-LA",
+  "description": "Driver de moteur pas à pas bipolaire, boîtier QFN28. Commande par STEP/DIR ou UART, courant réglé par résistances de mesure et tension VREF. Cette fiche décrit la puce seule ; le module sur breadboard a sa propre fiche (tmc2209-module).",
+  "documents": [
+    {
+      "id": "tmc2209-ds",
+      "titre": "TMC2209 Datasheet",
+      "editeur": "TRINAMIC Motion Control (Analog Devices)",
+      "revision": "1.08",
+      "date": "2022-05-25",
+      "url": "https://media.digikey.com/pdf/Data%20Sheets/Trinamic%20Motion%20Control%20PDFs/TMC2209_Rev.1.08.pdf",
+      "sha256": "24d6fe363ff4e5898c0c3fa2ed06e9d8a04e34481a5ad5cc9e4555e7403fdd44"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Extraite de la rév. 1.08 (copie DigiKey). Analog Devices publie une rév. 1.09 que je n'ai pas pu télécharger : les pages peuvent légèrement différer. Les tensions d'entrée logiques sont exprimées en fraction de VCC_IO (unité « 1 »), faute de champ « relatif à » dans le schéma."
+  },
+  "broches": [
+    {
+      "nom": "OB2",
+      "position": { "numero": 1 },
+      "role": "sortie_puissance",
+      "fonctions": ["BOBINE_B"],
+      "domaine": { "alim": "VS", "masse": "GND" },
+      "max_absolus": {
+        "courant": { "max": 3, "unite": "A", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Power bridge repetitive output current IOx 3 A" } }
+      },
+      "recommande": {
+        "courant": { "max": 2.8, "unite": "A", "conditions": "crête de la sinusoïde", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "Peak output current per motor coil output (sine wave peak) 2.8 A" } }
+      }
+    },
+    {
+      "nom": "ENN",
+      "position": { "numero": 2 },
+      "role": "entree_logique",
+      "fonctions": ["EN"],
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_haut_interne": false, "tirage_bas_interne": false, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "ENN 2 DI Enable not input" } },
+      "niveaux": {
+        "vil_max": { "max": 0.3, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage low level VINLO -0.3 0.3 VVIO V" } },
+        "vih_min": { "min": 0.7, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage high level VINHI 0.7 VVIO VVIO+0.3 V" } }
+      },
+      "entree": {
+        "diodes_protection": {
+          "vers_alim": true,
+          "vers_masse": true,
+          "courant_injection_max": { "max": 10, "unite": "mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Maximum current to / from digital pins ... IIO +/-10 mA" } },
+          "src": { "type": "hypothese", "justification": "La p. 75 borne la tension des entrées logiques entre -0,5 V et VCC_IO + 0,5 V et leur courant à ±10 mA : c'est le comportement de diodes de protection vers VCC_IO et GND, que la datasheet ne dessine pas." }
+        }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Logic input voltage VI -0.5 VVIO+0.5 V" }, "note": "Maximum relatif : VCC_IO + 0,5 V, porté par les diodes de protection." }
+      },
+      "etat_demarrage": { "etat": "haute_impedance", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "ENN 2 DI (pas de « pd » : aucun tirage interne)" } },
+      "note": "Niveau haut : étage de puissance coupé, sorties flottantes. Pas de tirage interne : en l'air, l'état est indéfini."
+    },
+    {
+      "nom": "GND",
+      "position": { "numero": 3 },
+      "role": "masse",
+      "note": "Broches 3 et 18, plus la plaque métallique sous le boîtier (die pad), qui sert de masse au pont de puissance."
+    },
+    {
+      "nom": "CPO",
+      "position": { "numero": 4 },
+      "role": "autre",
+      "note": "Pompe de charge : sortie du condensateur, relié à CPI par 22 nF."
+    },
+    {
+      "nom": "CPI",
+      "position": { "numero": 5 },
+      "role": "autre",
+      "note": "Pompe de charge : entrée du condensateur, relié à CPO par 22 nF."
+    },
+    {
+      "nom": "VCP",
+      "position": { "numero": 6 },
+      "role": "autre",
+      "note": "Tension de la pompe de charge, reliée à VS par 100 nF."
+    },
+    {
+      "nom": "SPREAD",
+      "position": { "numero": 7 },
+      "role": "configuration",
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_bas_interne": true, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "SPREAD 7 DI (pd) Chopper mode selection" } },
+      "entree": {
+        "tirage": { "vers": "masse", "resistance": { "min": 132, "typ": 166, "max": 200, "unite": "kΩ", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Pullup / pull-down resistors RPU/RPD 132 166 200 kΩ" } } }
+      },
+      "etat_demarrage": { "etat": "tirage_bas", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "SPREAD 7 DI (pd) ... (may be left unconnected)" } },
+      "note": "Bas : StealthChop (silencieux) ; haut : SpreadCycle."
+    },
+    {
+      "nom": "5VOUT",
+      "position": { "numero": 8 },
+      "role": "alim_sortie",
+      "domaine": { "masse": "GND" },
+      "max_absolus": {
+        "tension": { "min": -0.5, "max": 5.5, "unite": "V", "conditions": "si on alimente 5VOUT de l'extérieur", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "5VOUT supply voltage (when using external supply) -0.5 5.5 V" } },
+        "courant": { "max": 25, "unite": "mA", "conditions": "charge interne et externe comprises", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "5V regulator output current (internal plus external load) I5VOUT 25 mA" } }
+      },
+      "note": "Sortie du régulateur 5 V interne ; condensateur de 2,2 à 4,7 µF vers GND."
+    },
+    {
+      "nom": "MS1_AD0",
+      "position": { "numero": 9 },
+      "role": "configuration",
+      "fonctions": ["MS1", "AD0"],
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_bas_interne": true, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "MS1_AD0 9 DI (pd) ... (internal pull-down resistors)" } },
+      "niveaux": {
+        "vil_max": { "max": 0.3, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage low level VINLO -0.3 0.3 VVIO V" } },
+        "vih_min": { "min": 0.7, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage high level VINHI 0.7 VVIO VVIO+0.3 V" } }
+      },
+      "entree": {
+        "tirage": { "vers": "masse", "resistance": { "min": 132, "typ": 166, "max": 200, "unite": "kΩ", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Pullup / pull-down resistors RPU/RPD 132 166 200 kΩ" } } }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Logic input voltage VI -0.5 VVIO+0.5 V" }, "note": "Maximum relatif : VCC_IO + 0,5 V." }
+      },
+      "etat_demarrage": { "etat": "tirage_bas", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "MS1_AD0 9 DI (pd)" } },
+      "note": "Sans UART : choix des micro-pas avec MS2. Avec UART : bit 0 de l'adresse."
+    },
+    {
+      "nom": "MS2_AD1",
+      "position": { "numero": 10 },
+      "role": "configuration",
+      "fonctions": ["MS2", "AD1"],
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_bas_interne": true, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "MS2_AD1 10 DI (pd)" } },
+      "niveaux": {
+        "vil_max": { "max": 0.3, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage low level VINLO -0.3 0.3 VVIO V" } },
+        "vih_min": { "min": 0.7, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage high level VINHI 0.7 VVIO VVIO+0.3 V" } }
+      },
+      "entree": {
+        "tirage": { "vers": "masse", "resistance": { "min": 132, "typ": 166, "max": 200, "unite": "kΩ", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Pullup / pull-down resistors RPU/RPD 132 166 200 kΩ" } } }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Logic input voltage VI -0.5 VVIO+0.5 V" }, "note": "Maximum relatif : VCC_IO + 0,5 V." }
+      },
+      "etat_demarrage": { "etat": "tirage_bas", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "MS2_AD1 10 DI (pd)" } },
+      "note": "Sans UART : choix des micro-pas avec MS1. Avec UART : bit 1 de l'adresse."
+    },
+    {
+      "nom": "DIAG",
+      "position": { "numero": 11 },
+      "role": "sortie_logique",
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": false, "sortie": true, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "DIAG 11 DO Diagnostic and StallGuard output" } },
+      "niveaux": {
+        "vol_max": { "max": 0.2, "unite": "V", "conditions": "courant de sortie 2 mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Output voltage low level VOUTLO IOUTLO = 2mA 0.2 V" } }
+      },
+      "sortie": {
+        "courant_max": { "max": 10, "unite": "mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Maximum current to / from digital pins ... IIO +/-10 mA" } }
+      },
+      "note": "Haut en cas de blocage du moteur ou d'erreur du driver. Niveau haut : au moins VCC_IO − 0,2 V à 2 mA (p. 79)."
+    },
+    {
+      "nom": "INDEX",
+      "position": { "numero": 12 },
+      "role": "sortie_logique",
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": false, "sortie": true, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "INDEX 12 DO Configurable index output" } },
+      "niveaux": {
+        "vol_max": { "max": 0.2, "unite": "V", "conditions": "courant de sortie 2 mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Output voltage low level VOUTLO IOUTLO = 2mA 0.2 V" } }
+      },
+      "sortie": {
+        "courant_max": { "max": 10, "unite": "mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Maximum current to / from digital pins ... IIO +/-10 mA" } }
+      }
+    },
+    {
+      "nom": "CLK",
+      "position": { "numero": 13 },
+      "role": "entree_logique",
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_bas_interne": false, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "CLK 13 DI CLK input. Tie to GND using short wire for internal clock" } },
+      "entree": {
+        "diodes_protection": {
+          "vers_alim": true,
+          "vers_masse": true,
+          "courant_injection_max": { "max": 10, "unite": "mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Maximum current to / from digital pins ... IIO +/-10 mA" } },
+          "src": { "type": "hypothese", "justification": "Même raisonnement que pour ENN : limites de la p. 75 sur les entrées logiques." }
+        }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Logic input voltage VI -0.5 VVIO+0.5 V" }, "note": "Maximum relatif : VCC_IO + 0,5 V." }
+      },
+      "note": "À relier à GND pour utiliser l'horloge interne de 12 MHz."
+    },
+    {
+      "nom": "PDN_UART",
+      "position": { "numero": 14 },
+      "role": "communication",
+      "fonctions": ["PDN", "UART"],
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": true, "tirage_bas_interne": false, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions", "citation": "PDN_UART 14 DIO Power down not control input ... Optional UART Input/Output" } },
+      "niveaux": {
+        "vil_max": { "max": 0.3, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage low level VINLO -0.3 0.3 VVIO V" } },
+        "vih_min": { "min": 0.7, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage high level VINHI 0.7 VVIO VVIO+0.3 V" } },
+        "vol_max": { "max": 0.2, "unite": "V", "conditions": "courant de sortie 2 mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Output voltage low level VOUTLO IOUTLO = 2mA 0.2 V" } }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Logic input voltage VI -0.5 VVIO+0.5 V" }, "note": "Maximum relatif : VCC_IO + 0,5 V." }
+      },
+      "note": "Sans UART : bas = réduction automatique du courant à l'arrêt, haut = désactivée. Avec UART : ligne unique d'émission et de réception."
+    },
+    {
+      "nom": "VCC_IO",
+      "position": { "numero": 15 },
+      "role": "alim_entree",
+      "domaine": { "masse": "GND" },
+      "max_absolus": {
+        "tension": { "min": -0.5, "max": 5.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "I/O supply voltage VVIO -0.5 5.5 V" } }
+      },
+      "recommande": {
+        "tension": { "min": 3.0, "max": 5.25, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "I/O supply voltage VVIO 3.00 5.25 V" } }
+      },
+      "note": "Alimente les broches logiques (pas la logique interne). Fixe les seuils d'entrée : à brancher sur le 3,3 V de l'ESP32."
+    },
+    {
+      "nom": "STEP",
+      "position": { "numero": 16 },
+      "role": "entree_logique",
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_bas_interne": false, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 10, "ou": "2.2 Signal Descriptions", "citation": "STEP 16 DI STEP input" } },
+      "niveaux": {
+        "vil_max": { "max": 0.3, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage low level VINLO -0.3 0.3 VVIO V" } },
+        "vih_min": { "min": 0.7, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage high level VINHI 0.7 VVIO VVIO+0.3 V" } }
+      },
+      "entree": {
+        "diodes_protection": {
+          "vers_alim": true,
+          "vers_masse": true,
+          "courant_injection_max": { "max": 10, "unite": "mA", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Maximum current to / from digital pins ... IIO +/-10 mA" } },
+          "src": { "type": "hypothese", "justification": "Même raisonnement que pour ENN : limites de la p. 75 sur les entrées logiques." }
+        }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Logic input voltage VI -0.5 VVIO+0.5 V" }, "note": "Maximum relatif : VCC_IO + 0,5 V." }
+      },
+      "etat_demarrage": { "etat": "haute_impedance", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 10, "ou": "2.2 Signal Descriptions", "citation": "STEP 16 DI (pas de « pd » : aucun tirage interne)" } }
+    },
+    {
+      "nom": "VREF",
+      "position": { "numero": 17 },
+      "role": "entree_analogique",
+      "domaine": { "masse": "GND" },
+      "entree": {
+        "resistance": { "min": 190, "typ": 240, "max": 300, "unite": "kΩ", "conditions": "vers une source interne de 1,8 V (résistances de mesure externes)", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "VREF input DC-Characteristics", "citation": "VREF input resistance to 1.8V ... RVREF 190 240 300 kΩ" } }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "max": 6, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "VREF input voltage ... VVREF -0.5 6 V" }, "note": "Ne pas dépasser VCC_IO et 5VOUT de plus de 10 % : cela active un mode de test." }
+      },
+      "recommande": {
+        "tension": { "min": 0, "max": 2.5, "unite": "V", "conditions": "réglage linéaire du courant ; le max vaut 5VOUT/2, soit 2,5 V pour 5VOUT = 5,0 V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "VREF input DC-Characteristics", "citation": "VREF input voltage range for linear current scaling 0 ... V5VOUT/2 V" } }
+      },
+      "note": "Fixe le courant des bobines : voir la formule dans le modèle."
+    },
+    {
+      "nom": "DIR",
+      "position": { "numero": 19 },
+      "role": "entree_logique",
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_bas_interne": true, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 10, "ou": "2.2 Signal Descriptions", "citation": "DIR 19 DI (pd) DIR input (internal pull-down resistor)" } },
+      "niveaux": {
+        "vil_max": { "max": 0.3, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage low level VINLO -0.3 0.3 VVIO V" } },
+        "vih_min": { "min": 0.7, "unite": "1", "conditions": "en fraction de VCC_IO", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Input voltage high level VINHI 0.7 VVIO VVIO+0.3 V" } }
+      },
+      "entree": {
+        "tirage": { "vers": "masse", "resistance": { "min": 132, "typ": 166, "max": 200, "unite": "kΩ", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Pullup / pull-down resistors RPU/RPD 132 166 200 kΩ" } } }
+      },
+      "max_absolus": {
+        "tension": { "min": -0.5, "unite": "V", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Logic input voltage VI -0.5 VVIO+0.5 V" }, "note": "Maximum relatif : VCC_IO + 0,5 V." }
+      },
+      "etat_demarrage": { "etat": "tirage_bas", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 10, "ou": "2.2 Signal Descriptions", "citation": "DIR 19 DI (pd)" } }
+    },
+    {
+      "nom": "STDBY",
+      "position": { "numero": 20 },
+      "role": "configuration",
+      "domaine": { "alim": "VCC_IO", "masse": "GND" },
+      "capacites": { "entree": true, "sortie": false, "tirage_bas_interne": true, "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 10, "ou": "2.2 Signal Descriptions", "citation": "STDBY 20 DI (pd) ... 100kOhm pulldown" } },
+      "entree": {
+        "tirage": { "vers": "masse", "resistance": { "min": 80, "typ": 100, "max": 120, "unite": "kΩ", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 79, "ou": "Digital pins DC-Characteristics", "citation": "Pull-down resistor STANDBY pin RPD 80 100 120 kΩ" } } }
+      },
+      "etat_demarrage": { "etat": "tirage_bas", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 10, "ou": "2.2 Signal Descriptions", "citation": "STDBY 20 DI (pd) ... (may be left unconnected)" } },
+      "note": "Haut : veille basse consommation, régulateur interne coupé."
+    },
+    {
+      "nom": "OA2",
+      "position": { "numero": 21 },
+      "role": "sortie_puissance",
+      "fonctions": ["BOBINE_A"],
+      "domaine": { "alim": "VS", "masse": "GND" },
+      "max_absolus": {
+        "courant": { "max": 3, "unite": "A", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Power bridge repetitive output current IOx 3 A" } }
+      },
+      "recommande": {
+        "courant": { "max": 2.8, "unite": "A", "conditions": "crête de la sinusoïde", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "Peak output current per motor coil output (sine wave peak) 2.8 A" } }
+      }
+    },
+    {
+      "nom": "VS",
+      "position": { "numero": 22 },
+      "role": "alim_entree",
+      "domaine": { "masse": "GND" },
+      "max_absolus": {
+        "tension": { "min": -0.5, "max": 32, "unite": "V", "conditions": "avec charge inductive (moteur)", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Supply voltage operating with inductive load VVS -0.5 32 V" }, "note": "La p. 75 donne aussi 33 V comme maximum de l'alim et du pont (VVMAX), et prévient que les inductances des fils ajoutent des oscillations de quelques volts." }
+      },
+      "recommande": {
+        "tension": { "min": 5.5, "max": 29, "unite": "V", "conditions": "avec le régulateur 5 V interne", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "Supply voltage (using internal +5V regulator) VVS 5.5 29 V" } }
+      },
+      "note": "Broches 22 et 28. Alimentation du moteur (VM sur le module). 29 V est le haut de la plage de fonctionnement ; le maximum absolu est 32 V."
+    },
+    {
+      "nom": "BRA",
+      "position": { "numero": 23 },
+      "role": "autre",
+      "fonctions": ["MESURE_A"],
+      "note": "Résistance de mesure du courant de la bobine A, vers GND."
+    },
+    {
+      "nom": "OA1",
+      "position": { "numero": 24 },
+      "role": "sortie_puissance",
+      "fonctions": ["BOBINE_A"],
+      "domaine": { "alim": "VS", "masse": "GND" },
+      "max_absolus": {
+        "courant": { "max": 3, "unite": "A", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Power bridge repetitive output current IOx 3 A" } }
+      },
+      "recommande": {
+        "courant": { "max": 2.8, "unite": "A", "conditions": "crête de la sinusoïde", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "Peak output current per motor coil output (sine wave peak) 2.8 A" } }
+      }
+    },
+    {
+      "nom": "NC",
+      "position": { "numero": 25 },
+      "role": "non_connectee",
+      "note": "Inutilisée ; peut être reliée à GND."
+    },
+    {
+      "nom": "OB1",
+      "position": { "numero": 26 },
+      "role": "sortie_puissance",
+      "fonctions": ["BOBINE_B"],
+      "domaine": { "alim": "VS", "masse": "GND" },
+      "max_absolus": {
+        "courant": { "max": 3, "unite": "A", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Power bridge repetitive output current IOx 3 A" } }
+      },
+      "recommande": {
+        "courant": { "max": 2.8, "unite": "A", "conditions": "crête de la sinusoïde", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "Peak output current per motor coil output (sine wave peak) 2.8 A" } }
+      }
+    },
+    {
+      "nom": "BRB",
+      "position": { "numero": 27 },
+      "role": "autre",
+      "fonctions": ["MESURE_B"],
+      "note": "Résistance de mesure du courant de la bobine B, vers GND."
+    }
+  ],
+  "modele": {
+    "type": "driver_pas_a_pas",
+    "valeurs": {
+      "courant_rms_continu": {
+        "max": 1.4,
+        "unite": "A",
+        "conditions": "par bobine, en continu (valeur de conception)",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "RMS motor coil current per coil (value for design guideline) IRMS 1.4 A" }
+      },
+      "courant_rms_cyclique": {
+        "max": 2.0,
+        "unite": "A",
+        "conditions": "par bobine, avec des pauses (par exemple 1 s en marche, 1 s en veille)",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "RMS motor coil current per coil with duty cycle limit ... 2.0 A" }
+      },
+      "rdson_bas": {
+        "typ": 0.17,
+        "max": 0.21,
+        "unite": "Ω",
+        "conditions": "MOSFET côté masse, 200 mA, 25 °C",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 76, "ou": "Motor driver section DC-Characteristics", "citation": "RDSON lowside MOSFET RONL ... 0.170 0.21 Ω" }
+      },
+      "rdson_haut": {
+        "typ": 0.17,
+        "max": 0.21,
+        "unite": "Ω",
+        "conditions": "MOSFET côté VS, 200 mA, 25 °C",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 76, "ou": "Motor driver section DC-Characteristics", "citation": "RDSON highside MOSFET RONH ... 0.170 0.21 Ω" }
+      },
+      "courant_vs_desactive": {
+        "typ": 7,
+        "max": 10,
+        "unite": "mA",
+        "conditions": "VS = 24 V, horloge 12 MHz, driver désactivé",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 76, "ou": "Power supply current DC-Characteristics", "citation": "Total supply current, driver disabled IVS fCLK=12MHz 7 10 mA" }
+      },
+      "tension_pleine_echelle": {
+        "typ": 325,
+        "unite": "mV",
+        "conditions": "vsense = 0 (réglage par défaut)",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 78, "ou": "Sense resistor voltage levels DC-Characteristics", "citation": "Sense input peak threshold voltage (low sensitivity) VSRTL ... 325 mV" }
+      },
+      "resistance_interne_br": {
+        "typ": 20,
+        "unite": "mΩ",
+        "conditions": "entre BRA ou BRB et le comparateur, en plus de la résistance de mesure",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 78, "ou": "Sense resistor voltage levels DC-Characteristics", "citation": "Internal resistance from pin BRxy ... RBRxy 20 mΩ" }
+      },
+      "formule_courant": {
+        "valeur": "I_RMS = 325 mV / (R_SENSE + 20 mΩ) × (1/√2) × (V_VREF / 2,5 V)",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 53, "ou": "9 Motor Current Control, Standalone mode RMS run current calculation" },
+        "note": "Mode autonome (sans UART), avec VREF entre 0 et 2,5 V."
+      },
+      "micro_pas": {
+        "colonnes": ["MS2", "MS1", "micro_pas", "adresse_uart"],
+        "lignes": [
+          [0, 0, 8, 0],
+          [0, 1, 32, 1],
+          [1, 0, 64, 2],
+          [1, 1, 16, 3]
+        ],
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 14, "ou": "MS1/MS2: Configuration of microstep resolution for STEP input" }
+      },
+      "seuil_sous_tension_vs": {
+        "min": 3.5,
+        "typ": 4.2,
+        "max": 4.6,
+        "unite": "V",
+        "conditions": "VS montante : en dessous, la puce reste en reset",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 78, "ou": "Detector levels DC-Characteristics", "citation": "VVS undervoltage threshold for RESET VUV_VS VVS rising 3.5 4.2 4.6 V" }
+      },
+      "seuil_sous_tension_vcc_io": {
+        "min": 2.1,
+        "typ": 2.55,
+        "max": 3.0,
+        "unite": "V",
+        "conditions": "VCC_IO montante",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 78, "ou": "Detector levels DC-Characteristics", "citation": "VVCC_IO undervoltage threshold for RESET VUV_VIO ... 2.1 2.55 3.0 V" }
+      },
+      "tension_5vout": {
+        "min": 4.8,
+        "typ": 5.0,
+        "max": 5.25,
+        "unite": "V",
+        "conditions": "sans charge, 25 °C, VS = 24 V",
+        "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 77, "ou": "Linear regulator DC-Characteristics", "citation": "Output voltage V5VOUT I5VOUT = 0mA TJ = 25°C 4.80 5.0 5.25 V" }
+      },
+      "diodes_pont": {
+        "valeur": "Chaque MOSFET du pont a une diode interne. Si VS passe sous GND, ces diodes conduisent de GND vers VS à travers les sorties : seule l'alim limite le courant.",
+        "src": { "type": "hypothese", "justification": "La note de la p. 75 cite les diodes internes (body diodes) des MOSFET de sortie ; leur conduction en cas d'inversion découle du pont en H, que la datasheet ne détaille pas. Sert au cas 2 (VM et GND inversés)." }
+      },
+      "courant_max_diodes_pont": {
+        "max": 3,
+        "unite": "A",
+        "src": { "type": "hypothese", "justification": "Repris du courant répétitif maximal du pont (IOx = 3 A, p. 75), faute de valeur propre aux diodes. Cas 2 : au-delà, « grillé » ; en dessous, « risque élevé »." }
+      }
+    }
+  },
+  "thermique": {
+    "resistance_thermique": {
+      "typ": 30,
+      "unite": "K/W",
+      "conditions": "jonction-ambiante, carte 4 couches JEDEC 2s2p de 70 × 133 mm",
+      "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 80, "ou": "Table 20.1 Thermal characteristics TMC2209", "citation": "Thermal resistance junction to ambient on a multilayer board QFN28 ... 30 K/W" },
+      "note": "Un petit module a bien moins de cuivre que cette carte d'essai : sa résistance thermique réelle est plus élevée."
+    },
+    "temperature_max": {
+      "max": 150,
+      "unite": "°C",
+      "conditions": "jonction",
+      "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "19 Absolute Maximum Ratings", "citation": "Junction temperature TJ -50 150 °C" }
+    },
+    "seuils": [
+      {
+        "nom": "fin de la plage de fonctionnement",
+        "temperature": { "max": 125, "unite": "°C", "conditions": "jonction", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 75, "ou": "20.1 Operational Range", "citation": "Junction temperature TJ -40 125 °C" } },
+        "effet": "Au-delà, le fabricant ne garantit plus les caractéristiques."
+      },
+      {
+        "nom": "pré-alerte",
+        "temperature": { "min": 100, "typ": 120, "max": 140, "unite": "°C", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 78, "ou": "Detector levels DC-Characteristics", "citation": "Overtemperature prewarning 120°C tOTPW Temperature rising 100 120 140 °C" } },
+        "effet": "Drapeau otpw levé (lisible par UART) ; le driver continue."
+      },
+      {
+        "nom": "coupure",
+        "temperature": { "min": 128, "typ": 143, "max": 163, "unite": "°C", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 78, "ou": "Detector levels DC-Characteristics", "citation": "Overtemperature shutdown or prewarning 143°C ... 128 143 163 °C" }, "note": "Réglage par défaut d'après la p. 68 ; 150 ou 157 °C possibles par programmation." },
+        "effet": "Étage de puissance coupé jusqu'au refroidissement : le moteur s'arrête."
+      }
+    ]
+  }
+}

@@ -2,5 +2,6 @@
 // TypeScript est compilé et exécuté sur la page en ligne (étape 1 du plan).
 const etat = document.querySelector<HTMLParagraphElement>('#etat');
 if (etat) {
-  etat.textContent = 'En construction : socle en place (étape 1 sur 7). Le moteur de calcul arrive aux étapes 3 à 5.';
+  etat.textContent =
+    'En construction : socle en place (étape 1 sur 9). Le plan de travail 2D arrive à l\'étape 4, le moteur de calcul aux étapes 5 et 6.';
 }

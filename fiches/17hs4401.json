@@ -1,0 +1,194 @@
+{
+  "format": "fiche-composant/1",
+  "id": "17hs4401",
+  "nom": "Moteur pas à pas NEMA 17 17HS4401",
+  "categorie": "moteur",
+  "reference": "17HS4401",
+  "description": "Moteur pas à pas bipolaire, 2 phases, 4 fils, boîtier NEMA 17 de 40 mm de long. Pas de datasheet officielle : plusieurs fabricants chinois vendent ce modèle sous ce nom. Valeurs retenues : celles sur lesquelles au moins deux sources concordent (décision de Jean, 19/11/2026).",
+  "documents": [
+    {
+      "id": "motionking-17hs4401",
+      "titre": "17HS4401 Datasheet – 40mm, Stepper Motor (page web qui reprend la fiche MotionKing, consultée le 19/11/2026)",
+      "editeur": "datasheetcafe.com",
+      "date": "2024-01-15",
+      "url": "https://www.datasheetcafe.com/17hs4401-datasheet-stepper-motor/"
+    },
+    {
+      "id": "handson-17hs4401s",
+      "titre": "17HS4401S Datasheet PDF – Stepper Motor (page web qui reprend la fiche Handson Technology, consultée le 19/11/2026)",
+      "editeur": "datasheetcafe.com",
+      "date": "2023-02-02",
+      "url": "https://www.datasheetcafe.com/17hs4401s-datasheet/"
+    },
+    {
+      "id": "hanpose-17hs4401s",
+      "titre": "Moteur pas à pas HANPOSE 17HS4401S NEMA 17 (page produit, consultée le 19/11/2026)",
+      "editeur": "OpenELAB",
+      "url": "https://openelab.io/fr/products/hanpose-nema17-42mm-12v-stepper"
+    },
+    {
+      "id": "wokwi-stepper-motor",
+      "titre": "wokwi-stepper-motor Reference (consultée le 19/11/2026)",
+      "editeur": "Wokwi",
+      "url": "https://docs.wokwi.com/parts/wokwi-stepper-motor"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Pas de datasheet officielle : valeurs tirées de pages web (un agrégateur et un vendeur), retenues là où deux sources concordent. À remplacer par la fiche du vendeur des moteurs si elle arrive, ou par une mesure de la résistance de phase au multimètre. À trancher à l'étape 5 : aucune source ne dit si le courant nominal est un courant efficace ou de crête."
+  },
+  "wokwi": {
+    "type": "wokwi-stepper-motor"
+  },
+  "broches": [
+    {
+      "nom": "A+",
+      "role": "autre",
+      "fonctions": ["BOBINE_A"],
+      "note": "Fil rouge chez MotionKing et HANPOSE. Les couleurs changent d'un vendeur à l'autre : au multimètre, les deux fils d'une même bobine montrent la résistance de phase, deux fils de bobines différentes ne se touchent pas."
+    },
+    {
+      "nom": "A-",
+      "role": "autre",
+      "fonctions": ["BOBINE_A"],
+      "note": "Fil vert chez MotionKing et HANPOSE."
+    },
+    {
+      "nom": "B+",
+      "role": "autre",
+      "fonctions": ["BOBINE_B"],
+      "note": "Fil jaune chez MotionKing et HANPOSE."
+    },
+    {
+      "nom": "B-",
+      "role": "autre",
+      "fonctions": ["BOBINE_B"],
+      "note": "Fil bleu chez MotionKing et HANPOSE."
+    }
+  ],
+  "modele": {
+    "type": "moteur_pas_a_pas",
+    "valeurs": {
+      "bobines": {
+        "colonnes": ["bobine", "debut", "fin"],
+        "lignes": [
+          ["A", "A+", "A-"],
+          ["B", "B+", "B-"]
+        ],
+        "src": {
+          "type": "hypothese",
+          "justification": "Noms des broches de wokwi-stepper-motor. Les deux paires A+/A- et B+/B- sont données par motionking-17hs4401 et hanpose-17hs4401s."
+        }
+      },
+      "courant_nominal_phase": {
+        "max": 1.7,
+        "unite": "A",
+        "conditions": "par phase",
+        "src": {
+          "type": "hypothese",
+          "justification": "1,7 A par phase dans motionking-17hs4401 et handson-17hs4401s ; hanpose-17hs4401s donne 1,5 A. Valeur retenue : celle des deux sources qui concordent, qui est aussi celle annoncée pour les moteurs de Jean."
+        },
+        "note": "Courant nominal, pas un maximum absolu : le dépasser fait chauffer le moteur (cas 10) sans le détruire sur le coup."
+      },
+      "resistance_phase": {
+        "min": 1.35,
+        "typ": 1.5,
+        "max": 1.65,
+        "unite": "Ω",
+        "conditions": "par phase",
+        "src": {
+          "type": "hypothese",
+          "justification": "1,5 Ω ± 10 % dans motionking-17hs4401 et handson-17hs4401s ; hanpose-17hs4401s donne 1,8 Ω. Min et max tirés de la tolérance de ± 10 %."
+        },
+        "note": "Se vérifie au multimètre entre A+ et A- (moteur débranché du driver)."
+      },
+      "inductance_phase": {
+        "min": 2.24,
+        "typ": 2.8,
+        "max": 3.36,
+        "unite": "mH",
+        "conditions": "par phase, à 1 kHz",
+        "src": {
+          "type": "hypothese",
+          "justification": "2,8 mH ± 20 % à 1 kHz dans handson-17hs4401s ; hanpose-17hs4401s donne 3,8 mH ; motionking-17hs4401 donne la même tolérance de ± 20 %. Min et max tirés de cette tolérance."
+        },
+        "note": "Inutile en régime continu ; servira en V2 pour les phénomènes brefs."
+      },
+      "tension_phase": {
+        "typ": 2.6,
+        "unite": "V",
+        "conditions": "au courant nominal, en continu",
+        "src": {
+          "type": "hypothese",
+          "justification": "2,6 V dans handson-17hs4401s, cohérent avec le produit du courant nominal par la résistance de phase (1,7 A × 1,5 Ω ≈ 2,55 V)."
+        },
+        "note": "Une bobine branchée directement sur l'alim tirerait bien plus que le courant nominal : le moteur passe toujours par un driver qui régule le courant."
+      },
+      "couple_maintien": {
+        "typ": 0.4,
+        "unite": "N·m",
+        "conditions": "au courant nominal",
+        "src": {
+          "type": "hypothese",
+          "justification": "40 N·cm dans motionking-17hs4401 et hanpose-17hs4401s ; handson-17hs4401s donne 43 N·cm. Non utilisé par le calcul en V1."
+        }
+      },
+      "angle_pas": {
+        "valeur": "1,8° par pas complet (200 pas par tour)",
+        "src": {
+          "type": "hypothese",
+          "justification": "Même valeur dans motionking-17hs4401, handson-17hs4401s et hanpose-17hs4401s."
+        }
+      },
+      "echauffement_max": {
+        "max": 80,
+        "unite": "°C",
+        "conditions": "au courant nominal, deux phases alimentées",
+        "src": {
+          "type": "hypothese",
+          "justification": "« Temperature rise : 80deg Max (rated current, 2 phase on) » dans motionking-17hs4401 ; 80 °C max aussi dans handson-17hs4401s."
+        },
+        "note": "Élévation au-dessus de la température ambiante, pas une température."
+      },
+      "temperature_ambiante": {
+        "min": -20,
+        "max": 50,
+        "unite": "°C",
+        "src": {
+          "type": "hypothese",
+          "justification": "« Ambient temperature : -20deg ~ +50deg » dans motionking-17hs4401."
+        }
+      },
+      "classe_isolation": {
+        "valeur": "B",
+        "src": {
+          "type": "hypothese",
+          "justification": "« Insulation Class : B » dans handson-17hs4401s."
+        }
+      }
+    }
+  },
+  "thermique": {
+    "resistance_thermique": {
+      "max": 9.2,
+      "unite": "K/W",
+      "conditions": "moteur à l'arrêt, deux phases au courant nominal, sans radiateur",
+      "src": {
+        "type": "hypothese",
+        "justification": "Calcul : échauffement max (80 °C) divisé par la puissance dissipée dans les bobines au courant nominal (2 phases × 1,7² × 1,5 Ω ≈ 8,7 W), soit environ 9,2 K/W. Les sources donnent l'échauffement, pas la résistance thermique."
+      },
+      "note": "Majorant : il surestime un peu la température, ce qui va dans le sens de la prudence."
+    },
+    "temperature_max": {
+      "max": 130,
+      "unite": "°C",
+      "src": {
+        "type": "hypothese",
+        "justification": "Ambiante max (50 °C) + échauffement max (80 °C) d'après motionking-17hs4401 : c'est le pire cas que couvre le fabricant. Cohérent avec la classe d'isolation B."
+      },
+      "note": "Au-delà, l'isolant des bobines vieillit vite : verdict « risque » au cas 10."
+    }
+  }
+}
