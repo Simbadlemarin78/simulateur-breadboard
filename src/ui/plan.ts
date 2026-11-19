@@ -84,18 +84,39 @@ export function tracerFils(montage: Montage, placements: Map<string, Placement>)
   return router(demandes, obstacles, broches);
 }
 
-export function dessinerPlan(montage: Montage, reseau: Reseau): string {
-  const placements = placerPieces(montage);
-  const liste = [...placements.values()];
+/** Zone du plan affichée (viewBox du SVG). */
+export interface Cadre {
+  x: number;
+  y: number;
+  largeur: number;
+  hauteur: number;
+}
 
-  const marge = 2 * P;
+/** Plus petit cadre qui contient toutes les pièces, avec une marge. */
+export function cadreDe(placements: Map<string, Placement>, marge = 2 * P): Cadre {
+  const liste = [...placements.values()];
+  if (liste.length === 0) return { x: 0, y: 0, largeur: 80 * P, hauteur: 40 * P };
   const minX = Math.min(...liste.map((p) => p.x)) - marge;
   const minY = Math.min(...liste.map((p) => p.y)) - marge;
   const maxX = Math.max(...liste.map((p) => p.x + p.dessin.largeur)) + marge;
   const maxY = Math.max(...liste.map((p) => p.y + p.dessin.hauteur)) + marge;
+  return { x: minX, y: minY, largeur: maxX - minX, hauteur: maxY - minY };
+}
+
+export interface OptionsPlan {
+  /** Zone affichée ; par défaut, juste autour des pièces. */
+  cadre?: Cadre;
+  /** Pièce ou fil (rang dans le diagram.json) à mettre en évidence. */
+  choix?: { piece?: string; fil?: number };
+}
+
+export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsPlan = {}): string {
+  const placements = placerPieces(montage);
+  const liste = [...placements.values()];
+  const cadre = options.cadre ?? cadreDe(placements);
 
   const corps = (pl: Placement) =>
-    `<g class="piece" data-piece="${echapper(pl.piece.id)}" transform="translate(${pl.x} ${pl.y})">` +
+    `<g class="piece${options.choix?.piece === pl.piece.id ? ' choisie' : ''}" data-piece="${echapper(pl.piece.id)}" transform="translate(${pl.x} ${pl.y})">` +
     `<title>${echapper(`${pl.piece.id} : ${pl.piece.fiche.nom}`)}</title>${pl.dessin.corps(pl.piece)}</g>`;
 
   const broches = (pl: Placement) =>
@@ -121,7 +142,7 @@ export function dessinerPlan(montage: Montage, reseau: Reseau): string {
       const d = trace.points.map((p, j) => `${j === 0 ? 'M' : 'L'}${p.x} ${p.y}`).join(' ');
       const titre = `${c.de.piece}:${c.de.broche} → ${c.vers.piece}:${c.vers.broche}`;
       return (
-        `<g class="fil-groupe"><title>${echapper(titre)}</title>` +
+        `<g class="fil-groupe${options.choix?.fil === c.indice ? ' choisi' : ''}" data-connexion="${c.indice}"><title>${echapper(titre)}</title>` +
         `<path class="fil-halo" d="${d}"/><path class="fil" d="${d}" stroke="${echapper(c.couleur)}"/></g>`
       );
     })
@@ -130,7 +151,7 @@ export function dessinerPlan(montage: Montage, reseau: Reseau): string {
   const breadboards = liste.filter((pl) => estBreadboard(pl.piece));
   const autres = liste.filter((pl) => !estBreadboard(pl.piece));
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" class="plan" viewBox="${minX} ${minY} ${maxX - minX} ${maxY - minY}">` +
+    `<svg xmlns="http://www.w3.org/2000/svg" class="plan" viewBox="${cadre.x} ${cadre.y} ${cadre.largeur} ${cadre.hauteur}">` +
     breadboards.map((pl) => corps(pl) + broches(pl)).join('') +
     autres.map(corps).join('') +
     `<g class="fils">${fils}</g>` +

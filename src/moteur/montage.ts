@@ -36,6 +36,8 @@ export interface Connexion {
   de: Extremite;
   vers: Extremite;
   couleur: string;
+  /** Rang de la ligne dans le tableau « connections » du diagram.json (pour l'éditeur). */
+  indice: number;
 }
 
 export interface Montage {
@@ -211,7 +213,7 @@ export function lireMontage(donnees: unknown, catalogue: Catalogue): Montage {
     if ((typeof a === 'string' && a.startsWith('$')) || (typeof b === 'string' && b.startsWith('$'))) continue;
     const de = extremite(a, `connections[${i}]`);
     const vers = extremite(b, `connections[${i}]`);
-    if (de && vers) connexions.push({ de, vers, couleur: typeof couleur === 'string' ? couleur : '' });
+    if (de && vers) connexions.push({ de, vers, couleur: typeof couleur === 'string' ? couleur : '', indice: i });
   }
 
   if (erreurs.length > 0) throw new MontageInvalide(erreurs);

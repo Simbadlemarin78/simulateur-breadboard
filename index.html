@@ -6,18 +6,35 @@
     <title>Simulateur de breadboard</title>
     <style>
       :root { color-scheme: light dark; font-family: system-ui, sans-serif; line-height: 1.5; }
-      body { max-width: 80rem; margin: 2rem auto; padding: 0 1rem; }
-      #plan { overflow-x: auto; border: 1px solid #8884; border-radius: 8px; background: #8881; }
-      #plan svg { display: block; width: 100%; min-width: 60rem; height: auto; }
+      body { max-width: 90rem; margin: 1.5rem auto; padding: 0 1rem; }
+      h1 { margin: 0 0 0.2rem; font-size: 1.6rem; }
+      #barre { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.8rem 0 0.5rem; }
+      #barre select, #barre button, .bouton { font: inherit; font-size: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid #8886; background: #8881; color: inherit; cursor: pointer; }
+      #barre button:disabled { opacity: 0.45; cursor: default; }
+      .bouton input { display: none; }
+      #atelier { display: grid; grid-template-columns: 11rem 1fr; gap: 0.6rem; align-items: start; }
+      #palette { display: flex; flex-direction: column; gap: 0.35rem; }
+      #palette p { margin: 0 0 0.2rem; font-size: 0.8rem; opacity: 0.75; }
+      #palette button { font: inherit; font-size: 0.88rem; text-align: left; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid #8886; background: #8881; color: inherit; cursor: pointer; }
+      #palette button:hover { background: #8883; }
+      #plan { overflow: auto; border: 1px solid #8884; border-radius: 8px; background: #8881; user-select: none; touch-action: none; }
+      #plan svg { display: block; width: 100%; height: auto; }
       #info { min-height: 3em; font-size: 0.9rem; }
+      #info.erreur { color: #d33; }
+      #aide { font-size: 0.85rem; opacity: 0.8; margin: 0.2rem 0 0; }
       .plan text { font-size: 6px; pointer-events: none; }
       .plan .etiquette { fill: #f2f2f2; }
       .plan .etiquette-sombre { fill: #222; font-weight: 600; }
       .plan .etiquette-bb { fill: #9a9380; font-size: 5px; text-anchor: middle; }
       .plan .afficheur { fill: #6cf2a0; font-size: 14px; font-family: ui-monospace, monospace; }
+      .plan .piece { cursor: grab; }
+      .plan .piece.choisie { outline: 2px dashed #ff9f0a; outline-offset: 3px; }
       .plan .fil { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
       .plan .fil-halo { fill: none; stroke: Canvas; stroke-width: 4.5; stroke-linejoin: round; opacity: 0.85; }
+      .plan .fil-groupe { cursor: pointer; }
       .plan .fil-groupe:hover .fil { stroke-width: 3.5; }
+      .plan .fil-groupe.choisi .fil-halo { stroke: #ff9f0a; stroke-width: 6; opacity: 1; }
+      .plan .fil-en-cours { stroke: #ff9f0a; stroke-width: 2; stroke-dasharray: 4 3; pointer-events: none; }
       .plan .broche { fill: #c9a227; stroke: #6b5512; stroke-width: 0.5; cursor: crosshair; }
       .plan .broche.trou { fill: #3d3a33; stroke: none; }
       .plan .broche.allumee { fill: #ff3b30; stroke: #fff; stroke-width: 1; }
@@ -26,9 +43,26 @@
   <body>
     <h1>Simulateur de breadboard</h1>
     <p>Avant de câbler un vrai montage, savoir s'il va marcher et s'il va griller quelque chose.</p>
+    <div id="barre">
+      <label>Montage <select id="choix-montage"></select></label>
+      <button id="annuler" title="Ctrl+Z">Annuler</button>
+      <button id="retablir" title="Ctrl+Y">Rétablir</button>
+      <button id="supprimer" title="Suppr">Supprimer</button>
+      <button id="exporter">Exporter le diagram.json</button>
+      <label class="bouton">Importer…<input type="file" id="importer" accept=".json,application/json" /></label>
+    </div>
+    <div id="atelier">
+      <aside id="palette"><p>Ajouter une pièce</p></aside>
+      <div id="plan"></div>
+    </div>
     <p id="etat">Chargement…</p>
-    <div id="plan"></div>
     <p id="info"></p>
+    <p id="aide">
+      Glisse une pièce pour la déplacer : lâchée sur la breadboard, elle s'enfiche dans les trous.
+      Tire d'une broche (ou d'un trou) à une autre pour tracer un fil : il reste droit pendant que tu tires, puis se range à angle droit.
+      Clique un fil ou une pièce, puis Suppr pour l'enlever. Ctrl+Z annule, Ctrl+Y rétablit, Échap abandonne.
+      Le calcul et les verdicts s'afficheront à l'étape 8 ; en attendant : <code>npm run verifier -- montage.diagram.json</code>.
+    </p>
     <p><a href="https://github.com/Simbadlemarin78/simulateur-breadboard">Code source (licence MIT)</a></p>
     <script type="module" src="/src/ui/main.ts"></script>
   </body>
