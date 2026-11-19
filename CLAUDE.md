@@ -115,7 +115,8 @@ outils/      scripts annexes
 - Datasheet TMC2209 : rév. 1.08 récupérée chez DigiKey (`datasheets/tmc2209-datasheet-rev1.08.pdf`), fiches `tmc2209` et `tmc2209-module` faites (brouillon). La rév. 1.09 n'est que sur analog.com, qui refuse les téléchargements automatiques : Jean la télécharge à la main s'il veut la dernière.
 - Marque et version des modules TMC2209 inconnues (photo recto-verso sinon). La fiche `tmc2209-module` suit le schéma BIGTREETECH V1.2 : il tire EN vers VDD par 20 kΩ, ce qui change le cas 5 ; à vérifier au multimètre sur un vrai module.
 - 17HS4401 : pas de datasheet officielle. Fiche `fiches/17hs4401.json` (brouillon) faite le 19/11/2026 depuis trois pages web, avec les valeurs sur lesquelles deux sources concordent. À remplacer par la fiche du vendeur si elle arrive.
-- ESP32 : datasheet v5.3, WROOM-32 v3.8 et schéma DevKitC V4 récupérés le 19/11/2026 (liste et empreintes dans `datasheets/LISEZMOI.md`). Reste à confirmer le module exact (WROOM-32, 32D ou 32E) de la carte Keyestudio.
+- ESP32 : fiches `esp32` (puce) et `esp32-devkitc` (carte, noms de broches de Wokwi) faites le 19/11/2026 (brouillon), depuis la datasheet v5.3, le WROOM-32 v3.8 et le schéma DevKitC V4. Restent à confirmer : le module exact (WROOM-32, 32D ou 32E) et l'ordre des broches de la carte Keyestudio. Espressif ne publie aucune limite de courant d'injection : le seuil de « grillé » du cas 1 (200 mA, tiré de l'essai de latch-up) est une hypothèse à valider.
+- Cas 5 : après le reset, IO13 a un tirage interne de 45 kΩ vers la masse (p. 69). Avec le tirage de 20 kΩ vers VDD du module BIGTREETECH, EN tombe vers 2,3 V, dans la zone indécise du TMC2209 (entre 0,3 et 0,7 × VCC_IO). Le calcul doit le trouver.
 - Pas de `pdftoppm` sur la machine : l'outil Read ne peut pas afficher les pages d'un PDF. Pour lire le texte, installer `pypdf` (Python) dans le dossier temporaire de la session, en l'annonçant à Jean.
 
 ## Commandes
@@ -125,4 +126,4 @@ outils/      scripts annexes
 - `npm test` : lance les tests Vitest une fois (`npm run test:watch` pour les relancer à chaque modification).
 - `npm run build` : vérifie les types TypeScript puis construit le site dans `dist/`.
 - CI : `.github/workflows/ci.yml` lance tests et build à chaque push ; sur `main`, publie `dist/` sur https://simbadlemarin78.github.io/simulateur-breadboard/.
-- Le test du schéma des fiches est `tests/schema.test.ts` (Ajv) ; il valide aussi chaque fichier de `fiches/`.
+- Le test du schéma des fiches est `tests/schema.test.ts` (Ajv) ; il valide aussi chaque fichier de `fiches/`. `tests/coherence.test.ts` vérifie ce que le schéma ne voit pas : noms de broches uniques, renvois `vers` vers une broche réelle de la sous-fiche, références de `domaine` et de `liaisons_internes`.

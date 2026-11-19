@@ -1,0 +1,915 @@
+{
+  "format": "fiche-composant/1",
+  "id": "esp32-devkitc",
+  "nom": "Carte ESP32 38 broches (type DevKitC V4, Keyestudio)",
+  "categorie": "carte",
+  "fabricant": "Espressif (carte de référence) ; Keyestudio (carte de Jean, « compatible DevKitC »)",
+  "reference": "ESP32-DevKitC V4",
+  "description": "Carte de développement : module ESP32-WROOM-32, régulateur 3,3 V AMS1117-3.3, convertisseur USB-série CP2102N, boutons EN et BOOT, deux rangées de 19 broches (J2 à gauche, J3 à droite). Noms des broches identiques à ceux de Wokwi.",
+  "documents": [
+    {
+      "id": "esp32-devkitc-schema",
+      "titre": "Schéma ESP32-DevKitC V4",
+      "editeur": "Espressif Systems",
+      "revision": "V4",
+      "date": "2020-02-25",
+      "url": "https://dl.espressif.com/dl/schematics/esp32_devkitc_v4_sch.pdf",
+      "sha256": "ea500de5a3bfa97633f32ddb88fabd2d680637225190ea9c3f81e91b7d8bb7f6"
+    },
+    {
+      "id": "esp32-wroom-32-ds",
+      "titre": "ESP32-WROOM-32 Datasheet",
+      "editeur": "Espressif Systems",
+      "revision": "3.8",
+      "url": "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf",
+      "sha256": "fe7dced2f6077f983dcd7df0e72b6f6c8b7b77fd6de2ff1a0efceffe3fd1e1fa"
+    },
+    {
+      "id": "wokwi-devkitc",
+      "titre": "wokwi-boards : esp32-devkit-c-v4/board.json (noms des broches, consulté le 19/11/2026)",
+      "editeur": "Wokwi",
+      "url": "https://github.com/wokwi/wokwi-boards/blob/main/boards/esp32-devkit-c-v4/board.json"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-19",
+    "remarques": "Fiche faite sur le schéma de la DevKitC V4 d'Espressif : la carte Keyestudio de Jean est « compatible », ordre des broches à vérifier. Module supposé WROOM-32 (à confirmer : 32D ou 32E). Le courant maximal du régulateur AMS1117-3.3 n'est pas dans les documents : sa datasheet manque. Type Wokwi déduit du dépôt wokwi-boards."
+  },
+  "wokwi": {
+    "type": "board-esp32-devkit-c-v4"
+  },
+  "sous_composants": [
+    {
+      "ref": "U1",
+      "fiche": "esp32",
+      "note": "Puce ESP32-D0WDQ6 du module ESP32-WROOM-32 (repère D2 sur le schéma) ; le module ne fait que relier ses broches à la puce."
+    }
+  ],
+  "broches": [
+    {
+      "nom": "3V3",
+      "alias": [
+        "VDD33"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 1
+      },
+      "role": "alim_sortie",
+      "vers": "U1.VDD3P3",
+      "domaine": {
+        "masse": "GND.1"
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.3,
+          "max": 3.6,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "esp32-wroom-32-ds",
+            "page": 26,
+            "ou": "Table 12 Absolute Maximum Ratings",
+            "citation": "VDD33 Power supply voltage -0.3 3.6 V"
+          }
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 3.0,
+          "typ": 3.3,
+          "max": 3.6,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "esp32-wroom-32-ds",
+            "page": 26,
+            "ou": "Table 13 Recommended Operating Conditions",
+            "citation": "VDD33 Power supply voltage 3.0 3.3 3.6 V"
+          }
+        }
+      },
+      "note": "Sortie du régulateur AMS1117-3.3 quand la carte est alimentée par l'USB ou par 5V ; c'est aussi l'alimentation du module. On peut y alimenter la carte en 3,3 V (sans rien sur 5V)."
+    },
+    {
+      "nom": "EN",
+      "position": {
+        "connecteur": "J2",
+        "numero": 2
+      },
+      "role": "entree_logique",
+      "vers": "U1.CHIP_PU",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Tirée au 3V3 par R11 (10 kΩ), 0,2 µF vers GND ; le bouton EN la met à GND (reset)."
+    },
+    {
+      "nom": "VP",
+      "alias": [
+        "SENSOR_VP",
+        "SVP",
+        "IO36"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 3
+      },
+      "role": "entree_logique",
+      "vers": "U1.GPIO36",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Entrée seulement : ni sortie ni tirage interne."
+    },
+    {
+      "nom": "VN",
+      "alias": [
+        "SENSOR_VN",
+        "SVN",
+        "IO39"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 4
+      },
+      "role": "entree_logique",
+      "vers": "U1.GPIO39",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Entrée seulement : ni sortie ni tirage interne."
+    },
+    {
+      "nom": "34",
+      "alias": [
+        "IO34",
+        "GPIO34"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 5
+      },
+      "role": "entree_logique",
+      "vers": "U1.GPIO34",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Entrée seulement : ni sortie ni tirage interne."
+    },
+    {
+      "nom": "35",
+      "alias": [
+        "IO35",
+        "GPIO35"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 6
+      },
+      "role": "entree_logique",
+      "vers": "U1.GPIO35",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Entrée seulement : ni sortie ni tirage interne."
+    },
+    {
+      "nom": "32",
+      "alias": [
+        "IO32",
+        "GPIO32"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 7
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO32",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "33",
+      "alias": [
+        "IO33",
+        "GPIO33"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 8
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO33",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "25",
+      "alias": [
+        "IO25",
+        "GPIO25"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 9
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO25",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "26",
+      "alias": [
+        "IO26",
+        "GPIO26"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 10
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO26",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "27",
+      "alias": [
+        "IO27",
+        "GPIO27"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 11
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO27",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "14",
+      "alias": [
+        "IO14",
+        "GPIO14"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 12
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO14",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "12",
+      "alias": [
+        "IO12",
+        "GPIO12"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 13
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO12",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.1",
+      "position": {
+        "connecteur": "J2",
+        "numero": 14
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "13",
+      "alias": [
+        "IO13",
+        "GPIO13"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 15
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO13",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "D2",
+      "alias": [
+        "SD2",
+        "IO9"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 16
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO9",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée à la flash du module : ne pas l'utiliser (règle broches-flash)."
+    },
+    {
+      "nom": "D3",
+      "alias": [
+        "SD3",
+        "IO10"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 17
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO10",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée à la flash du module : ne pas l'utiliser (règle broches-flash)."
+    },
+    {
+      "nom": "CMD",
+      "alias": [
+        "IO11"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 18
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO11",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée à la flash du module : ne pas l'utiliser (règle broches-flash)."
+    },
+    {
+      "nom": "5V",
+      "alias": [
+        "EXT_5V",
+        "VIN"
+      ],
+      "position": {
+        "connecteur": "J2",
+        "numero": 19
+      },
+      "role": "alim_entree",
+      "domaine": {
+        "masse": "GND.1"
+      },
+      "note": "Entrée du régulateur 3,3 V. Reçoit aussi le 5 V de l'USB à travers la diode D3 : avec l'USB branché, on y lit environ 5 V moins la chute de la diode."
+    },
+    {
+      "nom": "GND.2",
+      "position": {
+        "connecteur": "J3",
+        "numero": 1
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "23",
+      "alias": [
+        "IO23",
+        "GPIO23"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 2
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO23",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "22",
+      "alias": [
+        "IO22",
+        "GPIO22"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 3
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO22",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "TX",
+      "alias": [
+        "TXD0",
+        "IO1"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 4
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO1",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée au convertisseur USB-série CP2102N par une résistance de 0 Ω (R17, R18) : sert au téléversement et au moniteur série."
+    },
+    {
+      "nom": "RX",
+      "alias": [
+        "RXD0",
+        "IO3"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 5
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO3",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée au convertisseur USB-série CP2102N par une résistance de 0 Ω (R17, R18) : sert au téléversement et au moniteur série."
+    },
+    {
+      "nom": "21",
+      "alias": [
+        "IO21",
+        "GPIO21"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 6
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO21",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.3",
+      "position": {
+        "connecteur": "J3",
+        "numero": 7
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "19",
+      "alias": [
+        "IO19",
+        "GPIO19"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 8
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO19",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "18",
+      "alias": [
+        "IO18",
+        "GPIO18"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 9
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO18",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "5",
+      "alias": [
+        "IO5",
+        "GPIO5"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 10
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO5",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "17",
+      "alias": [
+        "IO17",
+        "GPIO17"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 11
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO17",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "16",
+      "alias": [
+        "IO16",
+        "GPIO16"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 12
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO16",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "4",
+      "alias": [
+        "IO4",
+        "GPIO4"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 13
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO4",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "0",
+      "alias": [
+        "IO0",
+        "GPIO0"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 14
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO0",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Bouton BOOT vers GND, et transistor Q2 du téléversement automatique."
+    },
+    {
+      "nom": "2",
+      "alias": [
+        "IO2",
+        "GPIO2"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 15
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO2",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "15",
+      "alias": [
+        "IO15",
+        "GPIO15"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 16
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO15",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "D1",
+      "alias": [
+        "SD1",
+        "IO8"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 17
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO8",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée à la flash du module : ne pas l'utiliser (règle broches-flash)."
+    },
+    {
+      "nom": "D0",
+      "alias": [
+        "SD0",
+        "IO7"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 18
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO7",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée à la flash du module : ne pas l'utiliser (règle broches-flash)."
+    },
+    {
+      "nom": "CLK",
+      "alias": [
+        "IO6"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 19
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO6",
+      "domaine": {
+        "alim": "3V3",
+        "masse": "GND.1"
+      },
+      "note": "Reliée à la flash du module : ne pas l'utiliser (règle broches-flash)."
+    }
+  ],
+  "liaisons_internes": [
+    {
+      "entre": [
+        "GND.1",
+        "GND.2"
+      ],
+      "type": "direct",
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-devkitc-schema",
+        "page": 1,
+        "ou": "J2 broche 14 et J3 broche 1 sur le réseau GND"
+      }
+    },
+    {
+      "entre": [
+        "GND.1",
+        "GND.3"
+      ],
+      "type": "direct",
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-devkitc-schema",
+        "page": 1,
+        "ou": "J2 broche 14 et J3 broche 7 sur le réseau GND"
+      }
+    },
+    {
+      "entre": [
+        "EN",
+        "3V3"
+      ],
+      "type": "resistance",
+      "valeur": {
+        "typ": 10,
+        "unite": "kΩ",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-devkitc-schema",
+          "page": 1,
+          "ou": "R11 entre VDD33 et EN",
+          "citation": "R11 10K(5%)"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-devkitc-schema",
+        "page": 1,
+        "ou": "R11 entre VDD33 et EN"
+      }
+    },
+    {
+      "entre": [
+        "EN",
+        "GND.1"
+      ],
+      "type": "condensateur",
+      "valeur": {
+        "typ": 0.2,
+        "unite": "µF",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-devkitc-schema",
+          "page": 1,
+          "ou": "C9 et C14 entre EN et GND",
+          "citation": "C9 0.1uF/50V(10%), C14 0.1uF/50V(10%)"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-devkitc-schema",
+        "page": 1,
+        "ou": "C9 et C14 entre EN et GND"
+      },
+      "note": "Retarde la montée de EN à la mise sous tension."
+    },
+    {
+      "entre": [
+        "3V3",
+        "GND.1"
+      ],
+      "type": "condensateur",
+      "valeur": {
+        "typ": 44.1,
+        "unite": "µF",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-devkitc-schema",
+          "page": 1,
+          "ou": "C3, C21, C22 sur VDD33",
+          "citation": "C3 22uF/10V, C21 22uF/10V, C22 0.1uF/50V"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-devkitc-schema",
+        "page": 1,
+        "ou": "C3, C21, C22 sur VDD33"
+      },
+      "note": "22 µF + 22 µF + 0,1 µF."
+    },
+    {
+      "entre": [
+        "5V",
+        "GND.1"
+      ],
+      "type": "condensateur",
+      "valeur": {
+        "typ": 22,
+        "unite": "µF",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-devkitc-schema",
+          "page": 1,
+          "ou": "C1 sur EXT_5V",
+          "citation": "C1 22uF/10V(20%)"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-devkitc-schema",
+        "page": 1,
+        "ou": "C1 sur EXT_5V"
+      },
+      "note": "La LED rouge D1 et sa résistance R2 (2 kΩ) sont aussi entre 5V et GND : témoin d'alimentation."
+    }
+  ],
+  "modele": {
+    "type": "microcontroleur",
+    "valeurs": {
+      "regulateur_3v3": {
+        "valeur": "U2, AMS1117-3.3 : régulateur linéaire de 5V vers 3V3.",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-devkitc-schema",
+          "page": 1,
+          "ou": "Power Supply",
+          "citation": "U2 AMS1117-3.3"
+        }
+      },
+      "tension_3v3": {
+        "typ": 3.3,
+        "unite": "V",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-devkitc-schema",
+          "page": 1,
+          "ou": "Power Supply",
+          "citation": "U2 AMS1117-3.3"
+        },
+        "note": "Valeur nominale tirée de la référence du régulateur."
+      },
+      "alimentation_usb": {
+        "valeur": "Le VBUS de l'USB arrive sur 5V à travers la diode Schottky D3 (BAT760-7) : une alim branchée sur 5V ne renvoie pas de courant vers le PC.",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-devkitc-schema",
+          "page": 1,
+          "ou": "Micro USB 5V&USB-UART",
+          "citation": "D3 BAT760-7 entre VBUS et EXT_5V"
+        }
+      },
+      "courant_sorties_cumule": {
+        "max": 1100,
+        "unite": "mA",
+        "conditions": "somme des courants de toutes les sorties du module",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-wroom-32-ds",
+          "page": 26,
+          "ou": "Table 12 Absolute Maximum Ratings",
+          "citation": "Ioutput Cumulative IO output current 1,100 mA"
+        }
+      },
+      "temperature_ambiante": {
+        "min": -40,
+        "max": 85,
+        "unite": "°C",
+        "conditions": "module en fonctionnement",
+        "src": {
+          "type": "datasheet",
+          "doc": "esp32-wroom-32-ds",
+          "page": 26,
+          "ou": "Table 13 Recommended Operating Conditions",
+          "citation": "T Operating ambient temperature -40 85 °C"
+        }
+      }
+    }
+  },
+  "regles": [
+    {
+      "id": "broches-flash",
+      "verdict": "ne_marchera_pas",
+      "explication": "D0, D1, D2, D3, CMD et CLK (GPIO6 à GPIO11) sont reliées à la flash du module. Y brancher autre chose perturbe la lecture du programme : la carte plante ou ne démarre pas.",
+      "correction": "Choisir une autre broche.",
+      "src": {
+        "type": "datasheet",
+        "doc": "esp32-wroom-32-ds",
+        "page": 10,
+        "ou": "Table 2 Pin Definitions, note 2",
+        "citation": "GPIO6 to GPIO11 ... are connected to the SPI flash integrated on the module and are not recommended for other uses"
+      }
+    }
+  ]
+}

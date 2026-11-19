@@ -222,13 +222,15 @@ Mis à jour le 19/11/2026.
 - [ ] Toi : la marque de tes modules TMC2209, ou mesurer au multimètre la résistance entre EN et VDD (20 kΩ sur le modèle BIGTREETECH).
 - [ ] Toi : le nom gravé sur le capot du module de ta carte ESP32 (WROOM-32, 32D ou 32E).
 - [ ] Toi : relire les fiches et les passer à « relue ».
-- [ ] Moi : fiches ESP32, breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont (fin de l'étape 2).
+- [x] Moi : fiches ESP32 (puce `esp32` et carte `esp32-devkitc`, noms de broches de Wokwi), en brouillon, et un test de cohérence entre fiches.
+- [ ] Toi : valider le seuil de « grillé » du cas 1 : Espressif ne publie aucune limite de courant d'injection, j'ai pris les 200 mA de l'essai de latch-up (hypothèse).
+- [ ] Moi : fiches breadboard, alim de labo, LiPo 4S, condensateur, résistance et fil Dupont (fin de l'étape 2).
 
 Questions encore ouvertes :
 
 - Que veut dire « près du driver » pour le condensateur ? Je propose d'abord « sur les mêmes bandes du breadboard que VM et GND du driver », à affiner.
 - Les quatre drivers forment-ils un « groupe » déclaré dans le montage (la base roulante) ? Le cas 7 compare les micro-pas à l'intérieur d'un groupe. Je propose oui, via un attribut du montage.
-- Le cas 5 (EN qui flotte) : sur le module BIGTREETECH, EN est tiré vers VDD par 20 kΩ, donc un EN en l'air coupe le driver. Si tes modules sont faits pareil, le cas 5 doit se reformuler.
+- Le cas 5 (EN qui flotte) : sur le module BIGTREETECH, EN est tiré vers VDD par 20 kΩ, donc un EN en l'air coupe le driver. Si tes modules sont faits pareil, le cas 5 doit se reformuler. Mais la datasheet de l'ESP32 (p. 69) montre qu'après le reset, IO13 tire vers la masse par 45 kΩ : avec les 20 kΩ du module, EN tombe vers 2,3 V, dans la zone indécise du TMC2209. Le cas 5 reste donc un vrai risque, que seul le calcul voit.
 
 ## Sources
 
