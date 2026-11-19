@@ -210,6 +210,13 @@ describe('importer et exporter le diagram.json', () => {
     expect(new Set(relu.diagramme.parts.map((p) => p.id)).size).toBe(fichesPosables(catalogue).length);
   });
 
+  it('dessine un montage vide, puis une pièce seule sans fil', () => {
+    const e = new Editeur(catalogue);
+    expect(dessinerPlan(e.montage(), construireReseau(e.montage(), catalogue))).toContain('<svg');
+    e.ajouterPiece('resistance', 0, 0);
+    expect(dessinerPlan(e.montage(), construireReseau(e.montage(), catalogue))).toContain('data-piece="r1"');
+  });
+
   it('donne des identifiants uniques et lisibles', () => {
     const e = new Editeur(catalogue);
     expect([e.ajouterPiece('resistance', 0, 0), e.ajouterPiece('resistance', 0, 100), e.ajouterPiece('tmc2209-module', 0, 200)]).toEqual(['r1', 'r2', 'drv1']);

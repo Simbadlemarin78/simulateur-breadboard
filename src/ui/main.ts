@@ -4,6 +4,8 @@
 import { catalogueIntegre as catalogue } from '../moteur/fiches-integrees';
 import { MontageInvalide } from '../moteur/montage';
 import { brochesDeComposants, construireReseau, type Reseau } from '../moteur/reseau';
+import { verifier, type Rapport } from '../moteur/verifications';
+import { htmlConstats, htmlReglages, marquesVerdicts, mesurerCourant, mesurerTension } from './affichage';
 import { diagrammeVide, Editeur, fichesPosables, type Diagramme } from './edition';
 import { P, type Point } from './pieces/dessins';
 import { cadreDe, dessinerPlan, placerPieces, positionBroche, type Cadre, type Placement } from './plan';
@@ -39,12 +41,76 @@ const boutonRetablir = element<HTMLButtonElement>('#retablir');
 const boutonSupprimer = element<HTMLButtonElement>('#supprimer');
 const boutonExporter = element<HTMLButtonElement>('#exporter');
 const champImporter = element<HTMLInputElement>('#importer');
+const boutonTension = element<HTMLButtonElement>('#tension');
+const ecran = element<HTMLSpanElement>('#ecran');
+const texteMesure = element<HTMLParagraphElement>('#mesure');
+const panneauReglages = element<HTMLElement>('#reglages');
+const panneauResultats = element<HTMLElement>('#resultats');
 
 let editeur = new Editeur(catalogue, diagrammeVide());
 let cadre: Cadre | undefined;
 let placements = new Map<string, Placement>();
 let reseau: Reseau | undefined;
 let choix: { piece?: string; fil?: number } = {};
+
+/** Sous tension : le calcul et les verdicts suivent chaque modification. */
+let sousTension = false;
+let rapport: { pour: Diagramme; rapport: Rapport } | undefined;
+let outil: 'editer' | 'mesurer' = 'editer';
+/** Multimètre : deux sondes sur des points, ou un fil dont on lit le courant. */
+let sondes: { rouge?: string; noir?: string } = {};
+let filMesure: number | undefined;
+
+/** Rapport du moteur pour le montage affiché ; recalculé seulement quand le montage change. */
+function rapportCourant(): Rapport {
+  if (rapport?.pour !== editeur.diagramme) rapport = { pour: editeur.diagramme, rapport: verifier(editeur.montage(), catalogue) };
+  return rapport.rapport;
+}
+
+function majMultimetre(): void {
+  if (!sousTension) {
+    ecran.textContent = '— V';
+    texteMesure.textContent = 'Hors tension : clique « Mettre sous tension » pour mesurer.';
+    return;
+  }
+  const r = rapportCourant();
+  if (!r.converge) {
+    ecran.textContent = 'Err';
+    texteMesure.textContent = `Calcul impossible : ${r.message ?? ''}`;
+    return;
+  }
+  const montage = editeur.montage();
+  if (filMesure !== undefined) {
+    const m = mesurerCourant(r.calcul, montage, filMesure);
+    ecran.textContent = m.texte;
+    texteMesure.textContent = `Courant ${m.detail}.`;
+  } else if (sondes.rouge && sondes.noir) {
+    const m = mesurerTension(r.calcul, sondes.rouge, sondes.noir);
+    ecran.textContent = m.texte;
+    texteMesure.textContent = m.valeur === undefined ? m.detail : `Tension ${m.detail}.`;
+  } else {
+    ecran.textContent = '— V';
+    texteMesure.textContent = sondes.rouge
+      ? `Sonde rouge sur ${sondes.rouge} : clique le point où poser la sonde noire.`
+      : outil === 'mesurer'
+        ? 'Clique un point pour la sonde rouge, puis un autre pour la noire ; ou clique un fil pour lire son courant.'
+        : 'Choisis l\'outil Multimètre, puis clique deux points ou un fil.';
+  }
+}
+
+function majPanneaux(): void {
+  const montage = editeur.montage();
+  const piece = choix.piece !== undefined ? montage.pieces.find((p) => p.id === choix.piece) : undefined;
+  panneauReglages.innerHTML =
+    '<h2>Réglages</h2>' +
+    (piece ? htmlReglages(piece, montage, (id) => catalogue.fiche(id)) : '<p>Clique une pièce (outil Éditer) pour voir ses réglages : tension et limite de l\'alim, VREF, état des broches de l\'ESP32...</p>');
+  panneauResultats.innerHTML =
+    '<h2>Verdicts</h2>' +
+    (sousTension
+      ? htmlConstats(rapportCourant())
+      : '<p>Hors tension. Clique « Mettre sous tension » : l\'appli calcule tensions et courants, puis montre ce qui grille, chauffe ou ne marchera pas.</p>');
+  majMultimetre();
+}
 
 /** Fil en train d'être tiré : droit jusqu'au lâcher, routé ensuite. */
 let filEnCours: { de: string; ligne: SVGLineElement; depart: Point; glisse: boolean } | undefined;
@@ -69,12 +135,29 @@ function afficher(recadrer = false): void {
   reseau = construireReseau(montage, catalogue);
   const juste = cadreDe(placements, 8 * P);
   cadre = recadrer || !cadre ? juste : unir(cadre, juste);
-  conteneur.innerHTML = dessinerPlan(montage, reseau, { cadre, choix });
+  // Les sondes ne survivent pas à la disparition de leur point.
+  for (const couleur of ['rouge', 'noir'] as const) {
+    const point = sondes[couleur];
+    if (point && !reseau.noeudDe(point)) sondes = {};
+  }
+  if (filMesure !== undefined && !montage.connexions.some((c) => c.indice === filMesure)) filMesure = undefined;
+  const r = sousTension ? rapportCourant() : undefined;
+  conteneur.innerHTML = dessinerPlan(montage, reseau, {
+    cadre,
+    choix,
+    sondes,
+    ...(r?.converge ? { verdicts: marquesVerdicts(r, montage) } : {}),
+  });
   boutonAnnuler.disabled = !editeur.peutAnnuler();
   boutonRetablir.disabled = !editeur.peutRetablir();
   boutonSupprimer.disabled = choix.piece === undefined && choix.fil === undefined;
+  boutonTension.textContent = sousTension ? 'Couper le courant' : 'Mettre sous tension';
+  boutonTension.classList.toggle('allume', sousTension);
   const fils = montage.connexions.filter((c) => c.couleur !== '').length;
-  etat.textContent = `${montage.pieces.length} pièces, ${fils} fils, ${montage.connexions.length - fils} broches enfichées.`;
+  etat.textContent =
+    `${montage.pieces.length} pièces, ${fils} fils, ${montage.connexions.length - fils} broches enfichées.` +
+    (r ? (r.converge ? ` Sous tension : ${r.constats.length === 0 ? 'rien à signaler' : `${r.constats.length} constat${r.constats.length > 1 ? 's' : ''}`}.` : ' Sous tension : calcul impossible.') : ' Hors tension.');
+  majPanneaux();
 }
 
 function charger(d: Diagramme): void {
@@ -85,6 +168,8 @@ function charger(d: Diagramme): void {
     return;
   }
   choix = {};
+  sondes = {};
+  filMesure = undefined;
   afficher(true);
 }
 
@@ -134,6 +219,21 @@ conteneur.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return;
   const cible = e.target instanceof Element ? e.target : null;
   const point = pointDe(cible);
+  if (outil === 'mesurer') {
+    // Multimètre : premier clic = sonde rouge, deuxième = sonde noire ; un fil donne son courant.
+    const fil = cible?.closest<SVGElement>('.fil-groupe');
+    if (point) {
+      filMesure = undefined;
+      sondes = !sondes.rouge || sondes.noir ? { rouge: point } : { rouge: sondes.rouge, noir: point };
+    } else if (fil) {
+      sondes = {};
+      filMesure = Number(fil.dataset['connexion']);
+    } else return;
+    if (!sousTension) message('Hors tension : mets le montage sous tension pour lire une valeur.');
+    afficher();
+    e.preventDefault();
+    return;
+  }
   if (filEnCours) {
     // Deuxième clic du mode « clic, puis clic » : sur une broche, le fil est tracé.
     if (point && point !== filEnCours.de) terminerFil(point);
@@ -297,6 +397,61 @@ document.addEventListener('keydown', (e) => {
     retablir();
     e.preventDefault();
   }
+});
+
+boutonTension.addEventListener('click', () => {
+  sousTension = !sousTension;
+  afficher();
+  if (!sousTension) message('Courant coupé.');
+  else {
+    const r = rapportCourant();
+    message(r.converge ? (r.constats.length === 0 ? 'Sous tension : rien à signaler.' : `Sous tension : ${r.constats.length} constats, détaillés plus bas.`) : `Calcul impossible : ${r.message ?? ''}`, !r.converge);
+  }
+});
+
+for (const radio of document.querySelectorAll<HTMLInputElement>('input[name="outil"]')) {
+  radio.addEventListener('change', () => {
+    outil = radio.value === 'mesurer' ? 'mesurer' : 'editer';
+    abandonnerFil();
+    if (outil === 'editer') {
+      sondes = {};
+      filMesure = undefined;
+    }
+    afficher();
+    message(outil === 'mesurer' ? 'Multimètre : clique un point (sonde rouge), puis un autre (sonde noire), ou un fil.' : 'Édition : glisse les pièces, tire les fils.');
+  });
+}
+
+// Réglages : chaque changement passe par l'éditeur, donc s'annule avec Ctrl+Z.
+panneauReglages.addEventListener('change', (e) => {
+  const id = choix.piece;
+  const champ = e.target;
+  if (!id || !(champ instanceof HTMLInputElement || champ instanceof HTMLSelectElement)) return;
+  let refus: string | undefined;
+  if (champ.dataset['param']) {
+    const nom = champ.dataset['param'];
+    const valeur =
+      champ instanceof HTMLInputElement && champ.type === 'checkbox' ? champ.checked
+      : champ instanceof HTMLInputElement && champ.type === 'number' ? (champ.value === '' ? undefined : Number(champ.value))
+      : champ.value;
+    refus = editeur.reglerPiece(id, nom, valeur);
+  } else if (champ.dataset['etat']) {
+    const etats = { ...((editeur.diagramme.parts.find((p) => p.id === id)?.attrs['etats'] as Record<string, string> | undefined) ?? {}) };
+    if (champ.value === '') delete etats[champ.dataset['etat']];
+    else etats[champ.dataset['etat']] = champ.value;
+    refus = editeur.reglerPiece(id, 'etats', Object.keys(etats).length > 0 ? etats : undefined);
+  } else return;
+  afficher();
+  message(refus ? `Réglage refusé : ${refus}.` : `${id} réglée${sousTension ? ' : calcul relancé' : ''}.`, refus !== undefined);
+});
+
+// Un clic sur un verdict choisit la pièce concernée.
+panneauResultats.addEventListener('click', (e) => {
+  const li = e.target instanceof Element ? e.target.closest<HTMLElement>('.constat') : null;
+  const piece = li?.dataset['piece'];
+  if (!piece || !placements.has(piece)) return;
+  choix = { piece };
+  afficher();
 });
 
 boutonAnnuler.addEventListener('click', annuler);

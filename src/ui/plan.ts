@@ -108,6 +108,10 @@ export interface OptionsPlan {
   cadre?: Cadre;
   /** Pièce ou fil (rang dans le diagram.json) à mettre en évidence. */
   choix?: { piece?: string; fil?: number };
+  /** Sous tension : verdict de chaque pièce, fil (rang dans le diagram.json) et point (trou ou broche). */
+  verdicts?: { pieces: Map<string, string>; fils: Map<number, string>; points: Map<string, string> };
+  /** Sondes du multimètre, posées sur des points "piece:broche". */
+  sondes?: { rouge?: string; noir?: string };
 }
 
 export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsPlan = {}): string {
@@ -115,9 +119,18 @@ export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsP
   const liste = [...placements.values()];
   const cadre = options.cadre ?? cadreDe(placements);
 
-  const corps = (pl: Placement) =>
-    `<g class="piece${options.choix?.piece === pl.piece.id ? ' choisie' : ''}" data-piece="${echapper(pl.piece.id)}" transform="translate(${pl.x} ${pl.y})">` +
-    `<title>${echapper(`${pl.piece.id} : ${pl.piece.fiche.nom}`)}</title>${pl.dessin.corps(pl.piece)}</g>`;
+  const corps = (pl: Placement) => {
+    const verdict = options.verdicts?.pieces.get(pl.piece.id);
+    // Une pièce grillée fume : trois volutes qui montent au-dessus d'elle.
+    const fumee =
+      verdict === 'grille'
+        ? `<g class="fumee" transform="translate(${pl.dessin.largeur / 2} 0)">${[0, 1, 2].map((k) => `<circle cx="${(k - 1) * 0.8 * P}" cy="0" r="${0.7 * P}" style="animation-delay:${k * 0.6}s"/>`).join('')}</g>`
+        : '';
+    return (
+      `<g class="piece${options.choix?.piece === pl.piece.id ? ' choisie' : ''}${verdict ? ` verdict-${verdict}` : ''}" data-piece="${echapper(pl.piece.id)}" transform="translate(${pl.x} ${pl.y})">` +
+      `<title>${echapper(`${pl.piece.id} : ${pl.piece.fiche.nom}`)}</title>${pl.dessin.corps(pl.piece)}${fumee}</g>`
+    );
+  };
 
   const broches = (pl: Placement) =>
     [...pl.dessin.broches]
@@ -125,8 +138,9 @@ export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsP
         const point = `${pl.piece.id}:${nom}`;
         const noeud = reseau.noeudDe(point)?.id ?? '';
         const cote = estBreadboard(pl.piece) ? 0.36 * P : 0.5 * P;
+        const verdict = options.verdicts?.points.get(point);
         return (
-          `<rect class="broche${estBreadboard(pl.piece) ? ' trou' : ''}" data-point="${echapper(point)}" data-noeud="${noeud}" ` +
+          `<rect class="broche${estBreadboard(pl.piece) ? ' trou' : ''}${verdict ? ` verdict-${verdict}` : ''}" data-point="${echapper(point)}" data-noeud="${noeud}" ` +
           `x="${pl.x + p.x - cote / 2}" y="${pl.y + p.y - cote / 2}" width="${cote}" height="${cote}"><title>${echapper(point)}</title></rect>`
         );
       })
@@ -142,9 +156,20 @@ export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsP
       const d = trace.points.map((p, j) => `${j === 0 ? 'M' : 'L'}${p.x} ${p.y}`).join(' ');
       const titre = `${c.de.piece}:${c.de.broche} → ${c.vers.piece}:${c.vers.broche}`;
       return (
-        `<g class="fil-groupe${options.choix?.fil === c.indice ? ' choisi' : ''}" data-connexion="${c.indice}"><title>${echapper(titre)}</title>` +
+        `<g class="fil-groupe${options.choix?.fil === c.indice ? ' choisi' : ''}${options.verdicts?.fils.has(c.indice) ? ` verdict-${options.verdicts.fils.get(c.indice)}` : ''}" data-connexion="${c.indice}"><title>${echapper(titre)}</title>` +
         `<path class="fil-halo" d="${d}"/><path class="fil" d="${d}" stroke="${echapper(c.couleur)}"/></g>`
       );
+    })
+    .join('');
+
+  // Sondes du multimètre : un rond rouge et un rond noir sur les points mesurés.
+  const sondes = (['rouge', 'noir'] as const)
+    .map((couleur) => {
+      const point = options.sondes?.[couleur];
+      if (!point) return '';
+      const i = point.indexOf(':');
+      const p = positionBroche(placements, point.slice(0, i), point.slice(i + 1));
+      return p ? `<circle class="sonde sonde-${couleur}" cx="${p.x}" cy="${p.y}" r="${0.6 * P}"><title>sonde ${couleur} : ${echapper(point)}</title></circle>` : '';
     })
     .join('');
 
@@ -156,6 +181,7 @@ export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsP
     autres.map(corps).join('') +
     `<g class="fils">${fils}</g>` +
     autres.map(broches).join('') +
+    sondes +
     `</svg>`
   );
 }

@@ -143,7 +143,8 @@ function parametreSI(pe: PieceElectrique, nom: string): number | undefined {
   return typeof v === 'number' && def ? versUniteDeBase(v, def.unite) : undefined;
 }
 
-function etatDemarrage(b: Broche): EtatBroche {
+/** État d'une broche de microcontrôleur au démarrage, d'après sa fiche. */
+export function etatDemarrage(b: Broche): EtatBroche {
   const etat = (b['etat_demarrage'] as { etat?: string } | undefined)?.etat;
   switch (etat) {
     case 'tirage_haut':

@@ -119,3 +119,18 @@ export function brocheDe(point: string, fiches: Map<string, Fiche>): { chemin: s
 export function canon(fiche: Fiche, nom: string | undefined): string | undefined {
   return nom === undefined ? undefined : (trouverBroche(fiche, nom)?.nom ?? nom);
 }
+
+/** Source d'un constat en une ligne : « tmc2209-ds, p. 11 (3.1 ...) ». */
+export function texteSource(s: { fiche: string; src: Source }): string {
+  const src = s.src as Source & { doc?: string; page?: number; ou?: string; justification?: string; fiche?: string; chemin?: string; par?: string; date?: string };
+  switch (src.type) {
+    case 'datasheet':
+      return `${src.doc}, p. ${src.page}${src.ou ? ` (${src.ou})` : ''}`;
+    case 'hypothese':
+      return `hypothèse de la fiche ${s.fiche}`;
+    case 'mesure':
+      return `mesure de ${src.par} le ${src.date}`;
+    case 'heritee':
+      return `valeur reprise de la fiche ${src.fiche} (${src.chemin})`;
+  }
+}

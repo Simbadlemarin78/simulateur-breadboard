@@ -1,23 +1,8 @@
 // Rapport de vérification en texte, pour la ligne de commande (outils/verifier.mjs).
-import { NOMS_VERDICTS, type Constat } from './constats';
-import type { Source } from './fiche';
+import { NOMS_VERDICTS, texteSource, type Constat } from './constats';
 import { catalogueIntegre } from './fiches-integrees';
 import { lireMontage, MontageInvalide } from './montage';
 import { verifier } from './verifications';
-
-function texteSource(s: { fiche: string; src: Source }): string {
-  const src = s.src as Source & { doc?: string; page?: number; ou?: string; justification?: string; fiche?: string; chemin?: string; par?: string; date?: string };
-  switch (src.type) {
-    case 'datasheet':
-      return `${src.doc}, p. ${src.page}${src.ou ? ` (${src.ou})` : ''}`;
-    case 'hypothese':
-      return `hypothèse de la fiche ${s.fiche}`;
-    case 'mesure':
-      return `mesure de ${src.par} le ${src.date}`;
-    case 'heritee':
-      return `valeur reprise de la fiche ${src.fiche} (${src.chemin})`;
-  }
-}
 
 function texteConstat(c: Constat): string {
   const lignes = [`${NOMS_VERDICTS[c.verdict].toUpperCase().padEnd(16)} ${c.titre}${c.regle ? `   [règle ${c.regle}]` : '   [calcul]'}`];

@@ -104,6 +104,7 @@ class Tas {
  * Renvoie un tracé par demande, dans l'ordre des demandes.
  */
 export function router(demandes: { a: Bout; b: Bout }[], obstacles: Rect[], broches: Point[]): Trace[] {
+  if (demandes.length === 0) return [];
   const tous = [
     ...obstacles.flatMap((r) => [{ x: r.x0, y: r.y0 }, { x: r.x1, y: r.y1 }]),
     ...broches,

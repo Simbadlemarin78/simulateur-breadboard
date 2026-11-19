@@ -38,6 +38,50 @@
       .plan .broche { fill: #c9a227; stroke: #6b5512; stroke-width: 0.5; cursor: crosshair; }
       .plan .broche.trou { fill: #3d3a33; stroke: none; }
       .plan .broche.allumee { fill: #ff3b30; stroke: #fff; stroke-width: 1; }
+      /* Sous tension : verdicts sur les pièces, les fils et les trous. */
+      #tension { font-weight: 600; }
+      #tension.allume { background: #ffcc00; color: #222; border-color: #c90; }
+      .outils { display: inline-flex; border: 1px solid #8886; border-radius: 6px; overflow: hidden; }
+      .outils label { padding: 0.25rem 0.6rem; font-size: 0.9rem; cursor: pointer; }
+      .outils input { display: none; }
+      .outils label:has(input:checked) { background: #4a8bf0; color: #fff; }
+      .plan .piece.verdict-grille { filter: drop-shadow(0 0 4px #ff2d20) drop-shadow(0 0 8px #ff2d20); }
+      .plan .piece.verdict-risque_eleve { filter: drop-shadow(0 0 3px #ff2d20); outline: 2px dashed #ff2d20; outline-offset: 2px; }
+      .plan .piece.verdict-risque { outline: 2px dashed #ffb000; outline-offset: 2px; }
+      .plan .piece.verdict-chauffe { animation: chauffe 1.2s ease-in-out infinite; }
+      .plan .piece.verdict-ne_marchera_pas { outline: 2px dashed #7d8da8; outline-offset: 2px; opacity: 0.85; }
+      .plan .fil-groupe.verdict-chauffe .fil-halo { stroke: #ff8c00; stroke-width: 6; opacity: 1; animation: halo 1.2s ease-in-out infinite; }
+      .plan .fil-groupe.verdict-grille .fil-halo, .plan .fil-groupe.verdict-risque_eleve .fil-halo { stroke: #ff2d20; stroke-width: 6; opacity: 1; }
+      .plan .broche.verdict-chauffe { fill: #ff8c00; animation: halo 1.2s ease-in-out infinite; }
+      .plan .broche.verdict-grille, .plan .broche.verdict-risque_eleve { fill: #ff2d20; }
+      .plan .fumee circle { fill: #8a8a8a; opacity: 0; animation: fumee 1.8s ease-out infinite; }
+      .plan .sonde { stroke: #fff; stroke-width: 1.2; pointer-events: none; }
+      .plan .sonde-rouge { fill: #e0201b; }
+      .plan .sonde-noir { fill: #111; }
+      @keyframes chauffe { 0%, 100% { filter: drop-shadow(0 0 1px #ff8c00); } 50% { filter: drop-shadow(0 0 7px #ff8c00) drop-shadow(0 0 3px #ffb000); } }
+      @keyframes halo { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+      @keyframes fumee { 0% { transform: translateY(0) scale(0.6); opacity: 0.7; } 100% { transform: translateY(-28px) scale(1.8); opacity: 0; } }
+      #panneaux { display: grid; grid-template-columns: minmax(16rem, 1fr) 2fr; gap: 1rem; margin-top: 0.6rem; }
+      #panneaux section { border: 1px solid #8884; border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.88rem; }
+      #panneaux h2 { font-size: 1rem; margin: 0 0 0.4rem; }
+      #ecran { font-family: ui-monospace, monospace; font-size: 1.6rem; background: #1b2b1f; color: #6cf2a0; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; min-width: 7rem; text-align: right; }
+      #reglages label { display: block; margin: 0.25rem 0; }
+      #reglages input[type="number"] { width: 6rem; }
+      .sous-titre { font-weight: 600; margin: 0.5rem 0 0.2rem; }
+      .constats { padding-left: 1.2rem; margin: 0.3rem 0; }
+      .constat { margin-bottom: 0.6rem; cursor: pointer; }
+      .constat p { margin: 0.15rem 0; }
+      .constat .badge { display: inline-block; padding: 0 0.45rem; border-radius: 4px; font-size: 0.78rem; font-weight: 700; color: #fff; text-transform: uppercase; }
+      .constat.verdict-grille .badge { background: #c4170f; }
+      .constat.verdict-risque_eleve .badge { background: #e0452b; }
+      .constat.verdict-risque .badge { background: #d88a00; }
+      .constat.verdict-chauffe .badge { background: #ff8c00; }
+      .constat.verdict-ne_marchera_pas .badge { background: #5d6f8e; }
+      .constat .origine, .constat .source { opacity: 0.7; font-size: 0.8rem; }
+      .constat .correction { font-style: italic; }
+      .rien { color: #2a9d4b; font-weight: 600; }
+      .non-simule { opacity: 0.75; font-size: 0.8rem; }
+      @media (max-width: 50rem) { #panneaux { grid-template-columns: 1fr; } #atelier { grid-template-columns: 1fr; } #palette { flex-direction: row; flex-wrap: wrap; } }
     </style>
   </head>
   <body>
@@ -50,6 +94,11 @@
       <button id="supprimer" title="Suppr">Supprimer</button>
       <button id="exporter">Exporter le diagram.json</button>
       <label class="bouton">Importer…<input type="file" id="importer" accept=".json,application/json" /></label>
+      <button id="tension" title="Calcule tensions et courants, et affiche les verdicts">Mettre sous tension</button>
+      <span class="outils" role="radiogroup" aria-label="Outil">
+        <label><input type="radio" name="outil" value="editer" checked />Éditer</label>
+        <label><input type="radio" name="outil" value="mesurer" />Multimètre</label>
+      </span>
     </div>
     <div id="atelier">
       <aside id="palette"><p>Ajouter une pièce</p></aside>
@@ -57,11 +106,28 @@
     </div>
     <p id="etat">Chargement…</p>
     <p id="info"></p>
+    <div id="panneaux">
+      <div>
+        <section id="multimetre">
+          <h2>Multimètre</h2>
+          <span id="ecran">— V</span>
+          <p id="mesure">Choisis l'outil Multimètre, mets sous tension, puis clique deux points (sonde rouge, puis noire) ou un fil.</p>
+        </section>
+        <section id="reglages">
+          <h2>Réglages</h2>
+          <p>Clique une pièce pour voir ses réglages (tension de l'alim, VREF, état des broches de l'ESP32...).</p>
+        </section>
+      </div>
+      <section id="resultats">
+        <h2>Verdicts</h2>
+        <p>Hors tension. Clique « Mettre sous tension » : l'appli calcule tensions et courants, puis montre ce qui grille, chauffe ou ne marchera pas.</p>
+      </section>
+    </div>
     <p id="aide">
       Glisse une pièce pour la déplacer : lâchée sur la breadboard, elle s'enfiche dans les trous.
       Tire d'une broche (ou d'un trou) à une autre pour tracer un fil : il reste droit pendant que tu tires, puis se range à angle droit.
       Clique un fil ou une pièce, puis Suppr pour l'enlever. Ctrl+Z annule, Ctrl+Y rétablit, Échap abandonne.
-      Le calcul et les verdicts s'afficheront à l'étape 8 ; en attendant : <code>npm run verifier -- montage.diagram.json</code>.
+      Sous tension, chaque modification relance le calcul. En ligne de commande : <code>npm run verifier -- montage.diagram.json</code>.
     </p>
     <p><a href="https://github.com/Simbadlemarin78/simulateur-breadboard">Code source (licence MIT)</a></p>
     <script type="module" src="/src/ui/main.ts"></script>
