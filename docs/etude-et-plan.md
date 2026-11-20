@@ -199,7 +199,7 @@ Demande de Jean : une petite fenêtre de chat dans l'appli, où l'on demande à 
 
 - Elle n'existe que dans la version publiée sur claude.ai (Artifact), parce que c'est là qu'une page peut interroger Claude avec le compte de la personne qui la regarde, après son accord. Sur GitHub Pages, la fenêtre est cachée : il faudrait une clé API, payée à l'usage.
 - Claude ne voit le montage qu'à travers des outils, qui sont des fonctions de la page : lire les verdicts, le montage, une fiche, le catalogue ; mesurer une tension ou un courant ; poser une pièce, tracer un fil, régler, supprimer. Le moteur calcule, Claude explique.
-- Limite : pas de recherche web ni de lecture de PDF dans cette fenêtre. Un composant absent du catalogue demande d'abord une fiche tirée de sa datasheet : ce sera le travail d'un plug-in Claude Code, plus tard.
+- Limite : pas de recherche web ni de lecture de PDF dans cette fenêtre. Un composant absent du catalogue demande d'abord une fiche tirée de sa datasheet : c'est le travail de la skill Claude Code `/ajouter-composant` (faite le 20/11/2026, `.claude/skills/ajouter-composant/`), vers laquelle l'assistant renvoie. Dans Claude Code, Claude peut chercher et lire la datasheet ; la pièce apparaît dans l'appli une fois celle-ci republiée.
 
 ## Limites de la V1, et deux cas à reformuler
 

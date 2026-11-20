@@ -63,6 +63,25 @@ describe('noms des broches sur les dessins', () => {
     for (const couleur of ['#d62c1f', '#2e9e3e', '#e8c21c', '#2b62d6']) expect(svg).toContain(`stroke="${couleur}"`);
   });
 
+  it('un composant sans dessin dédié montre aussi le nom de ses broches, au pas de 0,1 pouce', () => {
+    // Fiche minimale d'un composant ajouté plus tard (skill /ajouter-composant), sans dessin dédié.
+    const fiche = {
+      format: 'fiche-composant/1',
+      id: 'essai-generique',
+      nom: 'Composant d\'essai',
+      categorie: 'module',
+      broches: ['VIN', 'GND', 'VOUT', 'EN', 'NC'].map((nom) => ({ nom, role: nom === 'NC' ? 'non_connectee' : 'autre' })),
+    } as unknown as Parameters<typeof dessinPour>[0];
+    const dessin = dessinPour(fiche);
+    const svg = dessin.corps(piece('drv1'));
+    expect(etiquettes(svg)).toEqual(['VIN', 'GND', 'VOUT', 'EN', 'NC']);
+    expect(svg.match(/class="etiquette-broche nc"/g)).toHaveLength(1);
+    const xs = [...dessin.broches.values()].map((p) => p.x);
+    for (let i = 1; i < xs.length; i++) expect(xs[i]! - xs[i - 1]!).toBe(P);
+    // Le nom de la broche tient au-dessus d'elle, dans la boîte.
+    for (const p of dessin.broches.values()) expect(p.y - 0.45 * P - 7 * 2).toBeGreaterThan(1.6 * P);
+  });
+
   it('chaque nom de broche du module tombe dans le dessin, sans chevaucher sa voisine', () => {
     const svg = dessinPour(catalogue.fiche('tmc2209-module')!).corps(piece('drv1'));
     const xs = [...svg.matchAll(/<text x="([\d.]+)" y="([\d.]+)"[^>]*class="etiquette-broche/g)].map((m) => [Number(m[1]), Number(m[2])] as const);

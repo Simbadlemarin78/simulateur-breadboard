@@ -112,6 +112,13 @@ describe('outils offerts à Claude', () => {
   });
 });
 
+describe('consignes', () => {
+  it('renvoient un composant absent du catalogue vers /ajouter-composant, et interdisent d\'inventer une valeur', () => {
+    expect(CONSIGNES).toContain('/ajouter-composant');
+    expect(CONSIGNES).toContain('N\'invente jamais une valeur de datasheet');
+  });
+});
+
 describe('dialogue', () => {
   it('envoie les consignes en tête, la question avec le contexte de l\'écran, et laisse Claude appeler les outils', async () => {
     const { env } = environnement(cas['../montages/cas/cas-05-en-flotte.diagram.json']);

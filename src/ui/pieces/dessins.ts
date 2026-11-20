@@ -289,13 +289,24 @@ function dessinCondensateur(): Dessin {
 
 // ---------------------------------------------------------------- dessin générique
 function dessinGenerique(fiche: Fiche): Dessin {
-  const n = fiche.broches.length;
+  // Boîte et broches en rangées de 20 au plus, au pas de 0,1 pouce, dans l'ordre de la fiche :
+  // une pièce d'une seule rangée s'enfiche dans la breadboard. Le nom de chaque broche est écrit
+  // à la verticale au-dessus d'elle (place pour 7 caractères environ).
+  const n = Math.max(fiche.broches.length, 1);
   const parLigne = Math.min(n, 20);
   const lignes = Math.ceil(n / parLigne);
-  const largeur = (parLigne + 1) * P;
-  const hauteur = (3 + lignes) * P;
+  const largeur = Math.max(parLigne + 1, 8) * P;
+  const yRangee = (r: number) => (5 + 4 * r) * P;
+  const hauteur = yRangee(lignes - 1) + P;
   const broches = new Map<string, Point>();
-  fiche.broches.forEach((b, i) => broches.set(b.nom, { x: (1 + (i % parLigne)) * P, y: (3 + Math.floor(i / parLigne)) * P }));
+  fiche.broches.forEach((b, i) => broches.set(b.nom, { x: (1 + (i % parLigne)) * P, y: yRangee(Math.floor(i / parLigne)) }));
+  const noms = fiche.broches.flatMap((b) => {
+    const p = broches.get(b.nom);
+    if (!p) return [];
+    const x = p.x + 0.12 * P;
+    const y = p.y - 0.45 * P;
+    return [texte(x, y, b.nom, `class="etiquette-broche${b.role === 'non_connectee' ? ' nc' : ''}" transform="rotate(-90 ${x} ${y})"`)];
+  });
   return {
     largeur,
     hauteur,
@@ -303,6 +314,7 @@ function dessinGenerique(fiche: Fiche): Dessin {
     corps: () => [
       `<rect x="0" y="0" width="${largeur}" height="${hauteur}" rx="4" fill="#555" stroke="#333"/>`,
       texte(0.6 * P, 1.6 * P, fiche.nom, 'class="etiquette"'),
+      ...noms,
     ].join(''),
   };
 }
