@@ -126,6 +126,22 @@ function dessinModuleTmc(fiche: Fiche): Dessin {
     else if (connecteur === 'J4' && numero) broches.set(b.nom, { x: numero * P, y: 6 * P });
     else if (connecteur && isoles[connecteur]) broches.set(b.nom, isoles[connecteur]);
   }
+  // Noms imprimés à côté des broches, tirés de la fiche (schéma BTT) : « GND.1 » et « GND.2 »
+  // sont imprimés « GND » ; PDN_UART devient « PDN », faute de place au pas de 0,1 pouce.
+  const court = (nom: string) => {
+    const base = nom.replace(/\.\d+$/, '');
+    return base === 'PDN_UART' ? 'PDN' : base;
+  };
+  const etiquettes = fiche.broches.flatMap((b) => {
+    const p = broches.get(b.nom);
+    if (!p) return [];
+    const classe = `etiquette-broche${b.role === 'non_connectee' ? ' nc' : ''}`;
+    const { connecteur } = position(fiche, b.nom);
+    if (connecteur === 'J3') return [texte(p.x, p.y + 0.75 * P, court(b.nom), `class="${classe}" text-anchor="middle"`)];
+    if (connecteur === 'J4') return [texte(p.x, p.y - 0.45 * P, court(b.nom), `class="${classe}" text-anchor="middle"`)];
+    if (connecteur === 'J1') return [texte(p.x, p.y - 0.95 * P, court(b.nom), `class="${classe}" text-anchor="middle"`)];
+    return [texte(p.x + 0.55 * P, p.y + 0.12 * P, court(b.nom), `class="${classe}" text-anchor="start"`)];
+  });
   return {
     largeur,
     hauteur,
@@ -138,6 +154,7 @@ function dessinModuleTmc(fiche: Fiche): Dessin {
         ...ailettes,
         `<circle cx="${1.6 * P}" cy="${3.5 * P}" r="${0.7 * P}" fill="#d8d8d8" stroke="#888"/>`,
         texte(4.8 * P, 6.95 * P, 'TMC2209', 'class="etiquette" text-anchor="middle"'),
+        ...etiquettes,
       ].join('');
     },
   };
@@ -154,6 +171,17 @@ function dessinMoteur(fiche: Fiche): Dessin {
     const i = ordre.indexOf(b.nom);
     broches.set(b.nom, { x: (3.5 + (i < 0 ? ordre.length : i)) * P, y: 0.5 * P });
   }
+  // Nom de chaque broche sur le connecteur, et un bout de fil à la couleur notée dans la fiche
+  // (« Fil rouge chez MotionKing et HANPOSE » : les couleurs changent d'un vendeur à l'autre).
+  const fils = fiche.broches.flatMap((b) => {
+    const p = broches.get(b.nom);
+    if (!p) return [];
+    const couleur = COULEURS_FILS[/Fil (\p{L}+)/u.exec(String(b['note'] ?? ''))?.[1]?.toLowerCase() ?? ''];
+    return [
+      ...(couleur ? [`<line class="fil-moteur" x1="${p.x}" y1="${1.5 * P}" x2="${p.x}" y2="${2.6 * P}" stroke="${couleur}" stroke-width="2"/>`] : []),
+      texte(p.x, 1.3 * P, b.nom, 'class="etiquette-broche sombre" text-anchor="middle"'),
+    ];
+  });
   return {
     largeur,
     hauteur,
@@ -164,9 +192,20 @@ function dessinMoteur(fiche: Fiche): Dessin {
       `<circle cx="${5 * P}" cy="${6.5 * P}" r="${2.2 * P}" fill="#8e8e93" stroke="#5a5a5e"/>`,
       `<circle cx="${5 * P}" cy="${6.5 * P}" r="${0.5 * P}" fill="#d1d1d6"/>`,
       texte(5 * P, 10.6 * P, piece.id, 'class="etiquette" text-anchor="middle"'),
+      ...fils,
     ].join(''),
   };
 }
+
+/** Couleurs des fils citées dans les notes des fiches. */
+const COULEURS_FILS: Record<string, string> = {
+  rouge: '#d62c1f',
+  vert: '#2e9e3e',
+  jaune: '#e8c21c',
+  bleu: '#2b62d6',
+  noir: '#111',
+  blanc: '#eee',
+};
 
 // ---------------------------------------------------------------- résistance
 function formaterOhms(valeur: unknown): string {

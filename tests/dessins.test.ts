@@ -43,6 +43,41 @@ describe('géométrie des dessins', () => {
   });
 });
 
+describe('noms des broches sur les dessins', () => {
+  const montage = lireMontage(baseRoulante, catalogue);
+  const piece = (id: string) => montage.pieces.find((p) => p.id === id)!;
+  const etiquettes = (svg: string) => [...svg.matchAll(/<text[^>]*class="etiquette-broche[^"]*"[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]);
+
+  it('le module TMC2209 porte le nom de ses 19 broches, comme imprimé sur la carte', () => {
+    const svg = dessinPour(catalogue.fiche('tmc2209-module')!).corps(piece('drv1'));
+    expect(etiquettes(svg)).toEqual(['EN', 'MS1', 'MS2', 'PDN', 'PDN', 'CLK', 'STEP', 'DIR', 'VM', 'GND', 'A2', 'A1', 'B1', 'B2', 'VDD', 'GND', 'VREF', 'DIAG', 'INDEX']);
+    // La deuxième position du pont PDN, non reliée, est grisée.
+    expect(svg.match(/class="etiquette-broche nc"/g)).toHaveLength(1);
+  });
+
+  it('le moteur porte A+, A-, B+, B- et la couleur de chaque fil notée dans sa fiche', () => {
+    const svg = dessinPour(catalogue.fiche('17hs4401')!).corps(piece('mot1'));
+    expect(etiquettes(svg).sort()).toEqual(['A+', 'A-', 'B+', 'B-']);
+    // Rouge (A+), vert (A-), jaune (B+), bleu (B-) chez MotionKing et HANPOSE.
+    expect(svg.match(/class="fil-moteur"[^>]*stroke="(#[0-9a-f]+)"/g)).toHaveLength(4);
+    for (const couleur of ['#d62c1f', '#2e9e3e', '#e8c21c', '#2b62d6']) expect(svg).toContain(`stroke="${couleur}"`);
+  });
+
+  it('chaque nom de broche du module tombe dans le dessin, sans chevaucher sa voisine', () => {
+    const svg = dessinPour(catalogue.fiche('tmc2209-module')!).corps(piece('drv1'));
+    const xs = [...svg.matchAll(/<text x="([\d.]+)" y="([\d.]+)"[^>]*class="etiquette-broche/g)].map((m) => [Number(m[1]), Number(m[2])] as const);
+    for (const [x, y] of xs) {
+      expect(x).toBeGreaterThan(0);
+      expect(x).toBeLessThan(9 * P);
+      expect(y).toBeLessThan(7 * P);
+    }
+    // Une rangée : un nom par pas de 0,1 pouce.
+    const rangee = xs.filter(([, y]) => y === 1.75 * P).map(([x]) => x);
+    expect(rangee).toHaveLength(8);
+    for (let i = 1; i < rangee.length; i++) expect(rangee[i]! - rangee[i - 1]!).toBe(P);
+  });
+});
+
 describe('zoom du plan', () => {
   const cadre = { x: 0, y: 0, largeur: 800, hauteur: 400 };
 
