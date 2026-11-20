@@ -4,7 +4,8 @@
 import { etatDemarrage, type Calcul } from '../moteur/circuit';
 import { formater, NOMS_VERDICTS, texteSource, VERDICTS, type Verdict } from '../moteur/constats';
 import { trouverBroche, type Fiche } from '../moteur/fiche';
-import { ETATS_BROCHE, type EtatBroche, type Montage, type Piece } from '../moteur/montage';
+import type { Effet } from '../moteur/effets';
+import { ETATS_BROCHE, FREQUENCE_DEFAUT, type EtatBroche, type Montage, type Piece } from '../moteur/montage';
 import type { Rapport } from '../moteur/verifications';
 import { echapper } from './pieces/dessins';
 
@@ -90,6 +91,7 @@ const NOMS_ETATS: Record<EtatBroche, string> = {
   entree_tirage_bas: 'entrée, tirage bas',
   sortie_haute: 'sortie haute (1)',
   sortie_basse: 'sortie basse (0)',
+  impulsions: 'impulsions (STEP)',
 };
 
 /** Broches de microcontrôleur réglables : celles d'une carte qui renvoient à une broche capable d'entrée-sortie, et qui sont branchées. */
@@ -132,11 +134,56 @@ export function htmlReglages(piece: Piece, montage: Montage, fiches: (id: string
     for (const b of broches) {
       const actuel = piece.etats[b.nom];
       const options = [`<option value="">au démarrage : ${NOMS_ETATS[b.demarrage]}</option>`]
-        .concat(ETATS_BROCHE.filter((e) => b.sortie || !e.startsWith('sortie')).map((e) => `<option value="${e}"${actuel === e ? ' selected' : ''}>${NOMS_ETATS[e]}</option>`))
+        .concat(
+          ETATS_BROCHE.filter((e) => b.sortie || (!e.startsWith('sortie') && e !== 'impulsions')).map(
+            (e) => `<option value="${e}"${actuel === e ? ' selected' : ''}>${NOMS_ETATS[e]}</option>`,
+          ),
+        )
         .join('');
-      lignes.push(`<label>${echapper(b.nom)} <select data-etat="${echapper(b.nom)}">${options}</select></label>`);
+      // Impulsions : leur fréquence, en Hz (une impulsion = un micro-pas pour un driver).
+      const frequence =
+        actuel === 'impulsions'
+          ? ` <input type="number" min="1" step="any" data-frequence="${echapper(b.nom)}" value="${piece.frequences[b.nom] ?? FREQUENCE_DEFAUT}" title="Impulsions par seconde"> Hz`
+          : '';
+      lignes.push(`<label>${echapper(b.nom)} <select data-etat="${echapper(b.nom)}">${options}</select>${frequence}</label>`);
     }
   }
   if (lignes.length === 0) lignes.push('<p>Rien à régler sur cette pièce.</p>');
   return `<p class="sous-titre">${echapper(piece.id)} : ${echapper(piece.fiche.nom)}</p>${lignes.join('')}`;
+}
+
+/** Nombre à la française, avec n décimales. */
+function nombre(x: number, n = 0): string {
+  return x.toFixed(n).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+/**
+ * Panneau des effets sous tension : pour chaque moteur, ce qui le fait tourner (ou l'en empêche),
+ * sa vitesse, son couple et la vitesse au-delà de laquelle le driver ne tient plus le courant ;
+ * pour chaque LED, son courant et son intensité.
+ */
+export function htmlEffets(effets: Effet[]): string {
+  if (effets.length === 0) return '';
+  const items = effets.map((e) => {
+    if (e.type === 'led') {
+      return `<li class="effet" data-piece="${echapper(e.piece)}"><strong>${echapper(e.piece)}</strong> ${e.eclat > 0 ? 'allumée' : 'éteinte'} : ${echapper(e.raison)}</li>`;
+    }
+    if (!e.tourne) return `<li class="effet" data-piece="${echapper(e.piece)}"><strong>${echapper(e.piece)}</strong> à l'arrêt : ${echapper(e.raison)}</li>`;
+    const details: string[] = [];
+    if (e.toursParSeconde !== undefined) {
+      const tps = Math.abs(e.toursParSeconde);
+      details.push(`${nombre(tps * 60)} tr/min (${nombre(tps * (e.pasParTour ?? 200), 0)} pas complets/s)`);
+    }
+    if (e.microPas !== undefined) details.push(`${e.microPas} micro-pas (${e.reglageMicroPas === 'UART' ? 'réglés par le programme' : 'MS1/MS2'})`);
+    if (e.sens !== undefined) details.push(`sens ${e.sens > 0 ? '+ (DIR à 0)' : '− (DIR à 1)'}`);
+    if (e.courant !== undefined) details.push(`${formater(e.courant, 'A')} par bobine`);
+    if (e.coupleArret !== undefined) details.push(`couple à l'arrêt ≈ ${nombre(e.coupleArret, 2)} N·m`);
+    if (e.vitesseMax !== undefined) details.push(`le driver tient ce courant jusqu'à ≈ ${nombre(e.vitesseMax * 60)} tr/min`);
+    if (e.couple !== undefined && e.coupleArret !== undefined && e.couple < e.coupleArret * 0.999) {
+      details.push(`à cette vitesse : ${formater(e.courantEffectif ?? 0, 'A')}, couple ≈ ${nombre(e.couple, 2)} N·m (${nombre((100 * e.couple) / e.coupleArret)} %)`);
+    }
+    if (e.roue) details.push(`roue de ${nombre(e.roue.diametre * 1000)} mm : ${nombre(Math.abs(e.roue.vitesse), 2)} m/s au sol`);
+    return `<li class="effet" data-piece="${echapper(e.piece)}"><strong>${echapper(e.piece)}</strong> tourne : ${echapper(e.raison)}<br>${details.map(echapper).join(' · ')}</li>`;
+  });
+  return `<h3>Ce qui bouge et s'allume</h3><ul class="effets">${items.join('')}</ul><p class="discret">Vitesse max et couple : estimation au premier ordre (datasheet du TMC2209, p. 43-44), moteur à vide.</p>`;
 }

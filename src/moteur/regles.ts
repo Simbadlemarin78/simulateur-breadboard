@@ -34,7 +34,7 @@ function depuisRegle(chemin: string, fiche: Fiche, regle: Regle, titre: string, 
 }
 
 /** La puce driver d'un module ("drv1" -> "drv1/U1"). */
-function puceDe(calcul: Calcul, module: string): { chemin: string; fiche: Fiche } | undefined {
+export function puceDe(calcul: Calcul, module: string): { chemin: string; fiche: Fiche } | undefined {
   for (const [chemin, fiche] of calcul.fiches) {
     if (chemin.startsWith(`${module}/`) && !chemin.slice(module.length + 1).includes('/') && fiche.modele?.type === 'driver_pas_a_pas') {
       return { chemin, fiche };
@@ -51,7 +51,7 @@ function vsAlimente(calcul: Calcul, puce: { chemin: string; fiche: Fiche }): boo
 }
 
 /** Niveau logique lu par une entrée : 0, 1, ou undefined entre les deux seuils. */
-function niveau(calcul: Calcul, chemin: string, fiche: Fiche, nom: string): 0 | 1 | undefined {
+export function niveau(calcul: Calcul, chemin: string, fiche: Fiche, nom: string): 0 | 1 | undefined {
   const b = trouverBroche(fiche, nom);
   const niveaux = b?.['niveaux'] as { vil_max?: Grandeur; vih_min?: Grandeur } | undefined;
   const masse = canon(fiche, b?.domaine?.masse);
@@ -87,7 +87,7 @@ function ilots(calcul: Calcul): (n: number) => number {
 const groupesTraites = new WeakMap<Contexte, Set<string>>();
 
 /** UART utilisée : PDN_UART relié à une broche UART d'un microcontrôleur, directement ou par une résistance. */
-function uartUtilisee(ctx: Contexte, module: string, fiche: Fiche): boolean {
+export function uartUtilisee(ctx: Contexte, module: string, fiche: Fiche): boolean {
   const nom = canon(fiche, 'PDN_UART');
   const depart = nom && ctx.grossier.noeudDe(`${module}:${nom}`);
   if (!depart) return false;
@@ -100,7 +100,8 @@ function uartUtilisee(ctx: Contexte, module: string, fiche: Fiche): boolean {
       for (const p of noeud.points) {
         const info = brocheDe(p, ctx.calcul.fiches);
         if (!info) continue;
-        if (info.broche.fonctions?.some((f) => /^U\d(RXD|TXD)$/.test(f))) return true;
+        // U2TXD sur l'ESP32, TXD sur la Raspberry Pi.
+        if (info.broche.fonctions?.some((f) => /^(U\d)?(RXD|TXD)$/.test(f))) return true;
         // Une résistance série (1 kΩ sur TX) : on regarde de l'autre côté.
         if (info.fiche.modele?.type === 'resistance' && !info.chemin.includes('/')) {
           const autre = info.fiche.broches.find((b) => b.nom !== info.broche.nom);

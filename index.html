@@ -93,7 +93,21 @@
       @keyframes chauffe { 0%, 100% { filter: drop-shadow(0 0 1px #ff8c00); } 50% { filter: drop-shadow(0 0 7px #ff8c00) drop-shadow(0 0 3px #ffb000); } }
       @keyframes halo { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
       @keyframes fumee { 0% { transform: translateY(0) scale(0.6); opacity: 0.7; } 100% { transform: translateY(-28px) scale(1.8); opacity: 0; } }
-      @media (prefers-reduced-motion: reduce) { .plan .piece.verdict-chauffe, .plan .fil-groupe.verdict-chauffe .fil-halo, .plan .broche.verdict-chauffe, .plan .fumee circle { animation: none; } .plan .fumee circle { opacity: 0.5; } }
+      /* Effets sous tension : roue qui tourne (durée d'un tour posée par le dessin), LED allumée. */
+      .plan .rotor { transform-box: fill-box; transform-origin: center; }
+      .plan .rotor .pneu { fill: #2b2b2e; stroke: #111; }
+      .plan .rotor .jante { fill: #8e8e93; stroke: #5a5a5e; }
+      .plan .rotor line { stroke: #d1d1d6; stroke-width: 2; }
+      .plan .rotor .axe { fill: #d1d1d6; }
+      .plan .rotor.tourne { animation: tourner 1s linear infinite; }
+      .plan .rotor.tourne.inverse { animation-direction: reverse; }
+      .plan .etiquette-effet { fill: #c7c7cc; font-size: 6px; }
+      .plan .etiquette-effet.actif { fill: #7ee787; font-weight: 600; }
+      .plan .corps-led { fill: #8f1d1d; stroke: #5c0f0f; }
+      .plan .corps-led.allumee { fill: #ff3b30; filter: brightness(calc(0.9 + var(--eclat) * 0.6)); }
+      .plan .halo-led { fill: #ff4b3a; filter: blur(3px); }
+      @keyframes tourner { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { .plan .piece.verdict-chauffe, .plan .fil-groupe.verdict-chauffe .fil-halo, .plan .broche.verdict-chauffe, .plan .fumee circle, .plan .rotor.tourne { animation: none; } .plan .fumee circle { opacity: 0.5; } }
       section { border: 1px solid var(--bord); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.88rem; min-width: 0; }
       h2 { font-size: 1rem; margin: 0 0 0.4rem; }
       #panneaux { display: grid; grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr); gap: 1rem; margin-top: 0.6rem; }
@@ -104,6 +118,9 @@
       .sous-titre { font-weight: 600; margin: 0.5rem 0 0.2rem; }
       .constats { padding-left: 1.2rem; margin: 0.3rem 0; }
       .constat { margin-bottom: 0.6rem; cursor: pointer; }
+      .effets { padding-left: 1.1rem; }
+      .effet { margin-bottom: 0.5rem; cursor: pointer; }
+      .discret { color: var(--discret); font-size: 0.85rem; }
       .constat p { margin: 0.15rem 0; }
       .constat .badge { display: inline-block; padding: 0 0.45rem; border-radius: 4px; font-size: 0.78rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.02em; }
       .constat.verdict-grille .badge { background: #c4170f; }

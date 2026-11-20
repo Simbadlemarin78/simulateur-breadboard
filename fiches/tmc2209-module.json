@@ -39,12 +39,25 @@
     "remarques": "La marque des modules de Jean est inconnue : cette fiche suit le schéma BIGTREETECH V1.2. À vérifier au multimètre sur un vrai module, hors tension : 20 kΩ entre EN et VDD (tirage), continuité entre les deux GND, marquage « R110 » sur les résistances de mesure. Attention : la table des micro-pas imprimée sur le schéma BTT (1/2, 1/4...) est celle du TMC2208 ; la bonne est dans la fiche tmc2209 (p. 14)."
   },
   "sous_composants": [
-    { "ref": "U1", "fiche": "tmc2209" },
+    {
+      "ref": "U1",
+      "fiche": "tmc2209"
+    },
     {
       "ref": "R2",
       "fiche": "resistance",
       "valeurs": {
-        "resistance": { "typ": 0.11, "unite": "Ω", "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R2 sur BRA", "citation": "R2 0R11" } }
+        "resistance": {
+          "typ": 0.11,
+          "unite": "Ω",
+          "src": {
+            "type": "datasheet",
+            "doc": "btt-schema",
+            "page": 1,
+            "ou": "R2 sur BRA",
+            "citation": "R2 0R11"
+          }
+        }
       },
       "note": "Résistance de mesure de la bobine A, entre BRA et GND."
     },
@@ -52,7 +65,17 @@
       "ref": "R4",
       "fiche": "resistance",
       "valeurs": {
-        "resistance": { "typ": 0.11, "unite": "Ω", "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R4 sur BRB", "citation": "R4 0R11" } }
+        "resistance": {
+          "typ": 0.11,
+          "unite": "Ω",
+          "src": {
+            "type": "datasheet",
+            "doc": "btt-schema",
+            "page": 1,
+            "ou": "R4 sur BRB",
+            "citation": "R4 0R11"
+          }
+        }
       },
       "note": "Résistance de mesure de la bobine B, entre BRB et GND."
     }
@@ -60,173 +83,345 @@
   "broches": [
     {
       "nom": "EN",
-      "position": { "connecteur": "J3", "numero": 1 },
+      "position": {
+        "connecteur": "J3",
+        "numero": 1
+      },
       "role": "entree_logique",
       "vers": "U1.ENN",
-      "domaine": { "alim": "VDD", "masse": "GND.2" },
+      "domaine": {
+        "alim": "VDD",
+        "masse": "GND.2"
+      },
       "note": "Bas : moteur alimenté ; haut : sorties coupées. Tiré vers VDD par R1 (voir liaisons) : en l'air, le driver est coupé."
     },
     {
       "nom": "MS1",
-      "position": { "connecteur": "J3", "numero": 2 },
+      "position": {
+        "connecteur": "J3",
+        "numero": 2
+      },
       "role": "configuration",
       "vers": "U1.MS1_AD0",
-      "domaine": { "alim": "VDD", "masse": "GND.2" },
+      "domaine": {
+        "alim": "VDD",
+        "masse": "GND.2"
+      },
       "note": "Tirage vers GND dans la puce : en l'air, vaut 0."
     },
     {
       "nom": "MS2",
-      "position": { "connecteur": "J3", "numero": 3 },
+      "position": {
+        "connecteur": "J3",
+        "numero": 3
+      },
       "role": "configuration",
       "vers": "U1.MS2_AD1",
-      "domaine": { "alim": "VDD", "masse": "GND.2" },
+      "domaine": {
+        "alim": "VDD",
+        "masse": "GND.2"
+      },
       "note": "Tirage vers GND dans la puce : en l'air, vaut 0."
     },
     {
       "nom": "PDN_UART",
-      "alias": ["PDN", "UART"],
-      "position": { "connecteur": "J3", "numero": 4 },
+      "alias": [
+        "PDN",
+        "UART"
+      ],
+      "position": {
+        "connecteur": "J3",
+        "numero": 4
+      },
       "role": "communication",
       "vers": "U1.PDN_UART",
-      "domaine": { "alim": "VDD", "masse": "GND.2" },
+      "domaine": {
+        "alim": "VDD",
+        "masse": "GND.2"
+      },
       "note": "Reliée à PDN_UART de la puce par le pont de soudure T1, réglé en usine sur la broche 4 (wiki BTT)."
     },
     {
       "nom": "PDN_UART.2",
-      "position": { "connecteur": "J3", "numero": 5 },
+      "position": {
+        "connecteur": "J3",
+        "numero": 5
+      },
       "role": "non_connectee",
       "note": "Autre position du pont T1 : non reliée tant qu'on n'a pas déplacé le pont."
     },
     {
       "nom": "CLK",
-      "position": { "connecteur": "J3", "numero": 6 },
+      "position": {
+        "connecteur": "J3",
+        "numero": 6
+      },
       "role": "entree_logique",
       "vers": "U1.CLK",
-      "domaine": { "alim": "VDD", "masse": "GND.2" },
+      "domaine": {
+        "alim": "VDD",
+        "masse": "GND.2"
+      },
       "note": "Tirée vers GND par R3 : en l'air, la puce utilise son horloge interne."
     },
     {
       "nom": "STEP",
-      "position": { "connecteur": "J3", "numero": 7 },
+      "position": {
+        "connecteur": "J3",
+        "numero": 7
+      },
       "role": "entree_logique",
       "vers": "U1.STEP",
-      "domaine": { "alim": "VDD", "masse": "GND.2" }
+      "domaine": {
+        "alim": "VDD",
+        "masse": "GND.2"
+      }
     },
     {
       "nom": "DIR",
-      "position": { "connecteur": "J3", "numero": 8 },
+      "position": {
+        "connecteur": "J3",
+        "numero": 8
+      },
       "role": "entree_logique",
       "vers": "U1.DIR",
-      "domaine": { "alim": "VDD", "masse": "GND.2" }
+      "domaine": {
+        "alim": "VDD",
+        "masse": "GND.2"
+      }
     },
     {
       "nom": "VM",
-      "position": { "connecteur": "J4", "numero": 1 },
+      "position": {
+        "connecteur": "J4",
+        "numero": 1
+      },
       "role": "alim_entree",
       "vers": "U1.VS",
-      "domaine": { "masse": "GND.1" },
+      "domaine": {
+        "masse": "GND.1"
+      },
       "note": "Alimentation des moteurs. Le wiki BTT annonce 4,75 à 28 V ; les limites retenues sont celles de la puce."
     },
     {
       "nom": "GND.1",
-      "alias": ["GND"],
-      "position": { "connecteur": "J4", "numero": 2 },
+      "alias": [
+        "GND"
+      ],
+      "position": {
+        "connecteur": "J4",
+        "numero": 2
+      },
       "role": "masse",
       "vers": "U1.GND",
       "note": "Masse côté puissance, à côté de VM. Imprimée « GND » sur le module."
     },
     {
       "nom": "A2",
-      "position": { "connecteur": "J4", "numero": 3 },
+      "position": {
+        "connecteur": "J4",
+        "numero": 3
+      },
       "role": "sortie_puissance",
       "vers": "U1.OA2"
     },
     {
       "nom": "A1",
-      "position": { "connecteur": "J4", "numero": 4 },
+      "position": {
+        "connecteur": "J4",
+        "numero": 4
+      },
       "role": "sortie_puissance",
       "vers": "U1.OA1"
     },
     {
       "nom": "B1",
-      "position": { "connecteur": "J4", "numero": 5 },
+      "position": {
+        "connecteur": "J4",
+        "numero": 5
+      },
       "role": "sortie_puissance",
       "vers": "U1.OB1"
     },
     {
       "nom": "B2",
-      "position": { "connecteur": "J4", "numero": 6 },
+      "position": {
+        "connecteur": "J4",
+        "numero": 6
+      },
       "role": "sortie_puissance",
       "vers": "U1.OB2"
     },
     {
       "nom": "VDD",
-      "alias": ["VCC_IO", "VIO"],
-      "position": { "connecteur": "J4", "numero": 7 },
+      "alias": [
+        "VCC_IO",
+        "VIO"
+      ],
+      "position": {
+        "connecteur": "J4",
+        "numero": 7
+      },
       "role": "alim_entree",
       "vers": "U1.VCC_IO",
-      "domaine": { "masse": "GND.2" },
+      "domaine": {
+        "masse": "GND.2"
+      },
       "note": "Alimentation des broches logiques : la relier au 3,3 V de l'ESP32."
     },
     {
       "nom": "GND.2",
-      "alias": ["GND"],
-      "position": { "connecteur": "J4", "numero": 8 },
+      "alias": [
+        "GND"
+      ],
+      "position": {
+        "connecteur": "J4",
+        "numero": 8
+      },
       "role": "masse",
       "vers": "U1.GND",
       "note": "Masse côté logique, à côté de VDD. Imprimée « GND » sur le module."
     },
     {
       "nom": "VREF",
-      "position": { "connecteur": "J1", "numero": 1 },
+      "position": {
+        "connecteur": "J1",
+        "numero": 1
+      },
       "role": "autre",
       "vers": "U1.VREF",
       "note": "Point de mesure sur le dessus du module : tension réglée par le potentiomètre (voir paramètre vref)."
     },
     {
       "nom": "DIAG",
-      "position": { "connecteur": "J2", "numero": 1 },
+      "position": {
+        "connecteur": "J2",
+        "numero": 1
+      },
       "role": "sortie_logique",
       "vers": "U1.DIAG"
     },
     {
       "nom": "INDEX",
-      "position": { "connecteur": "J5", "numero": 1 },
+      "position": {
+        "connecteur": "J5",
+        "numero": 1
+      },
       "role": "sortie_logique",
       "vers": "U1.INDEX"
     }
   ],
   "liaisons_internes": [
     {
-      "entre": ["GND.1", "GND.2"],
+      "entre": [
+        "GND.1",
+        "GND.2"
+      ],
       "type": "direct",
-      "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "J4, broches 2 et 8" },
+      "src": {
+        "type": "datasheet",
+        "doc": "btt-schema",
+        "page": 1,
+        "ou": "J4, broches 2 et 8"
+      },
       "note": "Les deux GND sont le même réseau : un module inversé met VM en court-circuit avec la masse commune."
     },
     {
-      "entre": ["EN", "VDD"],
+      "entre": [
+        "EN",
+        "VDD"
+      ],
       "type": "resistance",
-      "valeur": { "typ": 20, "unite": "kΩ", "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R1 entre EN et VDD", "citation": "R1 20K" } },
-      "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R1 entre EN et VDD" },
+      "valeur": {
+        "typ": 20,
+        "unite": "kΩ",
+        "src": {
+          "type": "datasheet",
+          "doc": "btt-schema",
+          "page": 1,
+          "ou": "R1 entre EN et VDD",
+          "citation": "R1 20K"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "btt-schema",
+        "page": 1,
+        "ou": "R1 entre EN et VDD"
+      },
       "note": "Tirage haut de EN : à vérifier sur les modules de Jean, il change le verdict du cas 5."
     },
     {
-      "entre": ["CLK", "GND.2"],
+      "entre": [
+        "CLK",
+        "GND.2"
+      ],
       "type": "resistance",
-      "valeur": { "typ": 20, "unite": "kΩ", "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R3 entre CLK et GND", "citation": "R3 20K" } },
-      "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R3 entre CLK et GND" }
+      "valeur": {
+        "typ": 20,
+        "unite": "kΩ",
+        "src": {
+          "type": "datasheet",
+          "doc": "btt-schema",
+          "page": 1,
+          "ou": "R3 entre CLK et GND",
+          "citation": "R3 20K"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "btt-schema",
+        "page": 1,
+        "ou": "R3 entre CLK et GND"
+      }
     },
     {
-      "entre": ["PDN_UART", "GND.2"],
+      "entre": [
+        "PDN_UART",
+        "GND.2"
+      ],
       "type": "resistance",
-      "valeur": { "typ": 20, "unite": "kΩ", "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R5 entre PDN_UART et GND", "citation": "R5 20K" } },
-      "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R5 entre PDN_UART et GND" }
+      "valeur": {
+        "typ": 20,
+        "unite": "kΩ",
+        "src": {
+          "type": "datasheet",
+          "doc": "btt-schema",
+          "page": 1,
+          "ou": "R5 entre PDN_UART et GND",
+          "citation": "R5 20K"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "btt-schema",
+        "page": 1,
+        "ou": "R5 entre PDN_UART et GND"
+      }
     },
     {
-      "entre": ["VM", "GND.1"],
+      "entre": [
+        "VM",
+        "GND.1"
+      ],
       "type": "condensateur",
-      "valeur": { "typ": 1.2, "unite": "µF", "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "C1, C3, C4 sur VM", "citation": "C1 1uF/50V, C3 100nF/50V, C4 100nF/50V" } },
-      "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "C1, C3, C4 sur VM" },
+      "valeur": {
+        "typ": 1.2,
+        "unite": "µF",
+        "src": {
+          "type": "datasheet",
+          "doc": "btt-schema",
+          "page": 1,
+          "ou": "C1, C3, C4 sur VM",
+          "citation": "C1 1uF/50V, C3 100nF/50V, C4 100nF/50V"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "btt-schema",
+        "page": 1,
+        "ou": "C1, C3, C4 sur VM"
+      },
       "note": "Somme de 1 µF + 2 × 100 nF, céramiques 50 V : très loin des 100 µF recommandés (règle condensateur-reservoir)."
     }
   ],
@@ -237,14 +432,43 @@
       "defaut": 1.2,
       "min": 0.2,
       "max": 2.2,
-      "src": { "type": "hypothese", "justification": "Plage 0,2-2,2 V imprimée sur btt-schema (« Vref scope ») ; réglage d'usine 1,2 V ± 0,1 V d'après btt-wiki." }
+      "src": {
+        "type": "hypothese",
+        "justification": "Plage 0,2-2,2 V imprimée sur btt-schema (« Vref scope ») ; réglage d'usine 1,2 V ± 0,1 V d'après btt-wiki."
+      }
     },
     "courant_uart": {
       "description": "Courant efficace des bobines réglé par le programme via l'UART (registres IRUN et GCONF, référence interne), à saisir à la main faute d'émuler le code. Sans valeur, le courant suit VREF.",
       "unite": "A",
       "min": 0,
       "max": 1.76,
-      "src": { "type": "hypothese", "justification": "Maximum : pleine échelle de la puce avec les résistances de 0,11 Ω, 325 mV / (0,11 + 0,02) Ω / √2 = 1,77 A (tmc2209-ds, p. 53), arrondi en dessous." }
+      "src": {
+        "type": "hypothese",
+        "justification": "Maximum : pleine échelle de la puce avec les résistances de 0,11 Ω, 325 mV / (0,11 + 0,02) Ω / √2 = 1,77 A (tmc2209-ds, p. 53), arrondi en dessous."
+      }
+    },
+    "micro_pas_uart": {
+      "description": "Micro-pas réglés par le programme via l'UART (bit mstep_reg_select de GCONF, puis champ MRES de CHOPCONF), à saisir à la main faute d'émuler le code. Sans UART, ce sont MS1 et MS2 qui choisissent (8, 16, 32 ou 64).",
+      "unite": "1",
+      "defaut": 16,
+      "choix": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128,
+        256
+      ],
+      "src": {
+        "type": "datasheet",
+        "doc": "tmc2209-ds",
+        "page": 33,
+        "ou": "Registre CHOPCONF, champ MRES",
+        "citation": "Number of microsteps per step pulse = 2^MRES"
+      }
     }
   },
   "modele": {
@@ -254,7 +478,13 @@
         "typ": 0.11,
         "unite": "Ω",
         "conditions": "une par bobine : R2 sur BRA, R4 sur BRB",
-        "src": { "type": "datasheet", "doc": "btt-schema", "page": 1, "ou": "R2 sur BRA, R4 sur BRB", "citation": "R2 0R11 ; R4 0R11" }
+        "src": {
+          "type": "datasheet",
+          "doc": "btt-schema",
+          "page": 1,
+          "ou": "R2 sur BRA, R4 sur BRB",
+          "citation": "R2 0R11 ; R4 0R11"
+        }
       }
     },
     "note": "Le calcul prend le pont de la puce U1 (fiche tmc2209) et y ajoute ces résistances de mesure et le réglage vref du potentiomètre."
@@ -265,31 +495,65 @@
       "verdict": "risque",
       "explication": "Au démarrage, tant que le programme ne commande pas EN, sa tension ne dépend que des tirages. Si EN n'est pas franchement au niveau haut, le driver peut s'activer : les bobines prennent du courant et le moteur peut bouger avant que le programme soit prêt.",
       "correction": "Tirer EN vers 3,3 V par une résistance de 10 kΩ : les drivers restent coupés tant que le programme ne les active pas.",
-      "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 9, "ou": "2.2 Signal Descriptions TMC2209, ENN", "citation": "power stage becomes switched off ... when this pin becomes driven to a high level" }
+      "src": {
+        "type": "datasheet",
+        "doc": "tmc2209-ds",
+        "page": 9,
+        "ou": "2.2 Signal Descriptions TMC2209, ENN",
+        "citation": "power stage becomes switched off ... when this pin becomes driven to a high level"
+      }
     },
     {
       "id": "condensateur-reservoir",
       "verdict": "risque_eleve",
       "parametres": {
-        "capacite_min": { "min": 100, "unite": "µF", "conditions": "entre VM et GND, au plus près du module", "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 11, "ou": "3.1 Standard Application Circuit", "citation": "A minimum capacity of 100µF near the driver is recommended" } }
+        "capacite_min": {
+          "min": 100,
+          "unite": "µF",
+          "conditions": "entre VM et GND, au plus près du module",
+          "src": {
+            "type": "datasheet",
+            "doc": "tmc2209-ds",
+            "page": 11,
+            "ou": "3.1 Standard Application Circuit",
+            "citation": "A minimum capacity of 100µF near the driver is recommended"
+          }
+        }
       },
       "explication": "Le module n'a que 1,2 µF sur VM. Sans gros condensateur tout près, la tension de VM oscille à chaque commutation et au branchement ; la datasheet prévient que cela peut faire passer des courants destructeurs par le condensateur de la pompe de charge.",
       "correction": "Mettre un condensateur électrolytique d'au moins 100 µF entre VM et GND, au plus près de chaque module, avec une tension nominale nettement au-dessus de VM.",
-      "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 11, "ou": "3.1 Standard Application Circuit, encadré Attention", "citation": "Failure to do so could result in destructive currents via the charge pump capacitor." }
+      "src": {
+        "type": "datasheet",
+        "doc": "tmc2209-ds",
+        "page": 11,
+        "ou": "3.1 Standard Application Circuit, encadré Attention",
+        "citation": "Failure to do so could result in destructive currents via the charge pump capacitor."
+      }
     },
     {
       "id": "pas-de-branchement-a-chaud",
       "verdict": "risque_eleve",
       "explication": "Brancher ou débrancher le moteur quand VM est alimenté crée des pointes de tension et de courant sur les sorties. C'est une cause classique de driver grillé, mais l'issue dépend de l'instant exact : le calcul en continu ne peut pas la prévoir.",
       "correction": "Couper VM avant de toucher aux fils du moteur. Le wiki BTT demande aussi de ne jamais enficher ou retirer le module sous tension.",
-      "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 17, "ou": "3.7 Driver Protection and EME Circuitry", "citation": "live plugging / pulling the motor, which also causes high voltages and high currents" }
+      "src": {
+        "type": "datasheet",
+        "doc": "tmc2209-ds",
+        "page": 17,
+        "ou": "3.7 Driver Protection and EME Circuitry",
+        "citation": "live plugging / pulling the motor, which also causes high voltages and high currents"
+      }
     },
     {
       "id": "micro-pas-identiques",
       "verdict": "ne_marchera_pas",
       "explication": "Sans UART, MS1 et MS2 fixent le nombre de micro-pas. Si deux drivers d'un même groupe ont des niveaux différents, leurs moteurs ne font pas le même angle pour une même impulsion STEP : les roues tournent à des vitesses différentes.",
       "correction": "Mettre les mêmes niveaux sur MS1 et MS2 de tous les drivers du groupe, ou régler les micro-pas par UART (MS1 et MS2 servent alors d'adresse).",
-      "src": { "type": "datasheet", "doc": "tmc2209-ds", "page": 14, "ou": "MS1/MS2: Configuration of microstep resolution for STEP input" }
+      "src": {
+        "type": "datasheet",
+        "doc": "tmc2209-ds",
+        "page": 14,
+        "ou": "MS1/MS2: Configuration of microstep resolution for STEP input"
+      }
     }
   ]
 }

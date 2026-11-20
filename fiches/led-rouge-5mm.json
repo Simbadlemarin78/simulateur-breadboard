@@ -1,0 +1,194 @@
+{
+  "format": "fiche-composant/1",
+  "id": "led-rouge-5mm",
+  "nom": "LED rouge 5 mm (Kingbright WP7113ID)",
+  "categorie": "passif",
+  "fabricant": "Kingbright",
+  "reference": "WP7113ID",
+  "description": "LED rouge diffusante de 5 mm, modèle très courant. Elle ne laisse passer le courant que de l'anode (A) vers la cathode (C) et s'allume à partir d'environ 1,7 V ; vers 10 mA elle éclaire bien. Toujours avec une résistance en série : sans elle, le courant n'est limité que par l'alim. Une LED rouge 5 mm d'une autre marque se comporte à peu près pareil.",
+  "documents": [
+    {
+      "id": "wp7113id-ds",
+      "titre": "WP7113ID T-1 3/4 (5mm) Solid State Lamp",
+      "editeur": "Kingbright",
+      "revision": "V.14A (DSAF0012)",
+      "date": "2026-01-08",
+      "url": "https://www.kingbrightusa.com/images/catalog/SPEC/WP7113ID.pdf",
+      "sha256": "b5bb33f69c13fd92ab6d47a8fd71168b6e7ee685139c8f381957aeea9286c9da"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-20",
+    "remarques": "Valeurs électriques lues dans les tableaux de la p. 2. À relire : le modèle de la courbe courant-tension (n ≈ 3,5 et 4,5 Ω) est un ajustement sur une lecture graphique de la p. 3 ; l'intensité lumineuse est supposée proportionnelle au courant, comme le montre la courbe de la p. 3 jusqu'à 20 mA. Seuils de verdict : au-delà de 30 mA en continu, « risque élevé » (la datasheet annonce dégradation ou panne prématurée, note 4 p. 2) ; au-delà de 160 mA, courant de crête permis seulement en impulsions de 0,1 ms, « grillé »."
+  },
+  "wokwi": {
+    "type": "wokwi-led"
+  },
+  "broches": [
+    {
+      "nom": "A",
+      "alias": [
+        "anode",
+        "+"
+      ],
+      "position": {
+        "connecteur": "pattes",
+        "numero": 1
+      },
+      "role": "autre",
+      "note": "Anode : la patte la plus longue, côté + (le courant entre par là)."
+    },
+    {
+      "nom": "C",
+      "alias": [
+        "cathode",
+        "-"
+      ],
+      "position": {
+        "connecteur": "pattes",
+        "numero": 2
+      },
+      "role": "autre",
+      "note": "Cathode : la patte la plus courte (repérée « Cathode » sur le dessin du boîtier, p. 1), côté masse."
+    }
+  ],
+  "modele": {
+    "type": "led",
+    "valeurs": {
+      "diode": {
+        "tension_directe": {
+          "typ": 1.855,
+          "unite": "V",
+          "conditions": "jonction seule, à 10 mA",
+          "src": {
+            "type": "hypothese",
+            "justification": "VF = 1,9 V à 10 mA (p. 2, « Forward Voltage IF = 10mA VF 1.9 2.3 V ») moins la chute dans la résistance série : 4,5 Ω × 10 mA = 0,045 V."
+          }
+        },
+        "courant": {
+          "typ": 10,
+          "unite": "mA",
+          "src": {
+            "type": "datasheet",
+            "doc": "wp7113id-ds",
+            "page": 2,
+            "ou": "Electrical / Optical Characteristics at TA=25°C",
+            "citation": "Forward Voltage IF = 10mA VF 1.9 2.3 V"
+          }
+        },
+        "idealite": {
+          "typ": 3.5,
+          "unite": "1",
+          "src": {
+            "type": "hypothese",
+            "justification": "Ajustement d'une diode et d'une résistance série sur la courbe « Forward Current vs. Forward Voltage » (p. 3), lue à 4 mA ≈ 1,79 V et 20 mA ≈ 2,01 V (lecture graphique, ± 0,02 V), et sur VF = 1,9 V à 10 mA (p. 2). Avec V = Vd(I) + Rs·I : n·VT ≈ 0,090 V (n ≈ 3,5) et Rs ≈ 4,5 Ω ; contrôle à 2 mA : 1,72 V calculés, 1,71 V lus."
+          }
+        }
+      },
+      "resistance_serie": {
+        "typ": 4.5,
+        "unite": "Ω",
+        "src": {
+          "type": "hypothese",
+          "justification": "Ajustement d'une diode et d'une résistance série sur la courbe « Forward Current vs. Forward Voltage » (p. 3), lue à 4 mA ≈ 1,79 V et 20 mA ≈ 2,01 V (lecture graphique, ± 0,02 V), et sur VF = 1,9 V à 10 mA (p. 2). Avec V = Vd(I) + Rs·I : n·VT ≈ 0,090 V (n ≈ 3,5) et Rs ≈ 4,5 Ω ; contrôle à 2 mA : 1,72 V calculés, 1,71 V lus."
+        }
+      },
+      "tension_directe_max": {
+        "max": 2.3,
+        "unite": "V",
+        "conditions": "à 10 mA",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 2,
+          "ou": "Electrical / Optical Characteristics at TA=25°C",
+          "citation": "Forward Voltage IF = 10mA VF 1.9 2.3 V"
+        }
+      },
+      "courant_direct_max": {
+        "max": 30,
+        "unite": "mA",
+        "conditions": "en continu, jusqu'à environ 25 °C (courbe de déclassement p. 3)",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 2,
+          "ou": "Absolute Maximum Ratings at TA=25°C",
+          "citation": "DC Forward Current IF 30 mA"
+        }
+      },
+      "courant_crete_max": {
+        "max": 160,
+        "unite": "mA",
+        "conditions": "impulsions de 0,1 ms, rapport cyclique 1/10",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 2,
+          "ou": "Absolute Maximum Ratings at TA=25°C",
+          "citation": "Peak Forward Current IFP 160 mA"
+        }
+      },
+      "puissance_max": {
+        "max": 75,
+        "unite": "mW",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 2,
+          "ou": "Absolute Maximum Ratings at TA=25°C",
+          "citation": "Power Dissipation PD 75 mW"
+        }
+      },
+      "tension_inverse_max": {
+        "max": 5,
+        "unite": "V",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 2,
+          "ou": "Absolute Maximum Ratings at TA=25°C",
+          "citation": "Reverse Voltage VR 5 V"
+        }
+      },
+      "intensite_lumineuse": {
+        "min": 25,
+        "typ": 50,
+        "unite": "mcd",
+        "conditions": "à 10 mA",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 1,
+          "ou": "Selection Guide",
+          "citation": "Iv (mcd) @ 10mA Min. 25 Typ. 50"
+        }
+      },
+      "courant_intensite": {
+        "typ": 10,
+        "unite": "mA",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 1,
+          "ou": "Selection Guide",
+          "citation": "Iv (mcd) @ 10mA"
+        }
+      },
+      "courant_eclat_max": {
+        "typ": 20,
+        "unite": "mA",
+        "src": {
+          "type": "datasheet",
+          "doc": "wp7113id-ds",
+          "page": 3,
+          "ou": "Courbe « Luminous Intensity vs. Forward Current »"
+        },
+        "note": "Haut de la courbe : intensité proportionnelle au courant, deux fois celle de 10 mA à 20 mA. Sert à doser l'éclat affiché."
+      }
+    },
+    "note": "Diode et résistance série : le moteur calcule le courant, l'éclat et les verdicts de courant et de tension inverse."
+  }
+}

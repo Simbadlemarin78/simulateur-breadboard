@@ -59,6 +59,7 @@ Règles :
 - Le moteur du simulateur calcule, toi tu expliques. Chaque valeur que tu cites (tension, courant, limite, page de datasheet) vient d'un outil. N'invente jamais une valeur de datasheet. Si une donnée manque, dis-le.
 - « Grillé » ne sort que du calcul du moteur. Ce que le moteur ne simule pas (phénomènes brefs, programme de l'ESP32), dis qu'il ne le simule pas.
 - Les fiches marquées brouillon n'ont pas encore été relues par Jean : signale-le quand ta réponse en dépend.
+- Un moteur ne tourne que si la broche qui commande STEP de son driver est réglée sur « impulsions » (etat:<broche>, puis frequence:<broche> en Hz) et que le driver est actif. Sa vitesse = fréquence / (micro-pas × 200 pas par tour) ; le courant donne le couple, pas la vitesse, mais limite la vitesse max. Lis vitesses, couple et LED dans « effets » de lire_verdicts.
 - Pour poser une pièce, tracer un fil, changer un réglage ou supprimer, utilise les outils ; chaque modification s'annule avec Ctrl+Z, dis-le. Ne modifie le montage que si on te le demande.
 - Un composant absent du catalogue (lister_catalogue) ne peut pas être créé ici : tu n'as accès ni au web ni aux PDF, et une fiche sans datasheet serait inventée. Dis à Jean de l'ajouter avec Claude Code ouvert sur le dépôt du projet, en tapant « /ajouter-composant » suivi du nom, de la référence ou du lien du composant : Claude y trouve la datasheet, écrit la fiche sourcée et le dessin, lance les tests ; la pièce apparaît ensuite ici une fois l'appli republiée.
 - Les noms de points s'écrivent « pièce:broche », par exemple esp:13, drv1:VM, bb1:10t.a (trou de breadboard : colonne, t ou b pour la moitié haute ou basse, puis la rangée a à j ; rails tp, tn, bp, bn).`;
@@ -128,6 +129,23 @@ export function outilsAssistant(env: EnvironnementAssistant): OutilAssistant[] {
           non_simule: r.nonSimule,
           drivers: r.calcul.drivers.map((d) => ({ piece: d.piece, actif: d.actif, raison: d.raison, courant_bobine_A: Number(d.courantBobine.toFixed(3)) })),
           sources: r.calcul.sources.map((s) => ({ piece: s.piece, regime: s.regime, tension_V: Number(s.tension.toFixed(3)), courant_A: Number(s.courant.toFixed(4)) })),
+          effets: r.effets.map((e) =>
+            e.type === 'led'
+              ? { piece: e.piece, led: e.eclat > 0 ? 'allumée' : 'éteinte', courant_mA: Number((e.courant * 1e3).toFixed(2)), intensite_mcd: e.intensite !== undefined ? Math.round(e.intensite) : undefined, raison: e.raison }
+              : {
+                  piece: e.piece,
+                  tourne: e.tourne,
+                  raison: e.raison,
+                  tr_min: e.toursParSeconde !== undefined ? Number((e.toursParSeconde * 60).toFixed(1)) : undefined,
+                  micro_pas: e.microPas,
+                  reglage_micro_pas: e.reglageMicroPas,
+                  courant_bobine_A: e.courant !== undefined ? Number(e.courant.toFixed(3)) : undefined,
+                  couple_arret_Nm: e.coupleArret !== undefined ? Number(e.coupleArret.toFixed(3)) : undefined,
+                  couple_a_cette_vitesse_Nm: e.couple !== undefined ? Number(e.couple.toFixed(3)) : undefined,
+                  vitesse_max_tr_min: e.vitesseMax !== undefined ? Math.round(e.vitesseMax * 60) : undefined,
+                  roue_m_s: e.roue ? Number(e.roue.vitesse.toFixed(3)) : undefined,
+                },
+          ),
         });
       },
     },
@@ -280,7 +298,7 @@ export function outilsAssistant(env: EnvironnementAssistant): OutilAssistant[] {
     {
       name: 'regler',
       description:
-        `Change un réglage d'une pièce : un paramètre de sa fiche (ex. alim : tension, limite_courant ; drv1 : vref, courant_uart ; r1 : value), ou l'état d'une broche de l'ESP32 avec nom « etat:<broche> » et une valeur parmi ${ETATS_BROCHE.join(', ')} (vide = état au démarrage). S'annule avec Ctrl+Z.`,
+        `Change un réglage d'une pièce : un paramètre de sa fiche (ex. alim : tension, limite_courant ; drv1 : vref, courant_uart ; r1 : value), ou l'état d'une broche de l'ESP32 ou de la Raspberry Pi avec nom « etat:<broche> » et une valeur parmi ${ETATS_BROCHE.join(', ')} (vide = état au démarrage), ou la fréquence d'une broche en impulsions avec nom « frequence:<broche> » (Hz ; une impulsion sur STEP = un micro-pas du moteur). S'annule avec Ctrl+Z.`,
       inputSchema: { type: 'object', properties: { piece: { type: 'string' }, nom: { type: 'string' }, valeur: { type: ['string', 'number', 'boolean'] } }, required: ['piece', 'nom'] },
       execute: (input) => {
         const piece = texte(input['piece']);
@@ -290,13 +308,13 @@ export function outilsAssistant(env: EnvironnementAssistant): OutilAssistant[] {
         const editeur = env.editeur();
         let refus: string | undefined;
         if (nom.startsWith('etat:')) {
-          const broche = nom.slice(5);
-          const etats = { ...((editeur.diagramme.parts.find((p) => p.id === piece)?.attrs['etats'] as Record<string, string> | undefined) ?? {}) };
           const valeur = texte(brut);
-          if (valeur === '') delete etats[broche];
-          else if (!(ETATS_BROCHE as readonly string[]).includes(valeur)) throw new Error(`état « ${valeur} » inconnu`);
-          else etats[broche] = valeur;
-          refus = editeur.reglerPiece(piece, 'etats', Object.keys(etats).length > 0 ? etats : undefined);
+          if (valeur !== '' && !(ETATS_BROCHE as readonly string[]).includes(valeur)) throw new Error(`état « ${valeur} » inconnu`);
+          refus = editeur.reglerBroche(piece, nom.slice(5), valeur);
+        } else if (nom.startsWith('frequence:')) {
+          const f = Number(brut);
+          if (!(f > 0)) throw new Error('la fréquence doit être un nombre de Hz au-dessus de 0');
+          refus = editeur.reglerBroche(piece, nom.slice(10), 'impulsions', f);
         } else {
           const valeur = typeof brut === 'string' && brut.trim() !== '' && !Number.isNaN(Number(brut)) ? Number(brut) : brut;
           refus = editeur.reglerPiece(piece, nom, valeur === null ? undefined : valeur);

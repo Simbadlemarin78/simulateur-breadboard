@@ -89,6 +89,7 @@ const FACTEURS: Record<string, number> = {
   nF: 1e-9,
   pF: 1e-12,
   mH: 1e-3,
+  mm: 1e-3,
   µH: 1e-6,
   mW: 1e-3,
   ms: 1e-3,

@@ -2,6 +2,7 @@
 // les fils, et les broches par-dessus. Une pièce enfichée dans une breadboard (connexion
 // sans couleur vers un trou, comme les écrit Wokwi) est recalée pour que ses broches
 // tombent pile sur leurs trous. Le résultat est une chaîne SVG, testable sans navigateur.
+import type { Effet } from '../moteur/effets';
 import type { Connexion, Extremite, Montage, Piece } from '../moteur/montage';
 import type { Reseau } from '../moteur/reseau';
 import { dessinPour, echapper, P, type Dessin, type Point } from './pieces/dessins';
@@ -128,6 +129,8 @@ export interface OptionsPlan {
   verdicts?: { pieces: Map<string, string>; fils: Map<number, string>; points: Map<string, string> };
   /** Sondes du multimètre, posées sur des points "piece:broche". */
   sondes?: { rouge?: string; noir?: string };
+  /** Sous tension : effet visible de chaque pièce (roue qui tourne, LED allumée). */
+  effets?: Map<string, Effet>;
 }
 
 export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsPlan = {}): string {
@@ -144,7 +147,7 @@ export function dessinerPlan(montage: Montage, reseau: Reseau, options: OptionsP
         : '';
     return (
       `<g class="piece${options.choix?.piece === pl.piece.id ? ' choisie' : ''}${verdict ? ` verdict-${verdict}` : ''}" data-piece="${echapper(pl.piece.id)}" transform="translate(${pl.x} ${pl.y})">` +
-      `<title>${echapper(`${pl.piece.id} : ${pl.piece.fiche.nom}`)}</title>${pl.dessin.corps(pl.piece)}${fumee}</g>`
+      `<title>${echapper(`${pl.piece.id} : ${pl.piece.fiche.nom}`)}</title>${pl.dessin.corps(pl.piece, options.effets?.get(pl.piece.id))}${fumee}</g>`
     );
   };
 

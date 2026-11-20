@@ -96,6 +96,17 @@ describe('outils offerts à Claude', () => {
     expect(() => appeler(env, 'regler', { piece: 'esp', nom: 'etat:13', valeur: 'clignote' })).toThrow(/inconnu/);
   });
 
+  it('regler met une broche en impulsions à la fréquence demandée, et lire_verdicts dit que la roue tourne', () => {
+    const { env, editeur } = environnement();
+    appeler(env, 'regler', { piece: 'esp', nom: 'etat:13', valeur: 'sortie_basse' });
+    appeler(env, 'regler', { piece: 'esp', nom: 'etat:32', valeur: 'impulsions' });
+    appeler(env, 'regler', { piece: 'esp', nom: 'frequence:32', valeur: '3200' });
+    expect(editeur.montage().pieces.find((p) => p.id === 'esp')!.frequences).toEqual({ '32': 3200 });
+    const r = appeler(env, 'lire_verdicts') as { effets: { piece: string; tourne?: boolean; tr_min?: number }[] };
+    expect(r.effets.find((e) => e.piece === 'mot1')).toMatchObject({ tourne: true, tr_min: 60 });
+    expect(() => appeler(env, 'regler', { piece: 'esp', nom: 'frequence:32', valeur: -5 })).toThrow(/Hz/);
+  });
+
   it('supprimer enlève un fil ou une pièce', () => {
     const { env, editeur } = environnement();
     appeler(env, 'supprimer', { de: 'alim:+', vers: 'bb1:bp.1' });

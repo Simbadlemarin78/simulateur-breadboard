@@ -3,6 +3,7 @@
 // elles-mêmes sont dessinées par le plan (plan.ts), par-dessus les corps et les fils.
 //
 // Unité : P = 10 px pour 0,1 pouce (2,54 mm), le pas des trous d'une breadboard.
+import { resumeMoteur, type Effet } from '../../moteur/effets';
 import type { Fiche } from '../../moteur/fiche';
 import type { Piece } from '../../moteur/montage';
 
@@ -18,8 +19,11 @@ export interface Dessin {
   hauteur: number;
   /** Position de chaque broche dans le repère du dessin (coin haut gauche = 0, 0). */
   broches: Map<string, Point>;
-  /** Corps de la pièce (sans les broches), en SVG, dans le repère du dessin. */
-  corps(piece: Piece): string;
+  /**
+   * Corps de la pièce (sans les broches), en SVG, dans le repère du dessin. Sous tension, l'effet
+   * calculé par le moteur (roue qui tourne, LED allumée) change le dessin.
+   */
+  corps(piece: Piece, effet?: Effet): string;
 }
 
 export function echapper(texte: string): string {
@@ -221,6 +225,36 @@ function dessinRaspberryPi5(fiche: Fiche): Dessin {
   };
 }
 
+// ---------------------------------------------------------------- LED 5 mm
+function dessinLed(fiche: Fiche): Dessin {
+  // Vue de dessus, pattes au pas de 0,1 pouce : l'anode (A, patte longue) à gauche, la cathode
+  // (C, patte courte, méplat) à droite. Elle s'enfiche dans la breadboard.
+  const largeur = 3 * P;
+  const hauteur = 4.4 * P;
+  const broches = new Map<string, Point>();
+  const ordre = ['A', 'C'];
+  for (const b of fiche.broches) broches.set(b.nom, { x: (1 + Math.max(ordre.indexOf(b.nom), 0)) * P, y: 3.9 * P });
+  return {
+    largeur,
+    hauteur,
+    broches,
+    corps: (_piece, effet) => {
+      const eclat = effet?.type === 'led' ? effet.eclat : 0;
+      const cx = 1.5 * P;
+      const cy = 1.5 * P;
+      return [
+        eclat > 0 ? `<circle class="halo-led" cx="${cx}" cy="${cy}" r="${(1.4 + 1.6 * eclat) * P}" style="opacity:${(0.25 + 0.6 * eclat).toFixed(2)}"/>` : '',
+        `<line x1="${P}" y1="${2.4 * P}" x2="${P}" y2="${3.9 * P}" stroke="#b0b0b5" stroke-width="1.5"/>`,
+        `<line x1="${2 * P}" y1="${2.4 * P}" x2="${2 * P}" y2="${3.9 * P}" stroke="#b0b0b5" stroke-width="1.5"/>`,
+        `<circle class="corps-led${eclat > 0 ? ' allumee' : ''}" cx="${cx}" cy="${cy}" r="${1.25 * P}" style="--eclat:${eclat.toFixed(2)}"/>`,
+        `<line x1="${2.55 * P}" y1="${0.6 * P}" x2="${2.55 * P}" y2="${2.4 * P}" stroke="#7a1010" stroke-width="1"/>`,
+        texte(P - 2, 3.3 * P, 'A', 'class="etiquette-broche sombre" text-anchor="end"'),
+        texte(2 * P + 2, 3.3 * P, 'C', 'class="etiquette-broche sombre" text-anchor="start"'),
+      ].join('');
+    },
+  };
+}
+
 // ---------------------------------------------------------------- moteur pas à pas NEMA 17
 function dessinMoteur(fiche: Fiche): Dessin {
   const largeur = 10 * P;
@@ -247,14 +281,30 @@ function dessinMoteur(fiche: Fiche): Dessin {
     largeur,
     hauteur,
     broches,
-    corps: (piece) => [
-      `<rect x="${3 * P}" y="0" width="${4 * P}" height="${1.5 * P}" fill="#fff" stroke="#666"/>`,
-      `<rect x="0" y="${1.5 * P}" width="${largeur}" height="${10 * P}" rx="8" fill="#3a3a3c" stroke="#222"/>`,
-      `<circle cx="${5 * P}" cy="${6.5 * P}" r="${2.2 * P}" fill="#8e8e93" stroke="#5a5a5e"/>`,
-      `<circle cx="${5 * P}" cy="${6.5 * P}" r="${0.5 * P}" fill="#d1d1d6"/>`,
-      texte(5 * P, 10.6 * P, piece.id, 'class="etiquette" text-anchor="middle"'),
-      ...fils,
-    ].join(''),
+    corps: (piece, effet) => {
+      // Roue sur l'axe : quatre rayons pour voir la rotation. L'animation suit la vitesse
+      // calculée, ralentie au-delà d'un tour et demi par seconde pour rester lisible.
+      const e = effet?.type === 'moteur' ? effet : undefined;
+      const tps = e?.tourne ? e.toursParSeconde : undefined;
+      const anime = tps !== undefined && tps !== 0;
+      const duree = anime ? Math.max(1 / Math.abs(tps), 0.67) : 0;
+      const rayons = [0, 45, 90, 135]
+        .map((a) => `<line x1="${5 * P}" y1="${4.5 * P}" x2="${5 * P}" y2="${8.5 * P}" transform="rotate(${a} ${5 * P} ${6.5 * P})"/>`)
+        .join('');
+      const rotor =
+        `<g class="rotor${anime ? ` tourne${tps! < 0 ? ' inverse' : ''}` : ''}"${anime ? ` style="animation-duration:${duree.toFixed(3)}s"` : ''}>` +
+        `<circle cx="${5 * P}" cy="${6.5 * P}" r="${2.6 * P}" class="pneu"/>` +
+        `<circle cx="${5 * P}" cy="${6.5 * P}" r="${2.1 * P}" class="jante"/>${rayons}` +
+        `<circle cx="${5 * P}" cy="${6.5 * P}" r="${0.5 * P}" class="axe"/></g>`;
+      return [
+        `<rect x="${3 * P}" y="0" width="${4 * P}" height="${1.5 * P}" fill="#fff" stroke="#666"/>`,
+        `<rect x="0" y="${1.5 * P}" width="${largeur}" height="${10 * P}" rx="8" fill="#3a3a3c" stroke="#222"/>`,
+        rotor,
+        e ? texte(5 * P, 3.4 * P, resumeMoteur(e), `class="etiquette-effet${e.tourne ? ' actif' : ''}" text-anchor="middle"`) : '',
+        texte(5 * P, 10.6 * P, piece.id, 'class="etiquette" text-anchor="middle"'),
+        ...fils,
+      ].join('');
+    },
   };
 }
 
@@ -397,6 +447,7 @@ export function dessinPour(fiche: Fiche): Dessin {
     : type === 'alim_laboratoire' ? dessinAlim(fiche)
     : type === 'batterie' ? dessinBatterie()
     : type === 'condensateur' ? dessinCondensateur()
+    : type === 'led' ? dessinLed(fiche)
     : dessinGenerique(fiche);
   cache.set(fiche.id, dessin);
   return dessin;

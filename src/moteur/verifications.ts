@@ -26,6 +26,7 @@ import {
 } from './constats';
 import { grandeurModele, trouverBroche, versUniteDeBase, type Fiche, type Grandeur, type Source } from './fiche';
 import type { Montage } from './montage';
+import { calculerEffets, verifierEffets, type Effet } from './effets';
 import { appliquerRegles } from './regles';
 import { construireReseau } from './reseau';
 
@@ -40,6 +41,8 @@ export interface Rapport {
   nonSimule: string[];
   calcul: Calcul;
   demarrage: Calcul;
+  /** Effets visibles : moteurs qui tournent, LED allumées. */
+  effets: Effet[];
 }
 
 interface Limites {
@@ -206,6 +209,104 @@ function inversionVS(ctx: Contexte, chemin: string, fiche: Fiche, v: number, min
     ...(limite ? { source: { fiche: fiche.id, src: limite.src } } : {}),
     origine: 'calcul',
   };
+}
+
+/**
+ * Courant de sortie d'une broche de microcontrôleur au-delà du courant sûr de sa fiche
+ * (sortie.courant_max avec un maximum : 16 mA par GPIO de la Raspberry Pi 5). Le fabricant
+ * ne dit pas ce qui casse ni à partir de quand : « risque élevé ».
+ */
+function verifierSorties(ctx: Contexte): NouveauConstat[] {
+  const { calcul } = ctx;
+  const sorties: NouveauConstat[] = [];
+  calcul.etiquettes.forEach((et, k) => {
+    if (et.role !== 'sortie') return;
+    const fiche = calcul.fiches.get(et.piece);
+    const b = fiche && trouverBroche(fiche, et.broches[0] ?? '');
+    const limite = (b?.['sortie'] as { courant_max?: Grandeur } | undefined)?.courant_max;
+    const max = borne(limite, 'max');
+    const i = Math.abs(calcul.solution.courants[k] ?? 0);
+    if (!fiche || !b || !limite || max === undefined || i <= max * (1 + 1e-6)) return;
+    const affiche = pointAffiche(et.piece, b.nom, calcul.fiches);
+    sorties.push({
+      chemin: et.piece,
+      fiche,
+      verdict: 'risque_eleve',
+      point: affiche,
+      titre: `${affiche} débite ${formater(i, 'A')}, au-delà de ${formater(max, 'A')}`,
+      explication: `La broche fournit ou absorbe ${formater(i, 'A')}, plus que les ${formater(max, 'A')} que sa fiche donne pour une broche. Au-delà, le fabricant ne garantit plus rien : la broche peut s'abîmer, et sa tension n'est plus un niveau logique propre.`,
+      correction: 'Ajouter une résistance en série (LED : 220 Ω à 1 kΩ) ou passer par un transistor pour les charges qui demandent du courant.',
+      source: { fiche: fiche.id, src: limite.src },
+      origine: 'calcul',
+    });
+  });
+  return sorties;
+}
+
+/**
+ * LED : courant direct au-delà de son maximum continu (risque élevé : la datasheet annonce une
+ * dégradation ou une panne prématurée, sans dire quand) ou de son courant de crête (grillé : même
+ * une impulsion brève n'est pas permise), tension inverse au-delà de son maximum (risque élevé),
+ * et LED branchée à l'envers (ne marchera pas : elle reste éteinte).
+ */
+function verifierLeds(ctx: Contexte): NouveauConstat[] {
+  const { calcul } = ctx;
+  const sorties: NouveauConstat[] = [];
+  calcul.etiquettes.forEach((et, k) => {
+    if (et.role !== 'led') return;
+    const fiche = calcul.fiches.get(et.piece)!;
+    const i = calcul.solution.courants[k] ?? 0;
+    const continu = grandeurModele(fiche, 'courant_direct_max');
+    const crete = grandeurModele(fiche, 'courant_crete_max');
+    const inverse = grandeurModele(fiche, 'tension_inverse_max');
+    const iContinu = borne(continu, 'max');
+    const iCrete = borne(crete, 'max');
+    const vInverse = calcul.difference(`${et.piece}:C`, `${et.piece}:A`) ?? 0;
+    const base = { chemin: et.piece, fiche, origine: 'calcul' as const };
+    if (iCrete !== undefined && i > iCrete) {
+      sorties.push({
+        ...base,
+        verdict: 'grille',
+        point: `${et.piece}:A`,
+        titre: `${et.piece} : ${formater(i, 'A')}, au-delà de son courant de crête (${formater(iCrete, 'A')})`,
+        explication: `${formater(i, 'A')} traversent la LED en continu, plus que le courant qu'elle ne supporte même en impulsions brèves (${formater(iCrete, 'A')}) : elle grille.`,
+        correction: "Mettre une résistance en série : R = (tension d'alim − 2 V) / 0,01 A pour 10 mA (330 Ω sous 5 V, 150 Ω sous 3,3 V).",
+        ...(crete ? { source: { fiche: fiche.id, src: crete.src } } : {}),
+      });
+    } else if (iContinu !== undefined && i > iContinu * (1 + 1e-6)) {
+      sorties.push({
+        ...base,
+        verdict: 'risque_eleve',
+        point: `${et.piece}:A`,
+        titre: `${et.piece} : ${formater(i, 'A')}, au-delà de ${formater(iContinu, 'A')} en continu`,
+        explication: `La LED reçoit ${formater(i, 'A')}, plus que son maximum en continu (${formater(iContinu, 'A')}). La datasheet annonce une forte baisse de lumière ou une panne prématurée, sans dire au bout de combien de temps.`,
+        correction: 'Augmenter la résistance en série pour rester vers 10 mA.',
+        ...(continu ? { source: { fiche: fiche.id, src: continu.src } } : {}),
+      });
+    }
+    const vMax = borne(inverse, 'max');
+    if (vMax !== undefined && vInverse > vMax * (1 + 1e-6)) {
+      sorties.push({
+        ...base,
+        verdict: 'risque_eleve',
+        point: `${et.piece}:C`,
+        titre: `${et.piece} à l'envers sous ${formater(vInverse, 'V')}, au-delà de ${formater(vMax, 'V')}`,
+        explication: `La cathode est ${formater(vInverse, 'V')} au-dessus de l'anode, plus que la tension inverse maximale (${formater(vMax, 'V')}). Sans donnée sur le courant de claquage, le calcul ne peut pas conclure « grillé ».`,
+        correction: "Retourner la LED : la patte de l'anode (A) côté +.",
+        ...(inverse ? { source: { fiche: fiche.id, src: inverse.src } } : {}),
+      });
+    } else if (vInverse > 1) {
+      sorties.push({
+        ...base,
+        verdict: 'ne_marchera_pas',
+        point: `${et.piece}:C`,
+        titre: `${et.piece} branchée à l'envers : elle reste éteinte`,
+        explication: `La cathode (C) est ${formater(vInverse, 'V')} au-dessus de l'anode (A) : une LED ne laisse passer le courant que de A vers C.`,
+        correction: "Retourner la LED : l'anode (A) côté +, la cathode (C) côté masse.",
+      });
+    }
+  });
+  return sorties;
 }
 
 /** Alim de labo en limite de courant : la tension n'est plus celle qu'on a réglée. */
@@ -474,12 +575,24 @@ export function verifier(montage: Montage, catalogue: Catalogue): Rapport {
       nonSimule: [`calcul impossible : ${calcul.message ?? demarrage.message}`, ...nonSimule],
       calcul,
       demarrage,
+      effets: [],
     };
   }
   const ctx: Contexte = { montage, catalogue, calcul, demarrage, grossier: construireReseau(montage, catalogue) };
   const regles = appliquerRegles(ctx);
+  const effets = calculerEffets(ctx);
   const tous = [
-    ...[...verifierInjections(ctx), ...verifierTensions(ctx), ...verifierSources(ctx), ...verifierConnectique(ctx), ...verifierThermique(ctx), ...verifierMasses(ctx)].map(constat),
+    ...[
+      ...verifierInjections(ctx),
+      ...verifierTensions(ctx),
+      ...verifierSorties(ctx),
+      ...verifierLeds(ctx),
+      ...verifierSources(ctx),
+      ...verifierConnectique(ctx),
+      ...verifierThermique(ctx),
+      ...verifierMasses(ctx),
+      ...verifierEffets(ctx, effets),
+    ].map(constat),
     ...regles.constats,
   ];
   const vus = new Set<string>();
@@ -493,5 +606,5 @@ export function verifier(montage: Montage, catalogue: Catalogue): Rapport {
     .sort((a, b) => VERDICTS.indexOf(a.verdict) - VERDICTS.indexOf(b.verdict) || a.piece.localeCompare(b.piece));
   const parPiece = new Map<string, Verdict>();
   for (const c of constats) if (!parPiece.has(c.piece)) parPiece.set(c.piece, c.verdict);
-  return { converge: true, constats, parPiece, nonSimule: [...nonSimule, ...regles.nonCodees], calcul, demarrage };
+  return { converge: true, constats, parPiece, nonSimule: [...nonSimule, ...regles.nonCodees], calcul, demarrage, effets };
 }

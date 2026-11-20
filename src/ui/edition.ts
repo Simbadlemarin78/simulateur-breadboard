@@ -8,7 +8,7 @@
 // comme les écrit Wokwi. Sinon, elle est simplement posée.
 import type { Catalogue } from '../moteur/catalogue';
 import type { Fiche } from '../moteur/fiche';
-import { lireMontage, MontageInvalide, type Montage } from '../moteur/montage';
+import { FREQUENCE_DEFAUT, lireMontage, MontageInvalide, type Montage } from '../moteur/montage';
 import { bandeBreadboard } from '../moteur/reseau';
 import { dessinPour, P } from './pieces/dessins';
 import { placerPieces } from './plan';
@@ -340,6 +340,28 @@ export class Editeur {
   }
 
   /** Change un réglage (attribut) d'une pièce ; undefined le retire. */
+  /**
+   * État d'une broche de microcontrôleur, et sa fréquence si elle envoie des impulsions, en une
+   * seule modification (un seul Ctrl+Z). Sans fréquence, des impulsions partent à 1 000 Hz.
+   */
+  reglerBroche(id: string, broche: string, etat: string | undefined, frequence?: number): string | undefined {
+    return this.modifier((d) => {
+      const partie = d.parts.find((p) => p.id === id);
+      if (!partie) return `pièce « ${id} » introuvable`;
+      const etats = { ...((partie.attrs['etats'] as Record<string, string> | undefined) ?? {}) };
+      const frequences = { ...((partie.attrs['frequences'] as Record<string, number> | undefined) ?? {}) };
+      if (etat === undefined || etat === '') delete etats[broche];
+      else etats[broche] = etat;
+      if (etats[broche] === 'impulsions') frequences[broche] = frequence ?? frequences[broche] ?? FREQUENCE_DEFAUT;
+      else delete frequences[broche];
+      if (Object.keys(etats).length > 0) partie.attrs['etats'] = etats;
+      else delete partie.attrs['etats'];
+      if (Object.keys(frequences).length > 0) partie.attrs['frequences'] = frequences;
+      else delete partie.attrs['frequences'];
+      return undefined;
+    });
+  }
+
   reglerPiece(id: string, nom: string, valeur: unknown): string | undefined {
     return this.modifier((d) => {
       const partie = d.parts.find((p) => p.id === id);

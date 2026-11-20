@@ -5,7 +5,7 @@ import { catalogueIntegre as catalogue } from '../moteur/fiches-integrees';
 import { MontageInvalide } from '../moteur/montage';
 import { brochesDeComposants, construireReseau, type Reseau } from '../moteur/reseau';
 import { verifier, type Rapport } from '../moteur/verifications';
-import { htmlConstats, htmlReglages, marquesVerdicts, mesurerCourant, mesurerTension } from './affichage';
+import { htmlConstats, htmlEffets, htmlReglages, marquesVerdicts, mesurerCourant, mesurerTension } from './affichage';
 import { contexte, messageErreur, outilsAssistant, poserQuestion, type EnvironnementAssistant, type FonctionSample, type MessageChat } from './assistant';
 import { diagrammeVide, Editeur, fichesPosables, type Diagramme } from './edition';
 import { P, type Point } from './pieces/dessins';
@@ -18,6 +18,7 @@ const SVG = 'http://www.w3.org/2000/svg';
 const NOMS_COURTS: Record<string, string> = {
   'breadboard-830': 'Breadboard',
   'esp32-devkitc': 'ESP32 DevKitC',
+  'led-rouge-5mm': 'LED rouge',
   'raspberry-pi-5': 'Raspberry Pi 5',
   'tmc2209-module': 'Driver TMC2209',
   '17hs4401': 'Moteur 17HS4401',
@@ -140,7 +141,7 @@ function majPanneaux(): void {
   panneauResultats.innerHTML =
     '<h2>Verdicts</h2>' +
     (sousTension
-      ? htmlConstats(rapportCourant())
+      ? htmlConstats(rapportCourant()) + htmlEffets(rapportCourant().effets)
       : '<p>Hors tension. Clique « Mettre sous tension » : l\'appli calcule tensions et courants, puis montre ce qui grille, chauffe ou ne marchera pas.</p>');
   majMultimetre();
 }
@@ -180,7 +181,7 @@ function afficher(recadrer = false): void {
     cadre: cadreAffiche(),
     choix,
     sondes,
-    ...(r?.converge ? { verdicts: marquesVerdicts(r, montage) } : {}),
+    ...(r?.converge ? { verdicts: marquesVerdicts(r, montage), effets: new Map(r.effets.map((e) => [e.piece, e])) } : {}),
   });
   boutonAnnuler.disabled = !editeur.peutAnnuler();
   boutonRetablir.disabled = !editeur.peutRetablir();
@@ -531,10 +532,11 @@ panneauReglages.addEventListener('change', (e) => {
       : champ.value;
     refus = editeur.reglerPiece(id, nom, valeur);
   } else if (champ.dataset['etat']) {
-    const etats = { ...((editeur.diagramme.parts.find((p) => p.id === id)?.attrs['etats'] as Record<string, string> | undefined) ?? {}) };
-    if (champ.value === '') delete etats[champ.dataset['etat']];
-    else etats[champ.dataset['etat']] = champ.value;
-    refus = editeur.reglerPiece(id, 'etats', Object.keys(etats).length > 0 ? etats : undefined);
+    refus = editeur.reglerBroche(id, champ.dataset['etat'], champ.value);
+  } else if (champ.dataset['frequence']) {
+    const f = Number(champ.value);
+    if (!(f > 0)) refus = 'la fréquence doit être un nombre de Hz au-dessus de 0';
+    else refus = editeur.reglerBroche(id, champ.dataset['frequence'], 'impulsions', f);
   } else return;
   afficher();
   message(refus ? `Réglage refusé : ${refus}.` : `${id} réglée${sousTension ? ' : calcul relancé' : ''}.`, refus !== undefined);
@@ -542,7 +544,7 @@ panneauReglages.addEventListener('change', (e) => {
 
 // Un clic sur un verdict choisit la pièce concernée.
 panneauResultats.addEventListener('click', (e) => {
-  const li = e.target instanceof Element ? e.target.closest<HTMLElement>('.constat') : null;
+  const li = e.target instanceof Element ? e.target.closest<HTMLElement>('.constat, .effet') : null;
   const piece = li?.dataset['piece'];
   if (!piece || !placements.has(piece)) return;
   choix = { piece };

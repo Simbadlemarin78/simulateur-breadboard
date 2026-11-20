@@ -6,9 +6,16 @@ import { trouverBroche, type Fiche } from './fiche';
 
 export type ValeurParametre = number | boolean | string;
 
-/** État d'une broche de microcontrôleur, réglé à la main (pas d'émulation du code). */
-export const ETATS_BROCHE = ['entree', 'entree_tirage_haut', 'entree_tirage_bas', 'sortie_haute', 'sortie_basse'] as const;
+/**
+ * État d'une broche de microcontrôleur, réglé à la main (pas d'émulation du code).
+ * « impulsions » : la broche envoie des impulsions (STEP d'un driver) à la fréquence de
+ * l'attribut « frequences » ; le calcul en continu la voit au niveau haut, le pire cas.
+ */
+export const ETATS_BROCHE = ['entree', 'entree_tirage_haut', 'entree_tirage_bas', 'sortie_haute', 'sortie_basse', 'impulsions'] as const;
 export type EtatBroche = (typeof ETATS_BROCHE)[number];
+
+/** Fréquence des impulsions quand l'attribut « frequences » ne la donne pas (Hz). */
+export const FREQUENCE_DEFAUT = 1000;
 
 export interface Piece {
   id: string;
@@ -18,6 +25,8 @@ export interface Piece {
   parametres: Record<string, ValeurParametre>;
   /** État des broches choisi à la main (attribut "etats"), par nom de broche canonique. */
   etats: Record<string, EtatBroche>;
+  /** Fréquence des broches à l'état « impulsions » (attribut "frequences"), en Hz. */
+  frequences: Record<string, number>;
   /**
    * Groupe de drivers qui doivent avoir les mêmes micro-pas (attribut "groupe", cas 7).
    * Les drivers sans groupe forment un même groupe.
@@ -54,7 +63,7 @@ export class MontageInvalide extends Error {
 }
 
 /** Attributs propres au simulateur, en plus des paramètres de la fiche. */
-const ATTRIBUTS_SIMULATEUR = new Set(['fiche', 'etats', 'groupe']);
+const ATTRIBUTS_SIMULATEUR = new Set(['fiche', 'etats', 'frequences', 'groupe']);
 
 function estObjet(x: unknown): x is Record<string, unknown> {
   return typeof x === 'object' && x !== null && !Array.isArray(x);
@@ -137,6 +146,24 @@ function lireEtats(id: string, fiche: Fiche, brut: unknown, erreurs: string[]) {
   return etats;
 }
 
+/** Fréquences des impulsions : { broche: Hz }, nombres strictement positifs. */
+function lireFrequences(id: string, fiche: Fiche, brut: unknown, erreurs: string[]): Record<string, number> {
+  const frequences: Record<string, number> = {};
+  if (brut === undefined) return frequences;
+  if (!estObjet(brut)) {
+    erreurs.push(`${id} : l'attribut frequences doit être un objet { broche: fréquence en Hz }`);
+    return frequences;
+  }
+  for (const [nom, f] of Object.entries(brut)) {
+    const broche = trouverBroche(fiche, nom);
+    const valeur = typeof f === 'string' && f.trim() !== '' ? Number(f) : f;
+    if (!broche) erreurs.push(`${id} : frequences cite la broche « ${nom} », absente de la fiche ${fiche.id}`);
+    else if (typeof valeur !== 'number' || !Number.isFinite(valeur) || valeur <= 0) erreurs.push(`${id} : fréquence « ${String(f)} » invalide pour ${nom} (un nombre de Hz, au-dessus de 0)`);
+    else frequences[broche.nom] = valeur;
+  }
+  return frequences;
+}
+
 /** Lit un diagram.json déjà analysé (JSON.parse). Lève MontageInvalide avec toutes les erreurs trouvées. */
 export function lireMontage(donnees: unknown, catalogue: Catalogue): Montage {
   const erreurs: string[] = [];
@@ -173,6 +200,7 @@ export function lireMontage(donnees: unknown, catalogue: Catalogue): Montage {
       fiche,
       parametres: lireParametres(id, fiche, attrs, erreurs, avertissements),
       etats: lireEtats(id, fiche, attrs['etats'], erreurs),
+      frequences: lireFrequences(id, fiche, attrs['frequences'], erreurs),
       ...(attrs['groupe'] !== undefined ? { groupe: String(attrs['groupe']) } : {}),
       position: {
         top: typeof partie['top'] === 'number' ? partie['top'] : 0,

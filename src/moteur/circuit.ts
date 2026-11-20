@@ -27,6 +27,7 @@ export type RoleElement =
   | 'regulateur'
   | 'alimentation_usb'
   | 'consommation'
+  | 'led'
   | 'diode_protection'
   | 'tirage'
   | 'sortie'
@@ -323,7 +324,7 @@ export function calculer(montage: Montage, catalogue: Catalogue, options: Option
       if (micro && (entree || sortie)) {
         let etat = etats.get(`${chemin}:${b.nom}`) ?? etatDemarrage(b);
         const capacites = b['capacites'] as { sortie?: boolean } | undefined;
-        if ((etat === 'sortie_haute' || etat === 'sortie_basse') && capacites?.sortie === false) {
+        if ((etat === 'sortie_haute' || etat === 'sortie_basse' || etat === 'impulsions') && capacites?.sortie === false) {
           avertissements.add(`${chemin}:${b.nom} ne peut pas être une sortie : vue comme une entrée`);
           etat = 'entree';
         }
@@ -331,10 +332,11 @@ export function calculer(montage: Montage, catalogue: Catalogue, options: Option
           const r = valeurSI(entree?.tirage?.resistance ?? tirageDefaut);
           if (r === undefined) avertissements.add(`${chemin}:${b.nom} : résistance de tirage inconnue, tirage non simulé`);
           resistance(id, etat === 'entree_tirage_haut' ? alim : masse, r, { piece: chemin, role: 'tirage', broches: [b.nom] });
-        } else if (etat === 'sortie_haute' || etat === 'sortie_basse') {
+        } else if (etat === 'sortie_haute' || etat === 'sortie_basse' || etat === 'impulsions') {
+          // Des impulsions sont calculées au niveau haut : le pire cas pour les courants.
           const r = valeurSI(sortie?.resistance_sortie);
           if (r === undefined) avertissements.add(`${chemin}:${b.nom} : résistance de sortie inconnue, sortie non simulée`);
-          resistance(id, etat === 'sortie_haute' ? alim : masse, r, { piece: chemin, role: 'sortie', broches: [b.nom] });
+          resistance(id, etat === 'sortie_basse' ? masse : alim, r, { piece: chemin, role: 'sortie', broches: [b.nom] });
         }
       } else if (entree?.tirage) {
         resistance(id, versDomaine(entree.tirage.vers), valeurSI(entree.tirage.resistance), { piece: chemin, role: 'tirage', broches: [b.nom] });
@@ -382,6 +384,22 @@ export function calculer(montage: Montage, catalogue: Catalogue, options: Option
         const limite = parametreSI(pe, 'limite_courant');
         fixes.push({ type: 'source', plus, moins, v, absorbe, ...(limite !== undefined ? { limite } : {}) });
         etiquettesFixes.push({ piece: chemin, role: 'source', broches: ['+', '-'] });
+        break;
+      }
+      case 'led': {
+        // Diode (loi de Shockley) et résistance série, ajustées sur la courbe de la datasheet.
+        const a = n('A');
+        const c = n('C');
+        const d = lireDiode(valeurs['diode'] as ModeleDiode | undefined);
+        const rs = valeurSI(grandeurModele(fiche, 'resistance_serie'));
+        if (a === undefined || c === undefined || !d || rs === undefined) {
+          avertissements.add(`${chemin} : LED sans modèle complet dans sa fiche, non simulée`);
+          break;
+        }
+        const interne = nbNoeuds++;
+        resistance(a, interne, rs, { piece: chemin, role: 'resistance_interne', broches: ['A'] });
+        fixes.push({ type: 'diode', anode: interne, cathode: c, ...d });
+        etiquettesFixes.push({ piece: chemin, role: 'led', broches: ['A', 'C'] });
         break;
       }
       case 'batterie': {

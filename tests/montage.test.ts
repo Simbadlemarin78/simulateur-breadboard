@@ -47,7 +47,7 @@ describe('lecture de la base roulante', () => {
     const piece = (id: string) => montage.pieces.find((p) => p.id === id)!;
     expect(piece('alim').parametres).toEqual({ tension: 12, limite_courant: 3 });
     expect(piece('r1').parametres).toMatchObject({ value: 1000, puissance_nominale: 0.25 });
-    expect(piece('drv1').parametres).toEqual({ vref: 1.2 });
+    expect(piece('drv1').parametres).toEqual({ vref: 1.2, micro_pas_uart: 16 });
     expect(piece('bb1').parametres).toEqual({ rails_coupes: false });
   });
 

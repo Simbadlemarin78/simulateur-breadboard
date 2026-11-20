@@ -46,25 +46,33 @@
     {
       "nom": "A+",
       "role": "autre",
-      "fonctions": ["BOBINE_A"],
+      "fonctions": [
+        "BOBINE_A"
+      ],
       "note": "Fil rouge chez MotionKing et HANPOSE. Les couleurs changent d'un vendeur à l'autre : au multimètre, les deux fils d'une même bobine montrent la résistance de phase, deux fils de bobines différentes ne se touchent pas."
     },
     {
       "nom": "A-",
       "role": "autre",
-      "fonctions": ["BOBINE_A"],
+      "fonctions": [
+        "BOBINE_A"
+      ],
       "note": "Fil vert chez MotionKing et HANPOSE."
     },
     {
       "nom": "B+",
       "role": "autre",
-      "fonctions": ["BOBINE_B"],
+      "fonctions": [
+        "BOBINE_B"
+      ],
       "note": "Fil jaune chez MotionKing et HANPOSE."
     },
     {
       "nom": "B-",
       "role": "autre",
-      "fonctions": ["BOBINE_B"],
+      "fonctions": [
+        "BOBINE_B"
+      ],
       "note": "Fil bleu chez MotionKing et HANPOSE."
     }
   ],
@@ -72,10 +80,22 @@
     "type": "moteur_pas_a_pas",
     "valeurs": {
       "bobines": {
-        "colonnes": ["bobine", "debut", "fin"],
+        "colonnes": [
+          "bobine",
+          "debut",
+          "fin"
+        ],
         "lignes": [
-          ["A", "A+", "A-"],
-          ["B", "B+", "B-"]
+          [
+            "A",
+            "A+",
+            "A-"
+          ],
+          [
+            "B",
+            "B+",
+            "B-"
+          ]
         ],
         "src": {
           "type": "hypothese",
@@ -167,6 +187,15 @@
           "type": "hypothese",
           "justification": "« Insulation Class : B » dans handson-17hs4401s."
         }
+      },
+      "pas_par_tour": {
+        "typ": 200,
+        "unite": "1",
+        "src": {
+          "type": "hypothese",
+          "justification": "Même valeur dans motionking-17hs4401, handson-17hs4401s et hanpose-17hs4401s."
+        },
+        "note": "1,8° par pas complet : 360 / 1,8 = 200 pas complets par tour."
       }
     }
   },
@@ -189,6 +218,19 @@
         "justification": "Ambiante max (50 °C) + échauffement max (80 °C) d'après motionking-17hs4401 : c'est le pire cas que couvre le fabricant. Cohérent avec la classe d'isolation B."
       },
       "note": "Au-delà, l'isolant des bobines vieillit vite : verdict « risque » au cas 10."
+    }
+  },
+  "parametres": {
+    "diametre_roue": {
+      "description": "Diamètre de la roue montée sur l'axe, pour passer de la vitesse de rotation à la vitesse au sol. 0 : pas de roue.",
+      "unite": "mm",
+      "defaut": 60,
+      "min": 0,
+      "max": 300,
+      "src": {
+        "type": "hypothese",
+        "justification": "Valeur d'exemple, pas une donnée du moteur : à remplacer par le diamètre mesuré des roues du robot."
+      }
     }
   }
 }

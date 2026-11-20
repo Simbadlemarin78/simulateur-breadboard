@@ -73,7 +73,7 @@
 
   "$defs": {
     "unite": {
-      "enum": ["V", "mV", "A", "mA", "µA", "nA", "Ω", "mΩ", "kΩ", "MΩ", "F", "mF", "µF", "nF", "pF", "H", "mH", "µH", "W", "mW", "°C", "K/W", "s", "ms", "µs", "ns", "Hz", "kHz", "MHz", "%", "N", "N·m", "1"]
+      "enum": ["V", "mV", "A", "mA", "µA", "nA", "Ω", "mΩ", "kΩ", "MΩ", "F", "mF", "µF", "nF", "pF", "H", "mH", "µH", "W", "mW", "°C", "K/W", "s", "ms", "µs", "ns", "Hz", "kHz", "MHz", "%", "N", "N·m", "mm", "mcd", "1"]
     },
 
     "source": {
