@@ -83,11 +83,28 @@ describe('les 10 cas donnent le verdict attendu', () => {
 });
 
 describe('montages de référence', () => {
-  it('le montage corrigé ne donne aucune alerte', () => {
+  it('le montage corrigé ne donne aucune alerte au démarrage', () => {
     const r = verifierDonnees(corrigee);
     expect(r.converge, r.message).toBe(true);
+    expect(r.calcul.drivers.every((d) => !d.actif)).toBe(true);
     expect(r.constats.map((c) => `${c.verdict} ${c.titre}`)).toEqual([]);
     expect(r.nonSimule).toEqual([]);
+  });
+
+  it('ni drivers actifs : les deux fils d\'alim en parallèle portent chacun la moitié des 1,02 A', () => {
+    // IO13 en sortie basse, comme le ferait le programme : les quatre drivers s'activent.
+    const d = structuredClone(corrigee) as unknown as { parts: { id: string; attrs: Record<string, unknown> }[] };
+    d.parts.find((p) => p.id === 'esp')!.attrs['etats'] = { '13': 'sortie_basse' };
+    const r = verifierDonnees(d);
+    expect(r.converge, r.message).toBe(true);
+    expect(r.calcul.drivers.every((x) => x.actif)).toBe(true);
+    expect(r.constats.map((c) => `${c.verdict} ${c.titre}`)).toEqual([]);
+    const montage = lireMontage(d, catalogue);
+    const filsAlim = montage.connexions.flatMap((c, k) => (c.de.piece === 'alim' && c.de.broche === '+' ? [Math.abs(r.calcul.courantFil(k)!)] : []));
+    expect(filsAlim).toHaveLength(2);
+    const total = filsAlim[0]! + filsAlim[1]!;
+    expect(total).toBeGreaterThan(1);
+    for (const i of filsAlim) expect(i).toBeCloseTo(total / 2, 2);
   });
 
   it('la base roulante proposée manque d\'un condensateur par driver, et c\'est tout', () => {

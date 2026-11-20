@@ -6,7 +6,8 @@ Produit :
 - montages/base-roulante.diagram.json : le brochage proposé dans CLAUDE.md, tel quel
   (sans condensateurs 100 µF ni tirage de EN) ;
 - montages/base-roulante-corrigee.diagram.json : le même, avec un condensateur de 100 µF 35 V
-  par driver et un tirage de 10 kΩ de EN vers 3,3 V : aucune alerte attendue ;
+  par driver, un tirage de 10 kΩ de EN vers 3,3 V et des fils d'alim doublés : aucune alerte
+  attendue, au démarrage comme drivers actifs ;
 - montages/cas/*.diagram.json : les 10 cas de test de CLAUDE.md (le cas 2 en deux montages).
   Chaque cas part du montage corrigé et n'y change qu'une chose, sauf les cas 2a et 2b, qui
   isolent un driver branché à l'envers.
@@ -114,6 +115,10 @@ def base_roulante(corrigee=False):
         parts.append({"type": "wokwi-resistor", "id": "r2", "top": -50, "left": 20, "attrs": {"value": "10000"}})
         fil(f"bb1:{colonnes(0)['EN']}t.c", "r2:1", "yellow")
         fil("r2:2", "bb1:tp.2", "orange")
+        # Fils d'alim doublés : drivers actifs, 4 × 0,25 A = 1,02 A arrivent sur le rail VM ;
+        # deux fils et deux trous en parallèle en portent chacun la moitié, sous le 1 A d'un contact.
+        fil("alim:+", "bb1:bp.5", "red")
+        fil("alim:-", "bb1:bn.5", "black")
 
     return {"version": 1, "author": "simulateur-breadboard", "editor": "wokwi", "parts": parts, "connections": connexions, "dependencies": {}}
 
@@ -191,9 +196,10 @@ def cas():
     gnd2 = {f"bb1:{colonnes(k)['GND.2']}b.j" for k in range(len(DRIVERS))}
     montages["cas-08-masses-separees"] = sans_connexions(copy.deepcopy(corrigee), lambda c: touche(c, "bb1:tn.50") or touche(c, *gnd2))
 
-    # 9. Plus de 1 A dans un contact : drivers activés (IO13 en sortie basse), VREF à 1,35 V :
-    #    0,95 A par bobine (sous 1 A), mais 4 × 0,32 A arrivent par le seul fil de l'alim sur le rail VM.
-    d = copy.deepcopy(corrigee)
+    # 9. Plus de 1 A dans un contact : drivers activés (IO13 en sortie basse), VREF à 1,35 V, et un
+    #    seul fil d'alim par borne (pas de doublement) : 0,95 A par bobine (sous 1 A), mais
+    #    4 × 0,32 A arrivent par ce seul fil sur le rail VM.
+    d = sans_connexions(copy.deepcopy(corrigee), lambda c: touche(c, "bb1:bp.5", "bb1:bn.5"))
     piece(d, "esp")["attrs"]["etats"] = {"13": "sortie_basse"}
     for k in range(len(DRIVERS)):
         piece(d, f"drv{k + 1}")["attrs"]["vref"] = 1.35
