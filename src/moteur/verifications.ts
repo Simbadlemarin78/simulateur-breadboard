@@ -423,33 +423,38 @@ function verifierMasses(ctx: Contexte): NouveauConstat[] {
   const { calcul, grossier } = ctx;
   const sorties: NouveauConstat[] = [];
   const vues = new Set<string>();
-  for (const [chemin, fiche] of calcul.fiches) {
-    if (chemin.includes('/')) continue;
-    for (const b of fiche.broches) {
-      const masse = canon(fiche, b.domaine?.masse);
-      if (!RECEPTEURS.includes(b.role) || !masse) continue;
-      const noeud = grossier.noeudDe(`${chemin}:${b.nom}`);
-      const maMasse = grossier.noeudDe(`${chemin}:${masse}`);
-      if (!noeud || !maMasse) continue;
-      for (const p of noeud.points) {
-        const info = brocheDe(p, calcul.fiches);
-        if (!info || info.chemin.includes('/') || info.chemin === chemin || !EMETTEURS.includes(info.broche.role)) continue;
-        const sienne = grossier.noeudDe(`${info.chemin}:${canon(info.fiche, info.broche.domaine?.masse)}`);
-        if (!sienne || sienne.id === maMasse.id) continue;
-        const cle = [chemin, info.chemin].sort().join('|');
-        if (vues.has(cle)) continue;
-        vues.add(cle);
-        sorties.push({
-          chemin,
-          fiche,
-          verdict: 'ne_marchera_pas',
-          point: `${chemin}:${b.nom}`,
-          titre: `${chemin} et ${info.chemin} n'ont pas de masse commune`,
-          explication: `${info.chemin}:${info.broche.nom} commande ${chemin}:${b.nom}, mais aucun fil ne relie la masse de ${chemin} (${masse}) à celle de ${info.chemin}. Un niveau logique se mesure par rapport à la masse : sans masse commune, ${chemin} lit n'importe quoi.`,
-          correction: `Relier par un fil la masse de ${info.chemin} à celle de ${chemin} (masse commune entre la logique et l'alim des moteurs).`,
-          origine: 'calcul',
-        });
-      }
+  // Broches qui reçoivent un signal : d'abord les entrées pures (entrée d'un driver commandée par
+  // l'ESP32), puis les GPIO entrée-sortie (liaison entre deux cartes, ESP32 et Raspberry Pi). Une
+  // paire de pièces ne donne qu'un constat, porté par la première pièce trouvée.
+  const pieces = [...calcul.fiches].filter(([chemin]) => !chemin.includes('/'));
+  const recepteurs = (roles: string[], dansLesDeuxSens: boolean) =>
+    pieces.flatMap(([chemin, fiche]) => fiche.broches.filter((b) => roles.includes(b.role)).map((b) => ({ chemin, fiche, b, dansLesDeuxSens })));
+  for (const { chemin, fiche, b, dansLesDeuxSens } of [...recepteurs(RECEPTEURS, false), ...recepteurs(['entree_sortie_logique'], true)]) {
+    const masse = canon(fiche, b.domaine?.masse);
+    if (!masse) continue;
+    const noeud = grossier.noeudDe(`${chemin}:${b.nom}`);
+    const maMasse = grossier.noeudDe(`${chemin}:${masse}`);
+    if (!noeud || !maMasse) continue;
+    for (const p of noeud.points) {
+      const info = brocheDe(p, calcul.fiches);
+      if (!info || info.chemin.includes('/') || info.chemin === chemin || !EMETTEURS.includes(info.broche.role)) continue;
+      const sienne = grossier.noeudDe(`${info.chemin}:${canon(info.fiche, info.broche.domaine?.masse)}`);
+      if (!sienne || sienne.id === maMasse.id) continue;
+      const cle = [chemin, info.chemin].sort().join('|');
+      if (vues.has(cle)) continue;
+      vues.add(cle);
+      sorties.push({
+        chemin,
+        fiche,
+        verdict: 'ne_marchera_pas',
+        point: `${chemin}:${b.nom}`,
+        titre: `${chemin} et ${info.chemin} n'ont pas de masse commune`,
+        explication: dansLesDeuxSens
+          ? `${chemin}:${b.nom} et ${info.chemin}:${info.broche.nom} échangent un signal, mais aucun fil ne relie la masse de ${chemin} (${masse}) à celle de ${info.chemin}. Un niveau logique se mesure par rapport à la masse : sans masse commune, chaque carte lit n'importe quoi.`
+          : `${info.chemin}:${info.broche.nom} commande ${chemin}:${b.nom}, mais aucun fil ne relie la masse de ${chemin} (${masse}) à celle de ${info.chemin}. Un niveau logique se mesure par rapport à la masse : sans masse commune, ${chemin} lit n'importe quoi.`,
+        correction: `Relier par un fil la masse de ${info.chemin} à celle de ${chemin} : la logique et chaque alimentation (moteurs, autre carte) partagent la même masse.`,
+        origine: 'calcul',
+      });
     }
   }
   return sorties;

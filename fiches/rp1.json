@@ -1,0 +1,4199 @@
+{
+  "format": "fiche-composant/1",
+  "id": "rp1",
+  "nom": "Puce d'entrées-sorties RP1 (Raspberry Pi 5)",
+  "categorie": "puce",
+  "fabricant": "Raspberry Pi Ltd",
+  "reference": "RP1",
+  "description": "Puce « southbridge » de la Raspberry Pi 5, dessinée par Raspberry Pi : elle porte les 28 GPIO du connecteur 40 broches (GPIO0 à GPIO27), en un seul banc alimenté par VDDIO0. Cette fiche ne décrit que ces GPIO, leur alimentation et la masse ; la carte a sa propre fiche (raspberry-pi-5). RP1 n'a pas de datasheet électrique à elle : les limites viennent de la datasheet de la Compute Module 5 (même puce RP1) et de la documentation officielle de la Pi 5.",
+  "documents": [
+    {
+      "id": "rp1-periph",
+      "titre": "Raspberry Pi RP1 Peripherals",
+      "editeur": "Raspberry Pi Ltd",
+      "revision": "build b9b6f74",
+      "date": "2023-11-07",
+      "url": "https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf",
+      "sha256": "87fb7b24e8d9add075b849d095a107827610c0409ea194785af624c1ea986c3d"
+    },
+    {
+      "id": "cm5-ds",
+      "titre": "Raspberry Pi Compute Module 5 Datasheet",
+      "editeur": "Raspberry Pi Ltd",
+      "revision": "Release 3",
+      "date": "2026-06-08",
+      "url": "https://datasheets.raspberrypi.com/cm5/cm5-datasheet.pdf",
+      "sha256": "80070fefd8db6e8abc6e146c8b7b5fb318ba129cc1e28826936d547fde79c863"
+    },
+    {
+      "id": "rpi-doc",
+      "titre": "Raspberry Pi hardware, documentation officielle (page web consultée le 20/11/2026 ; les citations portent « page 1 » et nomment la section)",
+      "editeur": "Raspberry Pi Ltd",
+      "url": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-20",
+    "remarques": "À relire en priorité : (1) les maxima absolus des GPIO (−0,5 V à 3,8 V) viennent de la datasheet de la CM5, pas d'un document de la Pi 5 ; (2) la résistance de sortie (42 Ω) est un calcul, pas une donnée ; (3) aucune diode de protection n'est décrite : les plots sont « fault-tolerant » (RP1 p. 18), donc au-delà de 3,8 V le moteur donne « risque élevé », jamais « grillé », faute de savoir quel courant entre ; (4) l'état des broches au démarrage est inconnu (tirages « varies », RP1 p. 34). La datasheet de la CM5 interdit aussi toute tension sur une broche quand la carte est éteinte (p. 24)."
+  },
+  "broches": [
+    {
+      "nom": "VDDIO0",
+      "alias": [
+        "GPIO_VREF"
+      ],
+      "role": "alim_entree",
+      "domaine": {
+        "masse": "GND"
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.6,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "VGPIO_VREF GPIO voltage −0.5 3.6 V"
+          },
+          "note": "Sur la CM5, GPIO_VREF alimente le banc de GPIO (p. 12), qui est VDDIO0 chez RP1 (RP1 p. 15)."
+        }
+      },
+      "note": "Alimentation du banc de GPIO : 3,3 V sur la Pi 5 (GPIO « 3.3 V logic » dans la doc). Peut aller de 1,8 à 3,3 V (RP1 p. 19)."
+    },
+    {
+      "nom": "GND",
+      "role": "masse"
+    },
+    {
+      "nom": "GPIO0",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_SIO[3]",
+        "DPI_PCLK",
+        "UART1_TX",
+        "I2C0_SDA",
+        "SYS_RIO[0]",
+        "PROC_RIO[0]",
+        "PIO[0]",
+        "SPI2_CSn[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO1",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_SIO[2]",
+        "DPI_DE",
+        "UART1_RX",
+        "I2C0_SCL",
+        "SYS_RIO[1]",
+        "PROC_RIO[1]",
+        "PIO[1]",
+        "SPI2_SIO[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO2",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_CSn[3]",
+        "DPI_VSYNC",
+        "UART1_CTS",
+        "I2C1_SDA",
+        "UART0_IR_RX",
+        "SYS_RIO[2]",
+        "PROC_RIO[2]",
+        "PIO[2]",
+        "SPI2_SIO[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO3",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_CSn[2]",
+        "DPI_HSYNC",
+        "UART1_RTS",
+        "I2C1_SCL",
+        "UART0_IR_TX",
+        "SYS_RIO[3]",
+        "PROC_RIO[3]",
+        "PIO[3]",
+        "SPI2_SCLK"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO4",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "GPCLK[0]",
+        "DPI_D[0]",
+        "UART2_TX",
+        "I2C2_SDA",
+        "UART0_RI",
+        "SYS_RIO[4]",
+        "PROC_RIO[4]",
+        "PIO[4]",
+        "SPI3_CSn[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO5",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "GPCLK[1]",
+        "DPI_D[1]",
+        "UART2_RX",
+        "I2C2_SCL",
+        "UART0_DTR",
+        "SYS_RIO[5]",
+        "PROC_RIO[5]",
+        "PIO[5]",
+        "SPI3_SIO[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO6",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "GPCLK[2]",
+        "DPI_D[2]",
+        "UART2_CTS",
+        "I2C3_SDA",
+        "UART0_DCD",
+        "SYS_RIO[6]",
+        "PROC_RIO[6]",
+        "PIO[6]",
+        "SPI3_SIO[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO7",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_CSn[1]",
+        "DPI_D[3]",
+        "UART2_RTS",
+        "I2C3_SCL",
+        "UART0_DSR",
+        "SYS_RIO[7]",
+        "PROC_RIO[7]",
+        "PIO[7]",
+        "SPI3_SCLK"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO8",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_CSn[0]",
+        "DPI_D[4]",
+        "UART3_TX",
+        "I2C0_SDA",
+        "SYS_RIO[8]",
+        "PROC_RIO[8]",
+        "PIO[8]",
+        "SPI4_CSn[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO9",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_SIO[1]",
+        "DPI_D[5]",
+        "UART3_RX",
+        "I2C0_SCL",
+        "SYS_RIO[9]",
+        "PROC_RIO[9]",
+        "PIO[9]",
+        "SPI4_SIO[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO10",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_SIO[0]",
+        "DPI_D[6]",
+        "UART3_CTS",
+        "I2C1_SDA",
+        "SYS_RIO[10]",
+        "PROC_RIO[10]",
+        "PIO[10]",
+        "SPI4_SIO[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO11",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI0_SCLK",
+        "DPI_D[7]",
+        "UART3_RTS",
+        "I2C1_SCL",
+        "SYS_RIO[11]",
+        "PROC_RIO[11]",
+        "PIO[11]",
+        "SPI4_SCLK"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO12",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PWM0[0]",
+        "DPI_D[8]",
+        "UART4_TX",
+        "I2C2_SDA",
+        "AUDIO_OUT_L",
+        "SYS_RIO[12]",
+        "PROC_RIO[12]",
+        "PIO[12]",
+        "SPI5_CSn[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO13",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PWM0[1]",
+        "DPI_D[9]",
+        "UART4_RX",
+        "I2C2_SCL",
+        "AUDIO_OUT_R",
+        "SYS_RIO[13]",
+        "PROC_RIO[13]",
+        "PIO[13]",
+        "SPI5_SIO[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO14",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PWM0[2]",
+        "DPI_D[10]",
+        "UART4_CTS",
+        "I2C3_SDA",
+        "UART0_TX",
+        "SYS_RIO[14]",
+        "PROC_RIO[14]",
+        "PIO[14]",
+        "SPI5_SIO[0]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO15",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PWM0[3]",
+        "DPI_D[11]",
+        "UART4_RTS",
+        "I2C3_SCL",
+        "UART0_RX",
+        "SYS_RIO[15]",
+        "PROC_RIO[15]",
+        "PIO[15]",
+        "SPI5_SCLK"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO16",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI1_CSn[2]",
+        "DPI_D[12]",
+        "MIPI0_DSI_TE",
+        "UART0_CTS",
+        "SYS_RIO[16]",
+        "PROC_RIO[16]",
+        "PIO[16]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO17",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI1_CSn[1]",
+        "DPI_D[13]",
+        "MIPI1_DSI_TE",
+        "UART0_RTS",
+        "SYS_RIO[17]",
+        "PROC_RIO[17]",
+        "PIO[17]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO18",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI1_CSn[0]",
+        "DPI_D[14]",
+        "I2S0_SCLK",
+        "PWM0[2]",
+        "I2S1_SCLK",
+        "SYS_RIO[18]",
+        "PROC_RIO[18]",
+        "PIO[18]",
+        "GPCLK[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO19",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI1_SIO[1]",
+        "DPI_D[15]",
+        "I2S0_WS",
+        "PWM0[3]",
+        "I2S1_WS",
+        "SYS_RIO[19]",
+        "PROC_RIO[19]",
+        "PIO[19]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO20",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI1_SIO[0]",
+        "DPI_D[16]",
+        "I2S0_SDI[0]",
+        "GPCLK[0]",
+        "I2S1_SDI[0]",
+        "SYS_RIO[20]",
+        "PROC_RIO[20]",
+        "PIO[20]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO21",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI1_SCLK",
+        "DPI_D[17]",
+        "I2S0_SDO[0]",
+        "GPCLK[1]",
+        "I2S1_SDO[0]",
+        "SYS_RIO[21]",
+        "PROC_RIO[21]",
+        "PIO[21]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO22",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SDIO0_CLK",
+        "DPI_D[18]",
+        "I2S0_SDI[1]",
+        "I2C3_SDA",
+        "I2S1_SDI[1]",
+        "SYS_RIO[22]",
+        "PROC_RIO[22]",
+        "PIO[22]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO23",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SDIO0_CMD",
+        "DPI_D[19]",
+        "I2S0_SDO[1]",
+        "I2C3_SCL",
+        "I2S1_SDO[1]",
+        "SYS_RIO[23]",
+        "PROC_RIO[23]",
+        "PIO[23]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO24",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SDIO0_DAT[0]",
+        "DPI_D[20]",
+        "I2S0_SDI[2]",
+        "I2S1_SDI[2]",
+        "SYS_RIO[24]",
+        "PROC_RIO[24]",
+        "PIO[24]",
+        "SPI2_CSn[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO25",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SDIO0_DAT[1]",
+        "DPI_D[21]",
+        "I2S0_SDO[2]",
+        "AUDIO_IN_CLK",
+        "I2S1_SDO[2]",
+        "SYS_RIO[25]",
+        "PROC_RIO[25]",
+        "PIO[25]",
+        "SPI3_CSn[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO26",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SDIO0_DAT[2]",
+        "DPI_D[22]",
+        "I2S0_SDI[3]",
+        "AUDIO_IN_DAT0",
+        "I2S1_SDI[3]",
+        "SYS_RIO[26]",
+        "PROC_RIO[26]",
+        "PIO[26]",
+        "SPI5_CSn[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    },
+    {
+      "nom": "GPIO27",
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SDIO0_DAT[3]",
+        "DPI_D[23]",
+        "I2S0_SDO[3]",
+        "AUDIO_IN_DAT1",
+        "I2S1_SDO[3]",
+        "SYS_RIO[27]",
+        "PROC_RIO[27]",
+        "PIO[27]",
+        "SPI1_CSn[1]"
+      ],
+      "domaine": {
+        "alim": "VDDIO0",
+        "masse": "GND"
+      },
+      "capacites": {
+        "entree": true,
+        "sortie": true,
+        "tirage_haut_interne": true,
+        "tirage_bas_interne": true,
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "Integrated pull-up, pull-down, bus-keeper or high-impedance behaviour"
+        }
+      },
+      "niveaux": {
+        "vil_max": {
+          "max": 0.8,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIL Input low voltage 0 0.8 V"
+          }
+        },
+        "vih_min": {
+          "min": 2.0,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          }
+        },
+        "vol_max": {
+          "max": 0.4,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOL Output low voltage 0.4 V"
+          }
+        },
+        "voh_min": {
+          "min": 2.9,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VOH Output high voltage 2.9 V"
+          }
+        }
+      },
+      "sortie": {
+        "resistance_sortie": {
+          "min": 32,
+          "typ": 42,
+          "max": 59,
+          "unite": "Ω",
+          "conditions": "force de sortie par défaut (4 mA), niveau haut",
+          "src": {
+            "type": "hypothese",
+            "justification": "Calcul. La doc (Voltage specifications, RP1 products) donne VOH ≥ 2,9 V et, à la force par défaut de 4 mA (DRIVE = 0x1 au reset, RP1 p. 34), IOH = 6,8 / 9,5 / 12,6 mA (min / typ / max). En lisant IOH comme le courant qui amène la sortie à VOH min (sens que la même page donne à la force de sortie), R ≈ (3,3 − 2,9) / IOH = 59 / 42 / 32 Ω. Au niveau bas, IOL = 14,3 mA typ à VOL = 0,4 V donne environ 28 Ω ; le moteur prend une seule valeur pour les deux niveaux."
+          }
+        },
+        "courant_max": {
+          "max": 16,
+          "unite": "mA",
+          "conditions": "par broche",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "GPIO pin inputs, outputs, and communication protocols, Outputs",
+            "citation": "An individual GPIO pin can supply up to 16 mA"
+          },
+          "note": "Le moteur ne vérifie pas encore le courant de sortie d'une broche. Au total, 50 mA pour toutes les GPIO."
+        }
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 3.8,
+          "unite": "V",
+          "conditions": "VDDIO0 = 3,3 V, comme sur la Pi 5",
+          "src": {
+            "type": "datasheet",
+            "doc": "cm5-ds",
+            "page": 26,
+            "ou": "4.3.1 Absolute maximum ratings, Table 7",
+            "citation": "Vgpio GPIO input voltage −0.5 VGPIO_VREF + 0.5 V"
+          },
+          "note": "3,8 V = 3,3 V + 0,5 V. Tiré de la datasheet de la Compute Module 5 : même puce RP1, et ses GPIO 0 à 27 sont celles du connecteur de la Pi 5 (p. 23)."
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 0,
+          "max": 3.3,
+          "unite": "V",
+          "src": {
+            "type": "datasheet",
+            "doc": "rpi-doc",
+            "page": 1,
+            "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+            "citation": "VIH Input high voltage 2.0 3.3 V"
+          },
+          "note": "La même page avertit : GPIO en 3,3 V, pas tolérantes au 5 V."
+        }
+      },
+      "etat_demarrage": {
+        "etat": "inconnu",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "PUE Pull up enable RW varies"
+        },
+        "note": "Les tirages au reset varient d'une broche à l'autre et ne sont pas publiés pour la Pi 5 : la broche est vue comme une entrée sans tirage."
+      }
+    }
+  ],
+  "modele": {
+    "type": "microcontroleur",
+    "valeurs": {
+      "resistance_tirage": {
+        "min": 37,
+        "typ": 55,
+        "max": 86,
+        "unite": "kΩ",
+        "conditions": "tirage haut interne, quand le programme l'active, VDDIO0 = 3,3 V",
+        "src": {
+          "type": "datasheet",
+          "doc": "rpi-doc",
+          "page": 1,
+          "ou": "Voltage specifications, tableau « RP1 products » (#voltage-specifications)",
+          "citation": "RPU Pull-up resistor 37 55 86 kΩ"
+        },
+        "note": "Tirage bas : 35 / 55 / 98 kΩ (même tableau)."
+      },
+      "courant_sorties_cumule": {
+        "max": 50,
+        "unite": "mA",
+        "conditions": "somme des courants de toutes les GPIO",
+        "src": {
+          "type": "datasheet",
+          "doc": "cm5-ds",
+          "page": 12,
+          "ou": "2.9 GPIO",
+          "citation": "Don’t exceed 50 mA for total current load on all 28 GPIO pins."
+        },
+        "note": "La doc de la Pi dit la même chose (section Outputs)."
+      },
+      "force_de_sortie_defaut": {
+        "valeur": "4 mA (champ DRIVE = 0x1 au reset)",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 34,
+          "ou": "Table 21, registres PADS_BANK0 GPIO0 à GPIO27",
+          "citation": "5:4 DRIVE Drive strength ... 0x1 → 4mA ... RW 0x1"
+        }
+      },
+      "plots_tolerants": {
+        "valeur": "Banc éteint, une broche laisse entrer très peu de courant tant qu'elle reste sous 3,63 V.",
+        "src": {
+          "type": "datasheet",
+          "doc": "rp1-periph",
+          "page": 18,
+          "ou": "3.1.3 Pads",
+          "citation": "very little current flows into the pin whilst it is below 3.63V"
+        }
+      }
+    },
+    "note": "Pas de diodes de protection décrites : une tension au-delà du maximum absolu donne « risque élevé »."
+  }
+}

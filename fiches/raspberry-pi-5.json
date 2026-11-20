@@ -1,0 +1,884 @@
+{
+  "format": "fiche-composant/1",
+  "id": "raspberry-pi-5",
+  "nom": "Raspberry Pi 5 (8 Go)",
+  "categorie": "carte",
+  "fabricant": "Raspberry Pi Ltd (kit RasTech pour la carte de Jean)",
+  "reference": "Raspberry Pi 5 Model B, 8 Go",
+  "description": "Ordinateur sur une carte : processeur BCM2712, puce d'entrées-sorties RP1, alimentation 5 V / 5 A par l'USB-C, connecteur de 40 broches au pas de 2,54 mm (2 × 20). La fiche décrit ce connecteur : 26 GPIO en 3,3 V, GPIO0 et GPIO1 réservées aux cartes HAT, deux broches 3V3, deux 5V et huit GND. Pin 1 en bas à gauche, broches impaires sur la rangée du bas, comme sur la figure officielle. Le kit RasTech ne change pas la carte.",
+  "documents": [
+    {
+      "id": "rpi5-brief",
+      "titre": "Raspberry Pi 5 Product Brief",
+      "editeur": "Raspberry Pi Ltd",
+      "date": "2026-11-01",
+      "url": "https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf",
+      "sha256": "f1ca525452e6fa4e9592a6705e41fb811bf12709d0605fd7cc2099c1b25534f3"
+    },
+    {
+      "id": "rpi-doc",
+      "titre": "Raspberry Pi hardware, documentation officielle (page web consultée le 20/11/2026 ; les citations portent « page 1 » et nomment la section)",
+      "editeur": "Raspberry Pi Ltd",
+      "url": "https://www.raspberrypi.com/documentation/computers/raspberry-pi.html"
+    },
+    {
+      "id": "cm5-ds",
+      "titre": "Raspberry Pi Compute Module 5 Datasheet",
+      "editeur": "Raspberry Pi Ltd",
+      "revision": "Release 3",
+      "date": "2026-06-08",
+      "url": "https://datasheets.raspberrypi.com/cm5/cm5-datasheet.pdf",
+      "sha256": "80070fefd8db6e8abc6e146c8b7b5fb318ba129cc1e28826936d547fde79c863"
+    }
+  ],
+  "validation": {
+    "statut": "brouillon",
+    "extraite_par": "Claude",
+    "date_extraction": "2026-11-20",
+    "remarques": "Brochage et niveaux des GPIO tirés de la doc officielle de la Pi 5 (page web). Hypothèses à relire : limites de la broche 5V reprises de la Compute Module 5 ; broches 3V3 vues comme l'alimentation des GPIO ; bloc USB-C et régulateur 3,3 V vus comme des sources sans limite de courant ; consommation de 800 mA (typique, carte seule). Si la Pi est alimentée par une broche 5V (alimentation_usb à false), le 3,3 V n'est pas simulé. La Pi n'est pas émulée : l'état de chaque GPIO se règle à la main."
+  },
+  "sous_composants": [
+    {
+      "ref": "U1",
+      "fiche": "rp1",
+      "note": "Puce RP1 : elle porte les GPIO 0 à 27 du connecteur 40 broches."
+    }
+  ],
+  "broches": [
+    {
+      "nom": "3V3.1",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 1
+      },
+      "role": "alim_sortie",
+      "vers": "U1.VDDIO0",
+      "domaine": {
+        "masse": "GND.1"
+      },
+      "note": "3,3 V pour des périphériques peu gourmands (doc officielle, sans chiffre). Vu comme l'alimentation des GPIO (hypothèse : sur la CM5, GPIO_VREF se relie au 3,3 V de la carte, p. 20). La CM5 annonce 600 mA au total sur son 3,3 V (p. 20) ; rien n'est publié pour la Pi 5."
+    },
+    {
+      "nom": "5V.1",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 2
+      },
+      "role": "alim_entree",
+      "domaine": {
+        "masse": "GND.1"
+      },
+      "max_absolus": {
+        "tension": {
+          "min": -0.5,
+          "max": 6.0,
+          "unite": "V",
+          "src": {
+            "type": "hypothese",
+            "justification": "Aucune limite publiée pour la Pi 5. La Compute Module 5, qui porte les mêmes puces BCM2712 et RP1, admet −0,5 à 6,0 V sur son entrée 5 V (cm5-ds p. 26, Table 7 : « VIN 5 V input voltage −0.5 6.0 V ») : valeur reprise faute de mieux."
+          }
+        }
+      },
+      "recommande": {
+        "tension": {
+          "min": 4.75,
+          "max": 5.25,
+          "unite": "V",
+          "src": {
+            "type": "hypothese",
+            "justification": "Plage de l'entrée 5 V de la Compute Module 5 (cm5-ds p. 20 : « 5V (Input) 4.75 V to 5.25 V »). Pour la Pi 5, la doc officielle demande une alim de 5,1 V et signale une tension trop basse sous 4,63 V (± 5 %, section Power supply warnings)."
+          }
+        }
+      },
+      "note": "Relié au 5 V du bloc USB-C : donne du 5 V aux périphériques, ou alimente la Pi si on n'utilise pas l'USB-C (doc officielle). Les limites de tension sont portées par cette broche pour les deux broches 5V."
+    },
+    {
+      "nom": "GPIO2",
+      "alias": [
+        "GP2"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 3
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SDA"
+      ],
+      "vers": "U1.GPIO2",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      },
+      "note": "Tirée au 3,3 V par une résistance de 1,8 kΩ sur la carte (bus I2C)."
+    },
+    {
+      "nom": "5V.2",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 4
+      },
+      "role": "alim_entree",
+      "domaine": {
+        "masse": "GND.1"
+      },
+      "note": "Même rail que 5V.1 (ses limites de tension sont portées par 5V.1)."
+    },
+    {
+      "nom": "GPIO3",
+      "alias": [
+        "GP3"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 5
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SCL"
+      ],
+      "vers": "U1.GPIO3",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      },
+      "note": "Tirée au 3,3 V par une résistance de 1,8 kΩ sur la carte (bus I2C)."
+    },
+    {
+      "nom": "GND.1",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 6
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO4",
+      "alias": [
+        "GP4"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 7
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "GPCLK0"
+      ],
+      "vers": "U1.GPIO4",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO14",
+      "alias": [
+        "GP14"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 8
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "TXD"
+      ],
+      "vers": "U1.GPIO14",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      },
+      "note": "Sortie série (UART) : vers l'entrée RX de l'autre carte, masses reliées."
+    },
+    {
+      "nom": "GND.2",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 9
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO15",
+      "alias": [
+        "GP15"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 10
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "RXD"
+      ],
+      "vers": "U1.GPIO15",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      },
+      "note": "Entrée série (UART) : depuis la sortie TX de l'autre carte, en 3,3 V seulement."
+    },
+    {
+      "nom": "GPIO17",
+      "alias": [
+        "GP17"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 11
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI CE1"
+      ],
+      "vers": "U1.GPIO17",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO18",
+      "alias": [
+        "GP18"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 12
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PCM clock",
+        "SPI CE0"
+      ],
+      "vers": "U1.GPIO18",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO27",
+      "alias": [
+        "GP27"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 13
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO27",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.3",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 14
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO22",
+      "alias": [
+        "GP22"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 15
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO22",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO23",
+      "alias": [
+        "GP23"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 16
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO23",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "3V3.2",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 17
+      },
+      "role": "alim_sortie",
+      "vers": "U1.VDDIO0",
+      "domaine": {
+        "masse": "GND.1"
+      },
+      "note": "3,3 V pour des périphériques peu gourmands (doc officielle, sans chiffre). Vu comme l'alimentation des GPIO (hypothèse : sur la CM5, GPIO_VREF se relie au 3,3 V de la carte, p. 20). La CM5 annonce 600 mA au total sur son 3,3 V (p. 20) ; rien n'est publié pour la Pi 5."
+    },
+    {
+      "nom": "GPIO24",
+      "alias": [
+        "GP24"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 18
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO24",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO10",
+      "alias": [
+        "GP10"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 19
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "MOSI"
+      ],
+      "vers": "U1.GPIO10",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.4",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 20
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO9",
+      "alias": [
+        "GP9"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 21
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "MISO"
+      ],
+      "vers": "U1.GPIO9",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO25",
+      "alias": [
+        "GP25"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 22
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO25",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO11",
+      "alias": [
+        "GP11"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 23
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SCLK"
+      ],
+      "vers": "U1.GPIO11",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO8",
+      "alias": [
+        "GP8"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 24
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI CE0"
+      ],
+      "vers": "U1.GPIO8",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.5",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 25
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO7",
+      "alias": [
+        "GP7"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 26
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI CE1"
+      ],
+      "vers": "U1.GPIO7",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "ID_SD",
+      "alias": [
+        "GPIO0",
+        "GP0"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 27
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "ID_SD"
+      ],
+      "vers": "U1.GPIO0",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      },
+      "note": "GPIO0, réservée à l'EEPROM d'identification des cartes HAT : « DNC » (ne pas connecter) sur la figure officielle."
+    },
+    {
+      "nom": "ID_SC",
+      "alias": [
+        "GPIO1",
+        "GP1"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 28
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "ID_SC"
+      ],
+      "vers": "U1.GPIO1",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      },
+      "note": "GPIO1, réservée à l'EEPROM d'identification des cartes HAT : « DNC » (ne pas connecter) sur la figure officielle."
+    },
+    {
+      "nom": "GPIO5",
+      "alias": [
+        "GP5"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 29
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO5",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.6",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 30
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO6",
+      "alias": [
+        "GP6"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 31
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO6",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO12",
+      "alias": [
+        "GP12"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 32
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PWM0"
+      ],
+      "vers": "U1.GPIO12",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO13",
+      "alias": [
+        "GP13"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 33
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PWM1"
+      ],
+      "vers": "U1.GPIO13",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.7",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 34
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO19",
+      "alias": [
+        "GP19"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 35
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PCM_FS",
+        "MISO"
+      ],
+      "vers": "U1.GPIO19",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO16",
+      "alias": [
+        "GP16"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 36
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "SPI CE2"
+      ],
+      "vers": "U1.GPIO16",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO26",
+      "alias": [
+        "GP26"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 37
+      },
+      "role": "entree_sortie_logique",
+      "vers": "U1.GPIO26",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GPIO20",
+      "alias": [
+        "GP20"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 38
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PCM_DIN"
+      ],
+      "vers": "U1.GPIO20",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    },
+    {
+      "nom": "GND.8",
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 39
+      },
+      "role": "masse",
+      "vers": "U1.GND"
+    },
+    {
+      "nom": "GPIO21",
+      "alias": [
+        "GP21"
+      ],
+      "position": {
+        "connecteur": "GPIO",
+        "numero": 40
+      },
+      "role": "entree_sortie_logique",
+      "fonctions": [
+        "PCM_DOUT"
+      ],
+      "vers": "U1.GPIO21",
+      "domaine": {
+        "alim": "3V3.1",
+        "masse": "GND.1"
+      }
+    }
+  ],
+  "liaisons_internes": [
+    {
+      "entre": [
+        "5V.1",
+        "5V.2"
+      ],
+      "type": "direct",
+      "src": {
+        "type": "datasheet",
+        "doc": "rpi-doc",
+        "page": 1,
+        "ou": "Pin types (#pin-types)",
+        "citation": "Power 4 3V3 (2) 5V (2) 3.3 V DC 5.0 V DC"
+      },
+      "note": "Deux broches du même rail 5 V."
+    },
+    {
+      "entre": [
+        "3V3.1",
+        "3V3.2"
+      ],
+      "type": "direct",
+      "src": {
+        "type": "datasheet",
+        "doc": "rpi-doc",
+        "page": 1,
+        "ou": "Pin types (#pin-types)",
+        "citation": "Power 4 3V3 (2) 5V (2) 3.3 V DC 5.0 V DC"
+      },
+      "note": "Deux broches du même rail 3,3 V."
+    },
+    {
+      "entre": [
+        "GPIO2",
+        "3V3.1"
+      ],
+      "type": "resistance",
+      "valeur": {
+        "typ": 1.8,
+        "unite": "kΩ",
+        "src": {
+          "type": "datasheet",
+          "doc": "rpi-doc",
+          "page": 1,
+          "ou": "Pin functions, tableau « Pin names, types, and typical functions » (#pin-functions)",
+          "citation": "this pin has a 1.8 kΩ on-board pull-up resistor to 3.3 V"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "rpi-doc",
+        "page": 1,
+        "ou": "Pin functions, tableau « Pin names, types, and typical functions » (#pin-functions)",
+        "citation": "this pin has a 1.8 kΩ on-board pull-up resistor to 3.3 V"
+      },
+      "note": "Tirage de SDA (I2C)."
+    },
+    {
+      "entre": [
+        "GPIO3",
+        "3V3.1"
+      ],
+      "type": "resistance",
+      "valeur": {
+        "typ": 1.8,
+        "unite": "kΩ",
+        "src": {
+          "type": "datasheet",
+          "doc": "rpi-doc",
+          "page": 1,
+          "ou": "Pin functions, tableau « Pin names, types, and typical functions » (#pin-functions)",
+          "citation": "this pin has a 1.8 kΩ on-board pull-up resistor to 3.3 V"
+        }
+      },
+      "src": {
+        "type": "datasheet",
+        "doc": "rpi-doc",
+        "page": 1,
+        "ou": "Pin functions, tableau « Pin names, types, and typical functions » (#pin-functions)",
+        "citation": "this pin has a 1.8 kΩ on-board pull-up resistor to 3.3 V"
+      },
+      "note": "Tirage de SCL (I2C)."
+    }
+  ],
+  "modele": {
+    "type": "microcontroleur",
+    "valeurs": {
+      "tension_3v3": {
+        "typ": 3.3,
+        "unite": "V",
+        "src": {
+          "type": "datasheet",
+          "doc": "rpi-doc",
+          "page": 1,
+          "ou": "Pin types (#pin-types)",
+          "citation": "Power 4 3V3 (2) 5V (2) 3.3 V DC 5.0 V DC"
+        }
+      },
+      "tension_usb": {
+        "typ": 5.0,
+        "unite": "V",
+        "src": {
+          "type": "datasheet",
+          "doc": "rpi-doc",
+          "page": 1,
+          "ou": "Pin types (#pin-types)",
+          "citation": "Power 4 3V3 (2) 5V (2) 3.3 V DC 5.0 V DC"
+        },
+        "note": "Le bloc officiel donne 5,1 V (section Power supply) ; 5,0 V retenu, valeur du tableau des broches."
+      },
+      "broche_usb": {
+        "valeur": "5V.1",
+        "src": {
+          "type": "datasheet",
+          "doc": "rpi-doc",
+          "page": 1,
+          "ou": "Pin functions, tableau « Pin names, types, and typical functions » (#pin-functions)",
+          "citation": "Provides 5 V power output to peripherals, or accepts 5 V power input"
+        },
+        "note": "Broche qui reçoit le 5 V du bloc USB-C quand alimentation_usb est vrai."
+      },
+      "alimentation_usbc": {
+        "valeur": "5 V / 5 A par l'USB-C, avec Power Delivery",
+        "src": {
+          "type": "datasheet",
+          "doc": "rpi5-brief",
+          "page": 3,
+          "ou": "Specification",
+          "citation": "5V/5A DC power via USB-C, with Power Delivery support"
+        }
+      }
+    },
+    "note": "Carte avec puce : le moteur pose une source de 5 V sur 5V.1 et de 3,3 V sur 3V3.1 quand alimentation_usb est vrai, et la consommation sur le 5 V."
+  },
+  "thermique": {
+    "temperature_max": {
+      "max": 70,
+      "unite": "°C",
+      "conditions": "température de fonctionnement",
+      "src": {
+        "type": "datasheet",
+        "doc": "rpi5-brief",
+        "page": 3,
+        "ou": "Specification",
+        "citation": "Operating temperature 0°C to 70°C"
+      }
+    }
+  },
+  "parametres": {
+    "alimentation_usb": {
+      "description": "La Pi est alimentée par son bloc USB-C : 5 V sur les broches 5V et 3,3 V sur les broches 3V3. Mettre false pour l'alimenter soi-même par une broche 5V (le 3,3 V n'est alors plus simulé).",
+      "unite": "1",
+      "defaut": true,
+      "src": {
+        "type": "hypothese",
+        "justification": "Cas courant : bloc USB-C officiel (5 V / 5 A, product brief p. 3). Le bloc est vu comme une source de 5 V et le régulateur 3,3 V comme une source de 3,3 V, sans limite de courant et sans absorber de courant : aucune limite n'est publiée pour la Pi 5."
+      }
+    },
+    "consommation": {
+      "description": "Courant pris par la carte sur le 5 V, vu comme une résistance équivalente. 800 mA : consommation typique de la carte seule en activité, sans périphérique USB.",
+      "unite": "mA",
+      "defaut": 800,
+      "min": 0,
+      "max": 5000,
+      "src": {
+        "type": "datasheet",
+        "doc": "rpi-doc",
+        "page": 1,
+        "ou": "Typical power requirements (#typical-power-requirements)",
+        "citation": "Raspberry Pi 5 ... 5.0A ... 800mA"
+      }
+    }
+  }
+}

@@ -18,6 +18,7 @@ const SVG = 'http://www.w3.org/2000/svg';
 const NOMS_COURTS: Record<string, string> = {
   'breadboard-830': 'Breadboard',
   'esp32-devkitc': 'ESP32 DevKitC',
+  'raspberry-pi-5': 'Raspberry Pi 5',
   'tmc2209-module': 'Driver TMC2209',
   '17hs4401': 'Moteur 17HS4401',
   resistance: 'Résistance',

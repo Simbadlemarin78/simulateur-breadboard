@@ -68,7 +68,7 @@ function prefixe(fiche: Fiche): string {
     case 'breadboard':
       return 'bb';
     case 'microcontroleur':
-      return 'esp';
+      return fiche.id.startsWith('raspberry-pi') ? 'pi' : fiche.id.startsWith('esp32') ? 'esp' : 'mcu';
     case 'driver_pas_a_pas':
       return 'drv';
     case 'moteur_pas_a_pas':

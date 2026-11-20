@@ -25,6 +25,7 @@ export type RoleElement =
   | 'source'
   | 'resistance_interne'
   | 'regulateur'
+  | 'alimentation_usb'
   | 'consommation'
   | 'diode_protection'
   | 'tirage'
@@ -400,20 +401,33 @@ export function calculer(montage: Montage, catalogue: Catalogue, options: Option
         break;
       }
       case 'microcontroleur': {
-        // Carte qui porte une puce : régulateur 3,3 V (USB) et consommation de la puce.
+        // Carte qui porte une puce : régulateur 3,3 V (USB) et consommation de la carte.
+        // Si la fiche nomme sa broche 5 V (broche_usb, Raspberry Pi 5), l'USB y met aussi sa
+        // tension (tension_usb) et la consommation est prise sur ce 5 V ; sinon, sur le 3,3 V.
         if (!fiche.sous_composants?.some((s) => catalogue.fiche(s.fiche)?.modele?.type === 'microcontroleur')) break;
         const sortie3v3 = fiche.broches.find((b) => b.role === 'alim_sortie');
         const a = n(sortie3v3?.nom);
         const m = n(sortie3v3?.domaine?.masse);
         const v = valeurSI(grandeurModele(fiche, 'tension_3v3'));
         if (a === undefined || m === undefined || v === undefined) break;
+        const nomUsb = (valeurs['broche_usb'] as { valeur?: unknown } | undefined)?.valeur;
+        const brocheUsb = typeof nomUsb === 'string' ? trouverBroche(fiche, nomUsb) : undefined;
+        const a5 = n(brocheUsb?.nom);
+        const m5 = n(brocheUsb?.domaine?.masse);
+        const v5 = valeurSI(grandeurModele(fiche, 'tension_usb'));
+        const usb = brocheUsb && a5 !== undefined && m5 !== undefined && v5 !== undefined ? { a: a5, m: m5, v: v5, broches: [brocheUsb.nom, brocheUsb.domaine!.masse] } : undefined;
         if (pe.parametres['alimentation_usb'] === true) {
           fixes.push({ type: 'source', plus: a, moins: m, v, absorbe: false });
           etiquettesFixes.push({ piece: chemin, role: 'regulateur', broches: [sortie3v3!.nom, sortie3v3!.domaine!.masse] });
+          if (usb) {
+            fixes.push({ type: 'source', plus: usb.a, moins: usb.m, v: usb.v, absorbe: false });
+            etiquettesFixes.push({ piece: chemin, role: 'alimentation_usb', broches: usb.broches });
+          }
         }
         const conso = parametreSI(pe, 'consommation');
         if (conso !== undefined && conso > 0) {
-          resistance(a, m, v / conso, { piece: chemin, role: 'consommation', broches: [sortie3v3!.nom, sortie3v3!.domaine!.masse] });
+          if (usb) resistance(usb.a, usb.m, usb.v / conso, { piece: chemin, role: 'consommation', broches: usb.broches });
+          else resistance(a, m, v / conso, { piece: chemin, role: 'consommation', broches: [sortie3v3!.nom, sortie3v3!.domaine!.masse] });
         }
         break;
       }
@@ -611,7 +625,7 @@ export function calculer(montage: Montage, catalogue: Catalogue, options: Option
   };
   const sources = elements.flatMap((e, k) => {
     const et = etiquettes[k]!;
-    if (e.type !== 'source' || (et.role !== 'source' && et.role !== 'regulateur')) return [];
+    if (e.type !== 'source' || (et.role !== 'source' && et.role !== 'regulateur' && et.role !== 'alimentation_usb')) return [];
     return [{ piece: et.piece, regime: sol.regimes[k]!, tension: sol.tensionsElements[k]!, courant: sol.courants[k]! }];
   });
 

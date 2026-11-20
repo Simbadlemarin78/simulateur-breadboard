@@ -160,6 +160,67 @@ function dessinModuleTmc(fiche: Fiche): Dessin {
   };
 }
 
+// ---------------------------------------------------------------- Raspberry Pi 5
+function dessinRaspberryPi5(fiche: Fiche): Dessin {
+  // Connecteur 2 × 20 au pas de 0,1 pouce : broches paires en haut, impaires en bas, broche 1
+  // en bas à gauche, comme sur la figure officielle (GPIO-numbers.png). Le reste de la carte
+  // (puces, prises) n'est qu'indicatif.
+  const largeur = 34 * P;
+  const hauteur = 22 * P;
+  const x0 = 7 * P;
+  const broches = new Map<string, Point>();
+  for (const b of fiche.broches) {
+    const { numero } = position(fiche, b.nom);
+    if (!numero) continue;
+    broches.set(b.nom, { x: x0 + Math.floor((numero - 1) / 2) * P, y: numero % 2 === 0 ? 4 * P : 5 * P });
+  }
+  // Noms imprimés sur la figure officielle : « GP17 » pour GPIO17, « GND » pour GND.3...
+  const court = (nom: string) => (/^GPIO\d+$/.test(nom) ? `GP${nom.slice(4)}` : nom.replace(/\.\d+$/, ''));
+  const etiquettes = fiche.broches.flatMap((b) => {
+    const p = broches.get(b.nom);
+    if (!p) return [];
+    const classe = `etiquette-broche${b.nom.startsWith('ID_') ? ' nc' : ''}`;
+    const x = p.x + 0.12 * P;
+    const y = p.y === 4 * P ? p.y - 0.45 * P : p.y + 0.45 * P;
+    const ancre = p.y === 4 * P ? 'start' : 'end';
+    return [texte(x, y, court(b.nom), `class="${classe}" text-anchor="${ancre}" transform="rotate(-90 ${x} ${y})"`)];
+  });
+  const trous = [
+    [1.4, 1.4],
+    [24.2, 1.4],
+    [1.4, 20.6],
+    [24.2, 20.6],
+  ].map(([x, y]) => `<circle cx="${x! * P}" cy="${y! * P}" r="${0.55 * P}" fill="#d9c27a" stroke="#a8914c"/>`);
+  const prise = (y: number, h: number, nom: string) => [
+    `<rect x="${28.6 * P}" y="${y * P}" width="${5.4 * P}" height="${h * P}" rx="2" fill="#b9bec4" stroke="#7d838a"/>`,
+    texte(31.3 * P, (y + h / 2) * P + 3, nom, 'class="etiquette-sombre" text-anchor="middle"'),
+  ];
+  const un = broches.get('3V3.1');
+  return {
+    largeur,
+    hauteur,
+    broches,
+    corps: () =>
+      [
+        `<rect x="0" y="0" width="${largeur}" height="${hauteur}" rx="6" fill="#2f7d3b" stroke="#1d5226"/>`,
+        ...trous,
+        `<rect x="${x0 - 0.6 * P}" y="${3.4 * P}" width="${20.2 * P}" height="${2.2 * P}" rx="1" fill="#1d1d1f"/>`,
+        un ? `<rect x="${un.x - 0.45 * P}" y="${un.y - 0.45 * P}" width="${0.9 * P}" height="${0.9 * P}" fill="none" stroke="#f2f2f2" stroke-width="0.6"/>` : '',
+        `<rect x="${9 * P}" y="${9 * P}" width="${5 * P}" height="${5 * P}" rx="2" fill="#9aa0a6"/>`,
+        texte(11.5 * P, 11.8 * P, 'BCM2712', 'class="etiquette-sombre" text-anchor="middle"'),
+        `<rect x="${17 * P}" y="${10 * P}" width="${3.4 * P}" height="${3.4 * P}" rx="2" fill="#2b2b2b"/>`,
+        texte(18.7 * P, 12 * P, 'RP1', 'class="etiquette" text-anchor="middle"'),
+        ...prise(1.5, 5, 'Ethernet'),
+        ...prise(8, 5, 'USB'),
+        ...prise(14.5, 5, 'USB'),
+        `<rect x="${3 * P}" y="${20.4 * P}" width="${3.4 * P}" height="${1.6 * P}" rx="3" fill="#b9bec4" stroke="#7d838a"/>`,
+        texte(4.7 * P, 19.8 * P, 'USB-C 5 V', 'class="etiquette" text-anchor="middle"'),
+        texte(9 * P, 17.5 * P, 'Raspberry Pi 5', 'class="etiquette"'),
+        ...etiquettes,
+      ].join(''),
+  };
+}
+
 // ---------------------------------------------------------------- moteur pas à pas NEMA 17
 function dessinMoteur(fiche: Fiche): Dessin {
   const largeur = 10 * P;
@@ -330,6 +391,7 @@ export function dessinPour(fiche: Fiche): Dessin {
     type === 'breadboard' ? dessinBreadboard(fiche)
     : fiche.id === 'esp32-devkitc' ? dessinEsp32(fiche)
     : fiche.id === 'tmc2209-module' ? dessinModuleTmc(fiche)
+    : fiche.id === 'raspberry-pi-5' ? dessinRaspberryPi5(fiche)
     : type === 'moteur_pas_a_pas' ? dessinMoteur(fiche)
     : type === 'resistance' ? dessinResistance()
     : type === 'alim_laboratoire' ? dessinAlim(fiche)

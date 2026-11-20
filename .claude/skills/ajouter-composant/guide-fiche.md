@@ -71,7 +71,7 @@ Diodes de protection : le moteur a besoin de leur loi. Mettre une seule fois dan
 | `batterie` | `tension_element` | `tension_element`, `tension_batterie`, `resistance_interne`, `courant_decharge_continu_max` |
 | `moteur_pas_a_pas` | — | `bobines` (table bobine, debut, fin), `resistance_phase`, `courant_nominal_phase` |
 | `driver_pas_a_pas` | puce : — ; module : `vref`, `courant_uart` | puce : `tension_pleine_echelle`, `resistance_interne_br`, `tension_vref_pleine_echelle`, `rdson_haut`, `rdson_bas`, `courant_vs_fonctionnement`, `courant_vs_desactive`, `seuil_sous_tension_vs`, `seuil_sous_tension_vcc_io`, `diodes_pont_modele`, `courant_max_diodes_pont`, `courant_rms_continu` ; module : `resistance_mesure` |
-| `microcontroleur` | carte : `alimentation_usb`, `consommation` | puce : `diodes_protection`, `resistance_tirage` ; carte : `tension_3v3` |
+| `microcontroleur` | carte : `alimentation_usb`, `consommation` | puce : `diodes_protection`, `resistance_tirage` ; carte : `tension_3v3`, et si sa broche 5 V reçoit l'USB : `tension_usb` et `broche_usb` (fait : nom de la broche ; la consommation passe alors sur le 5 V, voir `raspberry-pi-5.json`) |
 | `breadboard`, `fil` | — | voir `breadboard-830.json`, `fil-dupont.json` |
 
 Les types `regulateur_lineaire`, `diode`, `led` et `contact` existent dans le schéma, mais le moteur ne les simule pas encore. Un composant d'un autre genre (régulateur, capteur, pont en H d'une autre marque...) n'a donc pas de `modele` qui marche : on ne l'invente pas. On le laisse sans `modele` (ses broches restent vérifiées) et on le dit à Jean. Ajouter un nouveau type, c'est du code dans `circuit.ts`, avec des circuits de test calculés à la main.
