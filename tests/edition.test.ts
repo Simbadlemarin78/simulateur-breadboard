@@ -197,6 +197,17 @@ describe('importer et exporter le diagram.json', () => {
     expect(relu.montage()).toEqual(lireMontage(montages[nom], catalogue));
   });
 
+  it('charger un autre montage s\'annule avec Ctrl+Z, et un montage illisible est refusé', () => {
+    const e = new Editeur(catalogue, baseRoulante as Diagramme);
+    const avant = e.exporter();
+    expect(e.remplacer(montages['../montages/cas/cas-01-12v-sur-broche.diagram.json']!)).toBeUndefined();
+    expect(e.montage().pieces).toHaveLength(17);
+    expect(e.remplacer({ parts: [{ id: 'x', type: 'inconnu' }], connections: [] } as unknown as Diagramme)).toMatch(/inconnu/);
+    expect(e.montage().pieces).toHaveLength(17);
+    expect(e.annuler()).toBe(true);
+    expect(e.exporter()).toBe(avant);
+  });
+
   it('dit pourquoi un fichier ne se lit pas', () => {
     expect(() => Editeur.depuisTexte('{ pas du json', catalogue)).toThrow(/JSON/);
     expect(() => Editeur.depuisTexte('{"parts": [{"id": "x", "type": "inconnu"}], "connections": []}', catalogue)).toThrow(/inconnu/);

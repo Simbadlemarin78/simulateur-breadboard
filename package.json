@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verifier": "node outils/verifier.mjs"
+    "verifier": "node outils/verifier.mjs",
+    "build:artifact": "npm run build && node outils/artifact.mjs"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

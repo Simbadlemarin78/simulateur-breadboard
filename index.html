@@ -2,28 +2,55 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Simulateur de breadboard</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
     <style>
-      :root { color-scheme: light dark; font-family: system-ui, sans-serif; line-height: 1.5; }
-      body { max-width: 90rem; margin: 1.5rem auto; padding: 0 1rem; }
-      h1 { margin: 0 0 0.2rem; font-size: 1.6rem; }
+      /* Atelier d'électronique : interface sobre autour du plan de travail ; couleurs en variables, clair et sombre. */
+      :root {
+        --fond: #f5f6f8; --texte: #1c2128; --discret: #5b6470; --bord: #c8ced6;
+        --surface: #eaedf1; --surface-forte: #dde2e8; --fond-plan: #eceff2;
+        --accent: #2f6fd1; --sur-accent: #ffffff; --erreur: #c62828; --succes: #1f8a43;
+        --ecran-fond: #13241a; --ecran-texte: #6cf2a0; --choix: #ff9f0a;
+        color-scheme: light; font-family: system-ui, sans-serif; line-height: 1.5;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --fond: #15181d; --texte: #e6e9ee; --discret: #9aa3ae; --bord: #3a414b;
+          --surface: #20252c; --surface-forte: #2b313a; --fond-plan: #1b1f25;
+          --accent: #5b93f0; --sur-accent: #0b1220; --erreur: #ff6b5e; --succes: #4cc27a; color-scheme: dark;
+        }
+      }
+      :root[data-theme="dark"] {
+        --fond: #15181d; --texte: #e6e9ee; --discret: #9aa3ae; --bord: #3a414b;
+        --surface: #20252c; --surface-forte: #2b313a; --fond-plan: #1b1f25;
+        --accent: #5b93f0; --sur-accent: #0b1220; --erreur: #ff6b5e; --succes: #4cc27a; color-scheme: dark;
+      }
+      [hidden] { display: none !important; }
+      body {
+        max-width: 90rem; margin: 0 auto; background: var(--fond); color: var(--texte);
+        padding-block: 1.5rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+      }
+      a { color: var(--accent); }
+      h1 { margin: 0 0 0.2rem; font-size: 1.6rem; text-wrap: balance; }
+      button, select, textarea { font: inherit; color: inherit; }
+      button:focus-visible, select:focus-visible, textarea:focus-visible, .bouton:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
       #barre { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0.8rem 0 0.5rem; }
-      #barre select, #barre button, .bouton { font: inherit; font-size: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid #8886; background: #8881; color: inherit; cursor: pointer; }
+      #barre select, #barre button, .bouton { font-size: 0.9rem; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid var(--bord); background: var(--surface); cursor: pointer; }
       #barre button:disabled { opacity: 0.45; cursor: default; }
       .bouton input { display: none; }
       .zoom { display: inline-flex; align-items: center; gap: 0.3rem; }
       #zoom { font-size: 0.85rem; min-width: 3.2rem; text-align: center; font-variant-numeric: tabular-nums; }
-      #atelier { display: grid; grid-template-columns: 11rem 1fr; gap: 0.6rem; align-items: start; }
+      #atelier { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0.6rem; align-items: start; }
       #palette { display: flex; flex-direction: column; gap: 0.35rem; }
-      #palette p { margin: 0 0 0.2rem; font-size: 0.8rem; opacity: 0.75; }
-      #palette button { font: inherit; font-size: 0.88rem; text-align: left; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid #8886; background: #8881; color: inherit; cursor: pointer; }
-      #palette button:hover { background: #8883; }
-      #plan { overflow: auto; border: 1px solid #8884; border-radius: 8px; background: #8881; user-select: none; touch-action: none; }
+      #palette p { margin: 0 0 0.2rem; font-size: 0.8rem; color: var(--discret); }
+      #palette button { font-size: 0.88rem; text-align: left; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--bord); background: var(--surface); cursor: pointer; }
+      #palette button:hover { background: var(--surface-forte); }
+      #plan { overflow: auto; border: 1px solid var(--bord); border-radius: 8px; background: var(--fond-plan); user-select: none; touch-action: none; }
       #plan svg { display: block; width: 100%; height: auto; }
       #info { min-height: 3em; font-size: 0.9rem; }
-      #info.erreur { color: #d33; }
-      #aide { font-size: 0.85rem; opacity: 0.8; margin: 0.2rem 0 0; }
+      #info.erreur { color: var(--erreur); }
+      #aide { font-size: 0.85rem; color: var(--discret); margin: 0.2rem 0 0; }
       .plan text { font-size: 6px; pointer-events: none; }
       .plan .etiquette { fill: #f2f2f2; }
       .plan .etiquette-sombre { fill: #222; font-weight: 600; }
@@ -33,23 +60,23 @@
       .plan .etiquette-broche.nc { opacity: 0.45; }
       .plan .afficheur { fill: #6cf2a0; font-size: 14px; font-family: ui-monospace, monospace; }
       .plan .piece { cursor: grab; }
-      .plan .piece.choisie { outline: 2px dashed #ff9f0a; outline-offset: 3px; }
+      .plan .piece.choisie { outline: 2px dashed var(--choix); outline-offset: 3px; }
       .plan .fil { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-      .plan .fil-halo { fill: none; stroke: Canvas; stroke-width: 4.5; stroke-linejoin: round; opacity: 0.85; }
+      .plan .fil-halo { fill: none; stroke: var(--fond-plan); stroke-width: 4.5; stroke-linejoin: round; opacity: 0.85; }
       .plan .fil-groupe { cursor: pointer; }
       .plan .fil-groupe:hover .fil { stroke-width: 3.5; }
-      .plan .fil-groupe.choisi .fil-halo { stroke: #ff9f0a; stroke-width: 6; opacity: 1; }
-      .plan .fil-en-cours { stroke: #ff9f0a; stroke-width: 2; stroke-dasharray: 4 3; pointer-events: none; }
+      .plan .fil-groupe.choisi .fil-halo { stroke: var(--choix); stroke-width: 6; opacity: 1; }
+      .plan .fil-en-cours { stroke: var(--choix); stroke-width: 2; stroke-dasharray: 4 3; pointer-events: none; }
       .plan .broche { fill: #c9a227; stroke: #6b5512; stroke-width: 0.5; cursor: crosshair; }
       .plan .broche.trou { fill: #3d3a33; stroke: none; }
       .plan .broche.allumee { fill: #ff3b30; stroke: #fff; stroke-width: 1; }
-      /* Sous tension : verdicts sur les pièces, les fils et les trous. */
+      /* Sous tension : verdicts sur les pièces, les fils et les trous (couleurs de sens, lisibles sur les deux thèmes). */
       #tension { font-weight: 600; }
       #tension.allume { background: #ffcc00; color: #222; border-color: #c90; }
-      .outils { display: inline-flex; border: 1px solid #8886; border-radius: 6px; overflow: hidden; }
+      .outils { display: inline-flex; border: 1px solid var(--bord); border-radius: 6px; overflow: hidden; }
       .outils label { padding: 0.25rem 0.6rem; font-size: 0.9rem; cursor: pointer; }
       .outils input { display: none; }
-      .outils label:has(input:checked) { background: #4a8bf0; color: #fff; }
+      .outils label:has(input:checked) { background: var(--accent); color: var(--sur-accent); }
       .plan .piece.verdict-grille { filter: drop-shadow(0 0 4px #ff2d20) drop-shadow(0 0 8px #ff2d20); }
       .plan .piece.verdict-risque_eleve { filter: drop-shadow(0 0 3px #ff2d20); outline: 2px dashed #ff2d20; outline-offset: 2px; }
       .plan .piece.verdict-risque { outline: 2px dashed #ffb000; outline-offset: 2px; }
@@ -66,27 +93,44 @@
       @keyframes chauffe { 0%, 100% { filter: drop-shadow(0 0 1px #ff8c00); } 50% { filter: drop-shadow(0 0 7px #ff8c00) drop-shadow(0 0 3px #ffb000); } }
       @keyframes halo { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
       @keyframes fumee { 0% { transform: translateY(0) scale(0.6); opacity: 0.7; } 100% { transform: translateY(-28px) scale(1.8); opacity: 0; } }
-      #panneaux { display: grid; grid-template-columns: minmax(16rem, 1fr) 2fr; gap: 1rem; margin-top: 0.6rem; }
-      #panneaux section { border: 1px solid #8884; border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.88rem; }
-      #panneaux h2 { font-size: 1rem; margin: 0 0 0.4rem; }
-      #ecran { font-family: ui-monospace, monospace; font-size: 1.6rem; background: #1b2b1f; color: #6cf2a0; padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; min-width: 7rem; text-align: right; }
+      @media (prefers-reduced-motion: reduce) { .plan .piece.verdict-chauffe, .plan .fil-groupe.verdict-chauffe .fil-halo, .plan .broche.verdict-chauffe, .plan .fumee circle { animation: none; } .plan .fumee circle { opacity: 0.5; } }
+      section { border: 1px solid var(--bord); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.88rem; min-width: 0; }
+      h2 { font-size: 1rem; margin: 0 0 0.4rem; }
+      #panneaux { display: grid; grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr); gap: 1rem; margin-top: 0.6rem; }
+      #panneaux > div { display: grid; gap: 1rem; align-content: start; min-width: 0; }
+      #ecran { font-family: ui-monospace, monospace; font-size: 1.6rem; background: var(--ecran-fond); color: var(--ecran-texte); padding: 0.2rem 0.6rem; border-radius: 6px; display: inline-block; min-width: 7rem; text-align: right; font-variant-numeric: tabular-nums; }
       #reglages label { display: block; margin: 0.25rem 0; }
       #reglages input[type="number"] { width: 6rem; }
       .sous-titre { font-weight: 600; margin: 0.5rem 0 0.2rem; }
       .constats { padding-left: 1.2rem; margin: 0.3rem 0; }
       .constat { margin-bottom: 0.6rem; cursor: pointer; }
       .constat p { margin: 0.15rem 0; }
-      .constat .badge { display: inline-block; padding: 0 0.45rem; border-radius: 4px; font-size: 0.78rem; font-weight: 700; color: #fff; text-transform: uppercase; }
+      .constat .badge { display: inline-block; padding: 0 0.45rem; border-radius: 4px; font-size: 0.78rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.02em; }
       .constat.verdict-grille .badge { background: #c4170f; }
-      .constat.verdict-risque_eleve .badge { background: #e0452b; }
-      .constat.verdict-risque .badge { background: #d88a00; }
-      .constat.verdict-chauffe .badge { background: #ff8c00; }
+      .constat.verdict-risque_eleve .badge { background: #d83d22; }
+      .constat.verdict-risque .badge { background: #b87400; }
+      .constat.verdict-chauffe .badge { background: #d86f00; }
       .constat.verdict-ne_marchera_pas .badge { background: #5d6f8e; }
-      .constat .origine, .constat .source { opacity: 0.7; font-size: 0.8rem; }
+      .constat .origine, .constat .source { color: var(--discret); font-size: 0.8rem; }
       .constat .correction { font-style: italic; }
-      .rien { color: #2a9d4b; font-weight: 600; }
-      .non-simule { opacity: 0.75; font-size: 0.8rem; }
-      @media (max-width: 50rem) { #panneaux { grid-template-columns: 1fr; } #atelier { grid-template-columns: 1fr; } #palette { flex-direction: row; flex-wrap: wrap; } }
+      .rien { color: var(--succes); font-weight: 600; }
+      .non-simule { color: var(--discret); font-size: 0.8rem; }
+      /* Assistant : n'apparaît que sur claude.ai, où la page peut interroger Claude. */
+      #assistant { margin-top: 0.6rem; }
+      #assistant .aide-chat { color: var(--discret); margin: 0 0 0.4rem; }
+      #chat-messages { list-style: none; padding: 0; margin: 0 0 0.4rem; display: grid; gap: 0.45rem; max-height: 26rem; overflow-y: auto; }
+      #chat-messages li { padding: 0.4rem 0.6rem; border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; max-width: 52rem; }
+      #chat-messages .question { background: var(--surface-forte); justify-self: end; }
+      #chat-messages .reponse { background: var(--surface); justify-self: start; }
+      #chat-messages .reponse.erreur { color: var(--erreur); }
+      #chat-etat { color: var(--discret); font-size: 0.82rem; min-height: 1.2em; margin: 0 0 0.3rem; }
+      #chat-formulaire { display: grid; gap: 0.4rem; }
+      #chat-question { width: 100%; box-sizing: border-box; resize: vertical; min-height: 2.6rem; padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--bord); background: var(--fond); }
+      .chat-boutons { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+      .chat-boutons button { padding: 0.3rem 0.8rem; border-radius: 6px; border: 1px solid var(--bord); background: var(--surface); cursor: pointer; }
+      .chat-boutons button[type="submit"] { background: var(--accent); color: var(--sur-accent); border-color: var(--accent); font-weight: 600; }
+      .chat-boutons button:disabled { opacity: 0.45; cursor: default; }
+      @media (max-width: 50rem) { #panneaux { grid-template-columns: minmax(0, 1fr); } #atelier { grid-template-columns: minmax(0, 1fr); } #palette { flex-direction: row; flex-wrap: wrap; } }
     </style>
   </head>
   <body>
@@ -117,6 +161,25 @@
     </div>
     <p id="etat">Chargement…</p>
     <p id="info"></p>
+    <section id="assistant" hidden>
+      <h2>Assistant</h2>
+      <p class="aide-chat">
+        Pose une question sur le montage : « Pourquoi drv1 est en rouge ? », « À quoi sert le condensateur ? »,
+        « Ajoute une résistance de 10 kΩ entre EN et le 3,3 V ». Claude lit les verdicts, les mesures et les fiches du simulateur ;
+        chaque question compte sur ton compte Claude, et une réponse qui consulte le montage prend souvent une demi-minute.
+      </p>
+      <ol id="chat-messages"></ol>
+      <p id="chat-etat"></p>
+      <form id="chat-formulaire">
+        <label for="chat-question" hidden>Ta question</label>
+        <textarea id="chat-question" rows="2" placeholder="Ta question (Entrée pour envoyer, Maj+Entrée pour aller à la ligne)"></textarea>
+        <div class="chat-boutons">
+          <button type="submit" id="chat-envoyer">Envoyer</button>
+          <button type="button" id="chat-arreter" hidden>Arrêter</button>
+          <button type="button" id="chat-effacer">Effacer la conversation</button>
+        </div>
+      </form>
+    </section>
     <div id="panneaux">
       <div>
         <section id="multimetre">

@@ -193,6 +193,14 @@ Les 10 cas et ce qui doit les détecter :
 
 Une prédiction à vérifier à l'étape 9 : ton montage de référence déclenchera sans doute le cas 9. Réglé à 1 A efficace, le courant d'une bobine monte jusqu'à √2 × 1 A ≈ 1,4 A en crête. Sur tes photos, les sorties moteur passent par les contacts du breadboard.
 
+## Après la V1 : l'assistant (20/11/2026)
+
+Demande de Jean : une petite fenêtre de chat dans l'appli, où l'on demande à quoi sert un composant, pourquoi le montage marche ou ne marche pas, et où l'on fait ajouter une pièce. Fait le 20/11/2026 (`src/ui/assistant.ts`).
+
+- Elle n'existe que dans la version publiée sur claude.ai (Artifact), parce que c'est là qu'une page peut interroger Claude avec le compte de la personne qui la regarde, après son accord. Sur GitHub Pages, la fenêtre est cachée : il faudrait une clé API, payée à l'usage.
+- Claude ne voit le montage qu'à travers des outils, qui sont des fonctions de la page : lire les verdicts, le montage, une fiche, le catalogue ; mesurer une tension ou un courant ; poser une pièce, tracer un fil, régler, supprimer. Le moteur calcule, Claude explique.
+- Limite : pas de recherche web ni de lecture de PDF dans cette fenêtre. Un composant absent du catalogue demande d'abord une fiche tirée de sa datasheet : ce sera le travail d'un plug-in Claude Code, plus tard.
+
 ## Limites de la V1, et deux cas à reformuler
 
 La V1 calcule le régime établi, rien de ce qui dure une fraction de seconde. Pour chaque phénomène non simulé, une règle dit « risque » quand elle existe. Sinon, l'écran l'indique clairement : « non simulé ».

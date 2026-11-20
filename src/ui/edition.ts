@@ -321,6 +321,24 @@ export class Editeur {
     });
   }
 
+  /**
+   * Remplace tout le montage (charger un montage fourni, importer un fichier). C'est une
+   * modification comme une autre : Ctrl+Z ramène le montage précédent.
+   */
+  remplacer(d: Diagramme): string | undefined {
+    let nouveau: Diagramme;
+    try {
+      nouveau = normaliser(d);
+    } catch (e) {
+      return e instanceof MontageInvalide ? e.erreurs.join(' ; ') : String(e);
+    }
+    return this.modifier((copie) => {
+      for (const cle of Object.keys(copie)) delete copie[cle];
+      Object.assign(copie, structuredClone(nouveau));
+      return undefined;
+    });
+  }
+
   /** Change un réglage (attribut) d'une pièce ; undefined le retire. */
   reglerPiece(id: string, nom: string, valeur: unknown): string | undefined {
     return this.modifier((d) => {

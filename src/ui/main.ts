@@ -6,6 +6,7 @@ import { MontageInvalide } from '../moteur/montage';
 import { brochesDeComposants, construireReseau, type Reseau } from '../moteur/reseau';
 import { verifier, type Rapport } from '../moteur/verifications';
 import { htmlConstats, htmlReglages, marquesVerdicts, mesurerCourant, mesurerTension } from './affichage';
+import { contexte, messageErreur, outilsAssistant, poserQuestion, type EnvironnementAssistant, type FonctionSample, type MessageChat } from './assistant';
 import { diagrammeVide, Editeur, fichesPosables, type Diagramme } from './edition';
 import { P, type Point } from './pieces/dessins';
 import { cadreDe, dessinerPlan, placerPieces, positionBroche, zoomerCadre, type Cadre, type Placement } from './plan';
@@ -193,17 +194,27 @@ function afficher(recadrer = false): void {
   majPanneaux();
 }
 
-function charger(d: Diagramme): void {
-  try {
-    editeur = new Editeur(catalogue, d);
-  } catch (e) {
-    message(e instanceof MontageInvalide ? e.message : String(e), true);
-    return;
+/** Charge un montage. Au démarrage, il devient le point de départ ; ensuite, Ctrl+Z ramène le précédent. */
+function charger(d: Diagramme, premier = false): boolean {
+  if (premier) {
+    try {
+      editeur = new Editeur(catalogue, d);
+    } catch (e) {
+      message(e instanceof MontageInvalide ? e.message : String(e), true);
+      return false;
+    }
+  } else {
+    const refus = editeur.remplacer(d);
+    if (refus) {
+      message(`Montage illisible : ${refus}`, true);
+      return false;
+    }
   }
   choix = {};
   sondes = {};
   filMesure = undefined;
   afficher(true);
+  return true;
 }
 
 function versPlan(e: PointerEvent | MouseEvent): Point {
@@ -456,7 +467,7 @@ function retablir(): void {
 }
 
 document.addEventListener('keydown', (e) => {
-  if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
+  if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.target instanceof HTMLTextAreaElement) return;
   const ctrl = e.ctrlKey || e.metaKey;
   if (e.key === 'Escape') {
     abandonnerFil();
@@ -541,7 +552,25 @@ boutonAnnuler.addEventListener('click', annuler);
 boutonRetablir.addEventListener('click', retablir);
 boutonSupprimer.addEventListener('click', supprimerChoix);
 
-boutonExporter.addEventListener('click', () => {
+/** Hôte claude.ai : présent seulement quand la page est publiée comme Artifact. */
+interface HoteClaude {
+  use(nom: string): Promise<unknown>;
+}
+const hote = (window as unknown as { claude?: HoteClaude }).claude;
+
+boutonExporter.addEventListener('click', async () => {
+  // Sur claude.ai, la page ne peut pas télécharger elle-même : elle passe par la capacité « downloads ».
+  const telechargements = (hote ? await hote.use('downloads').catch(() => null) : null) as { save(r: { filename: string; data: string }): Promise<unknown> } | null;
+  if (telechargements) {
+    try {
+      await telechargements.save({ filename: 'montage.diagram.json', data: editeur.exporter() });
+      message('diagram.json enregistré.');
+    } catch (e) {
+      const code = (e as { code?: string }).code;
+      message(code === 'declined' ? 'Export annulé.' : `Export impossible ici (${code ?? 'erreur'}).`, code !== 'declined');
+    }
+    return;
+  }
   const lien = document.createElement('a');
   lien.href = URL.createObjectURL(new Blob([editeur.exporter()], { type: 'application/json' }));
   lien.download = 'montage.diagram.json';
@@ -554,14 +583,14 @@ champImporter.addEventListener('change', async () => {
   const fichier = champImporter.files?.[0];
   champImporter.value = '';
   if (!fichier) return;
+  let donnees: unknown;
   try {
-    editeur = Editeur.depuisTexte(await fichier.text(), catalogue);
-    choix = {};
-    afficher(true);
-    message(`${fichier.name} importé.`);
-  } catch (e) {
-    message(`Import impossible : ${e instanceof MontageInvalide ? e.erreurs.join(' ; ') : String(e)}`, true);
+    donnees = JSON.parse(await fichier.text());
+  } catch {
+    message(`Import impossible : ${fichier.name} n'est pas du JSON valide.`, true);
+    return;
   }
+  if (charger(donnees as Diagramme)) message(`${fichier.name} importé (Ctrl+Z pour revenir au montage précédent).`);
 });
 
 // Palette : une pièce posée sous le montage, à glisser ensuite où l'on veut.
@@ -598,15 +627,123 @@ const options: [string, string][] = [['vide', 'Montage vide'], ...Object.keys(MO
 options.sort((a, b) => (a[0].includes('/cas/') ? 1 : 0) - (b[0].includes('/cas/') ? 1 : 0));
 for (const [valeur, texte] of options) choixMontage.add(new Option(texte, valeur));
 choixMontage.addEventListener('change', () => {
-  if (editeur.peutAnnuler() && !window.confirm('Remplacer le montage en cours ? Pense à l\'exporter si tu veux le garder.')) return;
   const d = choixMontage.value === 'vide' ? diagrammeVide() : MONTAGES[choixMontage.value];
-  if (d) charger(d);
-  message(`${choixMontage.selectedOptions[0]?.textContent ?? ''} chargé.`);
+  if (d && charger(d)) message(`${choixMontage.selectedOptions[0]?.textContent ?? ''} chargé (Ctrl+Z pour revenir au montage précédent).`);
 });
 
 const depart = Object.keys(MONTAGES).find((c) => c.endsWith('/base-roulante.diagram.json'));
 if (depart) {
   choixMontage.value = depart;
-  charger(MONTAGES[depart]!);
+  charger(MONTAGES[depart]!, true);
 }
 message('Survole une broche ou un trou : tout ce qui lui est relié s\'allume.');
+
+// ------------------------------------------------------------------------------- assistant
+// La fenêtre n'apparaît que sur claude.ai, quand la page peut interroger Claude (capacité « sample »).
+const sectionAssistant = element<HTMLElement>('#assistant');
+const listeChat = element<HTMLOListElement>('#chat-messages');
+const etatChat = element<HTMLParagraphElement>('#chat-etat');
+const formulaireChat = element<HTMLFormElement>('#chat-formulaire');
+const questionChat = element<HTMLTextAreaElement>('#chat-question');
+const boutonEnvoyer = element<HTMLButtonElement>('#chat-envoyer');
+const boutonArreter = element<HTMLButtonElement>('#chat-arreter');
+const boutonEffacer = element<HTMLButtonElement>('#chat-effacer');
+const conversation: MessageChat[] = [];
+let controleurChat: AbortController | undefined;
+
+const environnementAssistant: EnvironnementAssistant = {
+  catalogue,
+  editeur: () => editeur,
+  apresModification: (resume) => {
+    afficher();
+    message(`Assistant : ${resume} (Ctrl+Z pour annuler).`);
+  },
+  progression: (texte) => {
+    etatChat.textContent = texte;
+  },
+};
+
+function bulle(classe: 'question' | 'reponse', texte: string): HTMLLIElement {
+  const li = document.createElement('li');
+  li.className = classe;
+  li.textContent = texte;
+  listeChat.appendChild(li);
+  listeChat.scrollTop = listeChat.scrollHeight;
+  return li;
+}
+
+async function demarrerAssistant(): Promise<void> {
+  if (!hote) return;
+  const sample = (await hote.use('sample').catch(() => null)) as (FonctionSample & { limits?(): Promise<{ tools?: { maxCount: number } }> }) | null;
+  if (!sample) return;
+  const limites = (await sample.limits?.().catch(() => null)) ?? null;
+  let maxOutils = limites?.tools?.maxCount ?? 0;
+  sectionAssistant.hidden = false;
+
+  formulaireChat.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = questionChat.value.trim();
+    if (!question || controleurChat) return;
+    questionChat.value = '';
+    bulle('question', question);
+    const reponse = bulle('reponse', 'Réfléchit…');
+    controleurChat = new AbortController();
+    boutonEnvoyer.disabled = true;
+    boutonArreter.hidden = false;
+    const outils = maxOutils > 0 ? outilsAssistant(environnementAssistant).slice(0, maxOutils) : [];
+    // Sans outils dans cette vue, on joint à la question le montage et ses verdicts (sans les garder ensuite).
+    const donnees =
+      outils.length === 0
+        ? `\n[Données du simulateur, à jour]\n${JSON.stringify({
+            montage: outilsAssistant(environnementAssistant).find((o) => o.name === 'lire_montage')!.execute({}),
+            verdicts: outilsAssistant(environnementAssistant).find((o) => o.name === 'lire_verdicts')!.execute({}),
+          })}`
+        : '';
+    const ecran = contexte(environnementAssistant, choix, sousTension);
+    try {
+      const r = await poserQuestion(sample, conversation, question + donnees, {
+        outils,
+        signal: controleurChat.signal,
+        contexte: ecran,
+        onText: (texte) => {
+          reponse.textContent = texte;
+          listeChat.scrollTop = listeChat.scrollHeight;
+        },
+      });
+      reponse.textContent = r.texte + (r.tronque ? '\n(Réponse coupée : demande moins à la fois.)' : '');
+    } catch (err) {
+      const code = (err as { code?: string }).code ?? 'upstream_error';
+      if (code === 'tools_unavailable') maxOutils = 0;
+      const { texte, cacher } = messageErreur(code);
+      const partiel = (err as { text?: string }).text;
+      reponse.textContent = partiel ? `${partiel}\n— ${texte}` : texte;
+      reponse.classList.add('erreur');
+      if (cacher) formulaireChat.hidden = true;
+    } finally {
+      // La question gardée pour la suite, sans les données jointes.
+      const derniere = [...conversation].reverse().find((m) => m.role === 'user');
+      if (derniere && donnees) derniere.content = `${ecran}\n${question}`;
+      controleurChat = undefined;
+      boutonEnvoyer.disabled = false;
+      boutonArreter.hidden = true;
+      etatChat.textContent = '';
+      listeChat.scrollTop = listeChat.scrollHeight;
+    }
+  });
+
+  questionChat.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      formulaireChat.requestSubmit();
+    }
+  });
+  boutonArreter.addEventListener('click', () => controleurChat?.abort());
+  boutonEffacer.addEventListener('click', () => {
+    controleurChat?.abort();
+    conversation.length = 0;
+    listeChat.replaceChildren();
+    etatChat.textContent = '';
+  });
+}
+
+void demarrerAssistant();
